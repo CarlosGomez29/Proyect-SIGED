@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,10 +50,14 @@ export default function DashboardHeader() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Ajustes</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/dashboard/ajustes">Ajustes</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem>Soporte</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Cerrar Sesión</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/login">Cerrar Sesión</Link>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
