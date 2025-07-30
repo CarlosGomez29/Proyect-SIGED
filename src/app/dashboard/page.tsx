@@ -8,7 +8,6 @@ import {
   FilePlus2,
   FileText,
   GraduationCap,
-  Megaphone,
   PlusCircle,
   UserPlus,
   Users,
@@ -44,7 +43,6 @@ import { Separator } from "@/components/ui/separator";
 
 const statCards = [
     { title: "Alumnos Activos", value: "1,254", delta: "+20.1% mes anterior", icon: Users, link: "/dashboard/alumnos" },
-    { title: "Promociones Activas", value: "15", delta: "+2 nuevos este mes", icon: Megaphone, link: "/dashboard/promociones" },
     { title: "Inscripciones Pendientes", value: "42", delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard/inscripciones" },
     { title: "Pagos Vencidos", value: "18", delta: "Necesitan seguimiento", icon: Wallet, color: "text-red-500", link: "/dashboard/pagos" },
     { title: "Instructores Asignados", value: "58", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard/instructores" },
@@ -53,7 +51,6 @@ const statCards = [
 
 const quickActions = [
     { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard/alumnos/nuevo" },
-    { label: "Crear Promoción", icon: Megaphone, link: "/dashboard/promociones/nueva" },
     { label: "Registrar Pago", icon: Wallet, link: "/dashboard/pagos/nuevo" },
     { label: "Emitir Certificado", icon: FileText, link: "/dashboard/certificados/emitir" },
     { label: "Gestionar Instructores", icon: GraduationCap, link: "/dashboard/instructores" },
@@ -76,7 +73,7 @@ export default function Dashboard() {
 
       {/* Visión General y Métricas Clave */}
       <section>
-        <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-6">
+        <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-5">
           {statCards.map((card) => (
             <Card key={card.title}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

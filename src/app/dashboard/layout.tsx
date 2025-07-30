@@ -8,7 +8,6 @@ import {
   Wallet,
   BarChartHorizontal,
   GraduationCap,
-  Megaphone,
   Library,
   UserPlus,
   FileText,
@@ -72,14 +71,6 @@ export default function DashboardLayout({
                   <Link href="/dashboard/cursos">
                     <Library />
                     Cursos
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/promociones" tooltip="Promociones">
-                  <Link href="/dashboard/promociones">
-                    <Megaphone />
-                    Promociones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
