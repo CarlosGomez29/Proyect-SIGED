@@ -45,7 +45,6 @@ export default function DashboardLayout({
                 <SidebarMenuButton
                   asChild
                   href="/dashboard"
-                  isActive
                   tooltip="Dashboard"
                 >
                   <Link href="/dashboard">
@@ -55,40 +54,40 @@ export default function DashboardLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Alumnos">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/alumnos" tooltip="Alumnos">
+                  <Link href="/dashboard/alumnos">
                     <UsersRound />
                     Alumnos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Cursos">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/cursos" tooltip="Cursos">
+                  <Link href="/dashboard/cursos">
                     <BookOpenCheck />
                     Cursos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Inscripciones">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/inscripciones" tooltip="Inscripciones">
+                  <Link href="/dashboard/inscripciones">
                     <ClipboardList />
                     Inscripciones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Pagos">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/pagos" tooltip="Pagos">
+                  <Link href="/dashboard/pagos">
                     <Wallet />
                     Pagos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Reportes">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/reportes" tooltip="Reportes">
+                  <Link href="/dashboard/reportes">
                     <BarChartHorizontal />
                     Reportes
                   </Link>
@@ -99,8 +98,8 @@ export default function DashboardLayout({
           <SidebarFooter>
             <SidebarMenu>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Ajustes">
-                  <Link href="#">
+                <SidebarMenuButton asChild href="/dashboard/ajustes" tooltip="Ajustes">
+                  <Link href="/dashboard/ajustes">
                     <Settings />
                     Ajustes
                   </Link>
