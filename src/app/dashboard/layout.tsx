@@ -6,7 +6,12 @@ import {
   Settings,
   UsersRound,
   Wallet,
-  BarChartHorizontal
+  BarChartHorizontal,
+  GraduationCap,
+  Megaphone,
+  Library,
+  UserPlus,
+  FileText,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -46,6 +51,7 @@ export default function DashboardLayout({
                   asChild
                   href="/dashboard"
                   tooltip="Dashboard"
+                  isActive
                 >
                   <Link href="/dashboard">
                     <LayoutDashboard />
@@ -64,8 +70,16 @@ export default function DashboardLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild href="/dashboard/cursos" tooltip="Cursos">
                   <Link href="/dashboard/cursos">
-                    <BookOpenCheck />
+                    <Library />
                     Cursos
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild href="/dashboard/promociones" tooltip="Promociones">
+                  <Link href="/dashboard/promociones">
+                    <Megaphone />
+                    Promociones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -74,6 +88,14 @@ export default function DashboardLayout({
                   <Link href="/dashboard/inscripciones">
                     <ClipboardList />
                     Inscripciones
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton asChild href="/dashboard/calificaciones" tooltip="Calificaciones">
+                  <Link href="/dashboard/calificaciones">
+                    <GraduationCap />
+                    Calificaciones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
