@@ -28,7 +28,7 @@ import {
 import { Icons } from "@/components/icons";
 import DashboardHeader from "@/components/dashboard-header";
 
-export default function DashboardLayout({
+export default function DashboardAdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -48,59 +48,59 @@ export default function DashboardLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  href="/dashboard"
+                  href="/dashboard-admin"
                   tooltip="Dashboard"
                   isActive
                 >
-                  <Link href="/dashboard">
+                  <Link href="/dashboard-admin">
                     <LayoutDashboard />
                     Dashboard
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/alumnos" tooltip="Alumnos">
-                  <Link href="/dashboard/alumnos">
+                <SidebarMenuButton asChild href="/dashboard-admin/alumnos" tooltip="Alumnos">
+                  <Link href="/dashboard-admin/alumnos">
                     <UsersRound />
                     Alumnos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/cursos" tooltip="Cursos">
-                  <Link href="/dashboard/cursos">
+                <SidebarMenuButton asChild href="/dashboard-admin/cursos" tooltip="Cursos">
+                  <Link href="/dashboard-admin/cursos">
                     <Library />
                     Cursos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/inscripciones" tooltip="Inscripciones">
-                  <Link href="/dashboard/inscripciones">
+                <SidebarMenuButton asChild href="/dashboard-admin/inscripciones" tooltip="Inscripciones">
+                  <Link href="/dashboard-admin/inscripciones">
                     <ClipboardList />
                     Inscripciones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/calificaciones" tooltip="Calificaciones">
-                  <Link href="/dashboard/calificaciones">
+                <SidebarMenuButton asChild href="/dashboard-admin/calificaciones" tooltip="Calificaciones">
+                  <Link href="/dashboard-admin/calificaciones">
                     <GraduationCap />
                     Calificaciones
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/pagos" tooltip="Pagos">
-                  <Link href="/dashboard/pagos">
+                <SidebarMenuButton asChild href="/dashboard-admin/pagos" tooltip="Pagos">
+                  <Link href="/dashboard-admin/pagos">
                     <Wallet />
                     Pagos
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/reportes" tooltip="Reportes">
-                  <Link href="/dashboard/reportes">
+                <SidebarMenuButton asChild href="/dashboard-admin/reportes" tooltip="Reportes">
+                  <Link href="/dashboard-admin/reportes">
                     <BarChartHorizontal />
                     Reportes
                   </Link>
@@ -111,8 +111,8 @@ export default function DashboardLayout({
           <SidebarFooter>
             <SidebarMenu>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard/ajustes" tooltip="Ajustes">
-                  <Link href="/dashboard/ajustes">
+                <SidebarMenuButton asChild href="/dashboard-admin/ajustes" tooltip="Ajustes">
+                  <Link href="/dashboard-admin/ajustes">
                     <Settings />
                     Ajustes
                   </Link>

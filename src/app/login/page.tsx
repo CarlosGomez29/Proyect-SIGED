@@ -1,6 +1,11 @@
 "use client";
 
+import { useState } from 'react';
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,8 +17,58 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
+import { useToast } from '@/hooks/use-toast';
 
 export default function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const role = docSnap.data().role;
+        switch (role) {
+          case 'super-admin':
+          case 'administrador':
+            router.push('/dashboard-admin');
+            break;
+          case 'admision':
+            router.push('/dashboard-admision');
+            break;
+          case 'instructor':
+            router.push('/dashboard-instructor');
+            break;
+          case 'alumno':
+            router.push('/dashboard-alumno');
+            break;
+          default:
+            router.push('/login');
+        }
+      } else {
+        toast({
+            variant: "destructive",
+            title: "Error de Rol",
+            description: "No se pudo determinar el rol del usuario.",
+        });
+      }
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: "Error de Autenticación",
+            description: error.message,
+        });
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="mx-auto max-w-sm">
@@ -25,7 +80,7 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -33,6 +88,8 @@ export default function LoginForm() {
                 type="email"
                 placeholder="m@ejemplo.com"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
@@ -42,12 +99,18 @@ export default function LoginForm() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
-            <Button asChild type="submit" className="w-full">
-              <Link href="/dashboard">Iniciar Sesión</Link>
+            <Button type="submit" className="w-full">
+              Iniciar Sesión
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>
