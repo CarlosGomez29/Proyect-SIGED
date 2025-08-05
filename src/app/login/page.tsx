@@ -51,16 +51,16 @@ export default function LoginForm() {
       switch (foundUser.role) {
         case 'super-admin':
         case 'administrador':
-          router.push('/dashboard-admin');
+          router.push('/dashboard/admin');
           break;
         case 'admision':
-          router.push('/dashboard-admision');
+          router.push('/dashboard/admision');
           break;
         case 'instructor':
-          router.push('/dashboard-instructor');
+          router.push('/dashboard/instructor');
           break;
         case 'alumno':
-          router.push('/dashboard-alumno');
+          router.push('/dashboard/alumno');
           break;
         default:
           router.push('/login');
@@ -87,16 +87,16 @@ export default function LoginForm() {
         switch (role) {
           case 'super-admin':
           case 'administrador':
-            router.push('/dashboard-admin');
+            router.push('/dashboard/admin');
             break;
           case 'admision':
-            router.push('/dashboard-admision');
+            router.push('/dashboard/admision');
             break;
           case 'instructor':
-            router.push('/dashboard-instructor');
+            router.push('/dashboard/instructor');
             break;
           case 'alumno':
-            router.push('/dashboard-alumno');
+            router.push('/dashboard/alumno');
             break;
           default:
             router.push('/login');
