@@ -15,20 +15,17 @@ import { Input } from "@/components/ui/input";
 import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Bell, Search, Calendar } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
 export default function DashboardHeader() {
   const { handleLogout } = useAuth();
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
+    <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6 sticky top-0 z-30">
       <SidebarTrigger className="md:hidden" />
       <div className="flex-1">
-        <h1 className="text-xl font-semibold hidden md:block">Dashboard</h1>
-      </div>
-      <div className="flex flex-1 items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-        <form className="ml-auto flex-1 sm:flex-initial">
+         <form className="relative ml-auto flex-1 sm:flex-initial">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -38,6 +35,8 @@ export default function DashboardHeader() {
             />
           </div>
         </form>
+      </div>
+      <div className="flex items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>
@@ -46,7 +45,7 @@ export default function DashboardHeader() {
             <DropdownMenuTrigger asChild>
             <Button variant="secondary" size="icon" className="rounded-full">
                 <Avatar className="h-8 w-8">
-                <AvatarImage src="https://placehold.co/40x40" alt="@admin" />
+                <AvatarImage src="https://placehold.co/40x40.png" alt="@admin" />
                 <AvatarFallback>AD</AvatarFallback>
                 </Avatar>
                 <span className="sr-only">Toggle user menu</span>

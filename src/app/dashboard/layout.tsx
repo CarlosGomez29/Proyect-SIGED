@@ -40,7 +40,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <Sidebar variant="floating" collapsible="icon">
+        <Sidebar collapsible="icon">
           <SidebarHeader>
              <div className="flex items-center gap-2 p-2" data-sidebar="header-content">
                 <Icons.logo className="h-8 w-8 text-primary" />
