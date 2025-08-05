@@ -50,9 +50,9 @@ export default function SignupForm() {
 
       // Store user role in Firestore
       await setDoc(doc(db, 'users', user.uid), {
-        role: role,
-        email: user.email,
         uid: user.uid,
+        email: user.email,
+        role: role,
       });
 
       toast({
