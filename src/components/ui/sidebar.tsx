@@ -255,7 +255,6 @@ const SidebarHeader = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div">
 >(({ className, children, ...props }, ref) => {
-  const { toggleSidebar } = useSidebar();
   return (
     <div
       ref={ref}
@@ -264,9 +263,6 @@ const SidebarHeader = React.forwardRef<
       {...props}
     >
         {children}
-        <button className="absolute top-3 right-3 group-data-[state=collapsed]:hidden p-1 rounded-md hover:bg-muted" onClick={toggleSidebar}>
-            <ChevronLeft className="w-5 h-5 text-muted-foreground hover:text-foreground" />
-        </button>
     </div>
   )
 })
