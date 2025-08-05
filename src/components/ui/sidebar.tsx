@@ -155,7 +155,7 @@ const Sidebar = React.forwardRef<
   (
     {
       side = "left",
-      collapsible = "offcanvas",
+      collapsible = "icon",
       className,
       children,
       ...props
@@ -189,20 +189,20 @@ const Sidebar = React.forwardRef<
         ref={ref}
         className={cn("group peer hidden md:block text-sidebar-foreground sticky top-0 h-screen", className)}
         data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
+        data-collapsible={collapsible}
         data-side={side}
       >
         <div
           className={cn(
             "duration-200 relative h-svh bg-transparent transition-[width] ease-in-out",
-            "w-[--sidebar-width] group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+            "w-[--sidebar-width] group-data-[state=collapsed]:w-[--sidebar-width-icon]"
           )}
         />
         <div
           className={cn(
             "duration-200 fixed inset-y-0 z-40 hidden h-svh transition-[left,right,width] ease-in-out md:flex border-r",
             side === "left" ? "left-0" : "right-0",
-            "w-[--sidebar-width] group-data-[collapsible=icon]:w-[--sidebar-width-icon]"
+            "w-[--sidebar-width] group-data-[state=collapsed]:w-[--sidebar-width-icon]"
           )}
           {...props}
         >
@@ -252,7 +252,7 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-      className={cn("flex-1", className)}
+      className={cn("flex-1", "md:group-data-[state=expanded]:ml-[16rem] md:group-data-[state=collapsed]:ml-[4rem] transition-all duration-200 ease-in-out", className)}
       {...props}
     />
   )
@@ -272,7 +272,7 @@ const SidebarHeader = React.forwardRef<
       {...props}
     >
         {children}
-        <button className="absolute top-3 right-3 group-data-[collapsible=icon]:hidden p-1 rounded-md hover:bg-muted" onClick={toggleSidebar}>
+        <button className="absolute top-3 right-3 group-data-[state=collapsed]:hidden p-1 rounded-md hover:bg-muted" onClick={toggleSidebar}>
             <ChevronLeft className="w-5 h-5 text-muted-foreground hover:text-foreground" />
         </button>
     </div>
@@ -305,7 +305,7 @@ const SidebarContent = React.forwardRef<
       ref={ref}
       data-sidebar="content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-1 overflow-auto group-data-[collapsible=icon]:overflow-hidden p-2",
+        "flex min-h-0 flex-1 flex-col gap-1 overflow-auto group-data-[state=collapsed]:overflow-hidden p-2",
         className
       )}
       {...props}
@@ -341,7 +341,7 @@ const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-200 ease-in-out hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-primary data-[active=true]:font-medium data-[active=true]:text-sidebar-primary-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:!p-2 [&_span]:group-data-[collapsible=icon]:hidden [&>svg]:size-5 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-3 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-all duration-200 ease-in-out hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-primary data-[active=true]:font-medium data-[active=true]:text-sidebar-primary-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[state=collapsed]:justify-center group-data-[state=collapsed]:!p-2 [&>span]:group-data-[state=collapsed]:hidden [&>svg]:size-5 [&>svg]:shrink-0",
   {
     variants: {
       variant: {

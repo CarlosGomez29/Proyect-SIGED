@@ -40,11 +40,11 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <Sidebar collapsible="icon">
+        <Sidebar>
           <SidebarHeader>
              <div className="flex items-center gap-2 p-2" data-sidebar="header-content">
                 <Icons.logo className="h-8 w-8 text-primary" />
-                <h1 className="text-xl font-semibold font-headline">ESAC</h1>
+                <span className="text-xl font-semibold font-headline">ESAC</span>
              </div>
           </SidebarHeader>
           <SidebarContent>
@@ -53,7 +53,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/admin" tooltip="Dashboard" isActive>
                   <Link href="/dashboard/admin">
                     <LayoutDashboard />
-                    Dashboard
+                    <span>Dashboard</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -65,7 +65,7 @@ export default function DashboardLayout({
                 >
                   <Link href="/dashboard/inscripciones">
                     <ClipboardList />
-                    Inscripciones
+                    <span>Inscripciones</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -73,7 +73,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/alumnos" tooltip="Alumnos">
                   <Link href="/dashboard/alumnos">
                     <UsersRound />
-                    Alumnos
+                    <span>Alumnos</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -81,7 +81,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/cursos" tooltip="Cursos">
                   <Link href="/dashboard/cursos">
                     <Library />
-                    Cursos
+                    <span>Cursos</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -89,7 +89,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/calificaciones" tooltip="Calificaciones">
                   <Link href="/dashboard/calificaciones">
                     <GraduationCap />
-                    Calificaciones
+                    <span>Calificaciones</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -97,7 +97,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/reportes" tooltip="Reportes">
                   <Link href="/dashboard/reportes">
                     <BarChartHorizontal />
-                    Reportes
+                    <span>Reportes</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -109,7 +109,7 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="#" tooltip="Ayuda">
                   <Link href="#">
                     <LifeBuoy />
-                    Ayuda
+                    <span>Ayuda</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -117,14 +117,14 @@ export default function DashboardLayout({
                 <SidebarMenuButton asChild href="/dashboard/ajustes" tooltip="Ajustes">
                   <Link href="/dashboard/ajustes">
                     <Settings />
-                    Ajustes
+                    <span>Ajustes</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={handleLogout} tooltip="Cerrar Sesión">
                   <LogOut />
-                  Cerrar Sesión
+                  <span>Cerrar Sesión</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -132,11 +132,9 @@ export default function DashboardLayout({
         </Sidebar>
         <div className="flex flex-col flex-1">
           <DashboardHeader />
-          <SidebarInset>
             <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/30">
               {children}
             </main>
-          </SidebarInset>
         </div>
       </div>
     </SidebarProvider>
