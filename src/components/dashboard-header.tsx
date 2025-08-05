@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +19,14 @@ import {
 import { Bell, Search } from "lucide-react";
 
 export default function DashboardHeader() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Clear the user role from local storage for dev mode
+    localStorage.removeItem('userRole');
+    router.push('/login');
+  };
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
       <SidebarTrigger className="md:hidden" />
@@ -55,8 +64,8 @@ export default function DashboardHeader() {
           </DropdownMenuItem>
           <DropdownMenuItem>Soporte</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/login">Cerrar Sesión</Link>
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            Cerrar Sesión
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
