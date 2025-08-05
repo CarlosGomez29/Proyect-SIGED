@@ -1,6 +1,5 @@
 "use client";
 import {
-    ArrowRight,
     Users,
     ClipboardCheck,
     BookOpen,
@@ -44,10 +43,10 @@ import {
   import { motion } from "framer-motion";
   
   const statCards = [
-    { title: "Nuevos Alumnos", value: "150", delta: "+11%", color: "bg-blue-500", icon: Users, chart: <EnrollmentChart type="bar" /> },
-    { title: "Cursos Activos", value: "22", delta: "-0.5%", color: "bg-purple-500", icon: BookOpen, chart: <EnrollmentChart type="pie" /> },
-    { title: "Certificados Emitidos", value: "3", delta: "+9%", color: "bg-red-500", icon: GraduationCap, chart: <EnrollmentChart type="bar" /> },
-    { title: "Inscripciones Pendientes", value: "5", delta: "+31%", color: "bg-green-500", icon: ClipboardCheck, chart: <EnrollmentChart type="pie" /> },
+    { title: "Nuevos Alumnos", value: "150", delta: "+11%", color: "bg-blue-500", icon: Users },
+    { title: "Cursos Activos", value: "22", delta: "-0.5%", color: "bg-purple-500", icon: BookOpen },
+    { title: "Certificados Emitidos", value: "3", delta: "+9%", color: "bg-red-500", icon: GraduationCap },
+    { title: "Inscripciones Pendientes", value: "5", delta: "+31%", color: "bg-green-500", icon: ClipboardCheck },
   ];
 
   const recentEnrollments = [
@@ -59,27 +58,56 @@ import {
       { name: "Jason L. Bowling", status: "Aprobado", course: "Seguridad de la Carga Aérea", date: "03.01.2024", time: "11:40 AM", avatar: "https://placehold.co/40x40.png" },
       { name: "Joseph A. Bove", status: "Aprobado", course: "Mercancías Peligrosas", date: "03.01.2024", time: "12:00 PM", avatar: "https://placehold.co/40x40.png" },
   ];
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+  };
   
   export default function DashboardAdminPage() {
     return (
       <div className="flex-1 space-y-6">
-        <h1 className="text-2xl font-semibold">Resumen General</h1>
-  
-        {/* Stat Cards */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
+        <motion.h1 
+          className="text-2xl font-semibold"
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {statCards.map((card, index) => (
+          Resumen General
+        </motion.h1>
+  
+        {/* Stat Cards */}
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+        >
+            {statCards.map((card) => (
               <motion.div
                 key={card.title}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                variants={itemVariants}
+                whileHover={{ y: -5, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
               >
-                <Card className={`text-white ${card.color}`}>
+                <Card className={`text-white ${card.color} overflow-hidden`}>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-medium">{card.title}</CardTitle>
                   </CardHeader>
@@ -92,17 +120,20 @@ import {
                         <span>{card.delta}</span>
                     </div>
                   </CardContent>
+                  <div className="h-12 w-full">
+                    <EnrollmentChart type={card.title === "Cursos Activos" || card.title === "Inscripciones Pendientes" ? "pie" : "bar"} />
+                  </div>
                 </Card>
               </motion.div>
             ))}
-          </div>
         </motion.section>
   
         {/* Recent Enrollments Table */}
         <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          variants={itemVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
         >
             <Card>
                 <CardHeader>
@@ -113,24 +144,34 @@ import {
                     <Table>
                         <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[250px]">Nombre</TableHead>
+                            <TableHead className="w-[250px] hidden sm:table-cell">Nombre</TableHead>
+                             <TableHead className="sm:hidden">Alumno</TableHead>
                             <TableHead>Estado</TableHead>
-                            <TableHead>Curso</TableHead>
-                            <TableHead>Fecha</TableHead>
-                            <TableHead className="text-right">Hora</TableHead>
+                            <TableHead className="hidden md:table-cell">Curso</TableHead>
+                            <TableHead className="hidden lg:table-cell text-right">Fecha</TableHead>
                             <TableHead className="text-center">Acciones</TableHead>
                         </TableRow>
                         </TableHeader>
                         <TableBody>
                         {recentEnrollments.map((enrollment) => (
-                            <TableRow key={enrollment.name}>
+                           <motion.tr 
+                              key={enrollment.name}
+                              className="hover:bg-muted/50 transition-colors"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.3 }}
+                              whileHover={{ scale: 1.01, transition: { type: "spring", stiffness: 400, damping: 10 } }}
+                            >
                                 <TableCell>
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={enrollment.avatar} alt={enrollment.name} />
                                             <AvatarFallback>{enrollment.name.charAt(0)}</AvatarFallback>
                                         </Avatar>
-                                        <span className="font-medium">{enrollment.name}</span>
+                                        <div className="flex flex-col">
+                                          <span className="font-medium">{enrollment.name}</span>
+                                          <span className="text-muted-foreground text-xs md:hidden">{enrollment.course}</span>
+                                        </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
@@ -145,9 +186,8 @@ import {
                                         {enrollment.status}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{enrollment.course}</TableCell>
-                                <TableCell>{enrollment.date}</TableCell>
-                                <TableCell className="text-right">{enrollment.time}</TableCell>
+                                <TableCell className="hidden md:table-cell">{enrollment.course}</TableCell>
+                                <TableCell className="hidden lg:table-cell text-right">{enrollment.date}</TableCell>
                                 <TableCell className="text-center">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -163,7 +203,7 @@ import {
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
-                            </TableRow>
+                            </motion.tr>
                         ))}
                         </TableBody>
                     </Table>
@@ -179,9 +219,17 @@ import {
 
   function CustomPagination() {
       return (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div>
+        <motion.div 
+            className="flex items-center justify-between text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+        >
+            <div className="hidden sm:block">
                 Mostrando 7 de 150 registros
+            </div>
+             <div className="sm:hidden">
+                7 de 150
             </div>
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
@@ -191,13 +239,13 @@ import {
                 <PaginationItem>
                     <PaginationLink href="#" isActive>1</PaginationLink>
                 </PaginationItem>
-                <PaginationItem>
+                <PaginationItem className="hidden sm:block">
                     <PaginationLink href="#">2</PaginationLink>
                 </PaginationItem>
-                <PaginationItem>
+                <PaginationItem className="hidden sm:block">
                     <PaginationLink href="#">3</PaginationLink>
                 </PaginationItem>
-                 <PaginationItem>
+                 <PaginationItem className="hidden sm:block">
                     <PaginationLink href="#">...</PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
@@ -208,7 +256,9 @@ import {
                 </PaginationItem>
                 </PaginationContent>
             </Pagination>
-        </div>
+        </motion.div>
       )
   }
   
+
+    
