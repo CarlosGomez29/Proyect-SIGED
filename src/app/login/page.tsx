@@ -64,7 +64,7 @@ export default function LoginForm() {
         toast({
             variant: "destructive",
             title: "Error de Autenticación",
-            description: error.message,
+            description: "Correo o contraseña incorrectos.",
         });
     }
   };
@@ -110,6 +110,12 @@ export default function LoginForm() {
             <Button type="submit" className="w-full">
               Iniciar Sesión
             </Button>
+            <div className="mt-4 text-center text-sm">
+              ¿No tienes una cuenta?{' '}
+              <Link href="/signup" className="underline">
+                Registrarse
+              </Link>
+            </div>
           </form>
         </CardContent>
       </Card>
