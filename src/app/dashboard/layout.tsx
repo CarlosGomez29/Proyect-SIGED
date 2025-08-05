@@ -23,7 +23,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarInset,
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
 import DashboardHeader from "@/components/dashboard-header";

@@ -187,28 +187,20 @@ const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className={cn("group peer hidden md:block text-sidebar-foreground sticky top-0 h-screen", className)}
+        className={cn("group peer hidden md:flex md:flex-col text-sidebar-foreground sticky top-0 h-screen border-r", className)}
         data-state={state}
         data-collapsible={collapsible}
         data-side={side}
       >
         <div
           className={cn(
-            "duration-200 relative h-svh bg-transparent transition-[width] ease-in-out",
+            "duration-200 h-full bg-sidebar transition-[width] ease-in-out",
             "w-[--sidebar-width] group-data-[state=collapsed]:w-[--sidebar-width-icon]"
           )}
-        />
-        <div
-          className={cn(
-            "duration-200 fixed inset-y-0 z-40 hidden h-svh transition-[left,right,width] ease-in-out md:flex border-r",
-            side === "left" ? "left-0" : "right-0",
-            "w-[--sidebar-width] group-data-[state=collapsed]:w-[--sidebar-width-icon]"
-          )}
-          {...props}
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar"
+            className="flex h-full w-full flex-col"
           >
             {children}
           </div>
@@ -252,7 +244,7 @@ const SidebarInset = React.forwardRef<
   return (
     <main
       ref={ref}
-      className={cn("flex-1", "md:group-data-[state=expanded]:ml-[16rem] md:group-data-[state=collapsed]:ml-[4rem] transition-all duration-200 ease-in-out", className)}
+      className={cn("flex-1", className)}
       {...props}
     />
   )
