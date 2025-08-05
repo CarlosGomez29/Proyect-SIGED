@@ -44,7 +44,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setUser(null);
         setRole(null);
-        if (pathname !== '/login') {
+        const allowedPaths = ['/login', '/signup'];
+        if (!allowedPaths.includes(pathname)) {
             router.push('/login');
         }
       }
