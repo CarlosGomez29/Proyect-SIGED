@@ -12,9 +12,10 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   role: UserRole;
+  handleLogout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null });
+const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, handleLogout: () => {} });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -85,9 +86,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    router.push('/login');
+  };
+
 
   return (
-    <AuthContext.Provider value={{ user, loading, role }}>
+    <AuthContext.Provider value={{ user, loading, role, handleLogout }}>
       {loading ? <div>Loading...</div> : children}
     </AuthContext.Provider>
   );

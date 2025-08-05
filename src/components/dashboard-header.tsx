@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,20 +16,16 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Bell, Search, Calendar } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function DashboardHeader() {
-  const router = useRouter();
-
-  const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    router.push('/login');
-  };
+  const { handleLogout } = useAuth();
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-card px-4 lg:h-[60px] lg:px-6">
       <SidebarTrigger className="md:hidden" />
       <div className="flex-1">
-        <h1 className="text-xl font-semibold hidden md:block">Inscripciones</h1>
+        <h1 className="text-xl font-semibold hidden md:block">Dashboard</h1>
       </div>
       <div className="flex flex-1 items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <form className="ml-auto flex-1 sm:flex-initial">
@@ -43,12 +38,6 @@ export default function DashboardHeader() {
             />
           </div>
         </form>
-        <Button variant="outline" size="sm" className="h-9 gap-1">
-            <Calendar className="h-4 w-4" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Hoy
-            </span>
-        </Button>
         <Button variant="ghost" size="icon" className="rounded-full">
             <Bell className="h-5 w-5" />
             <span className="sr-only">Toggle notifications</span>
