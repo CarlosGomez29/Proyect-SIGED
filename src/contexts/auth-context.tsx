@@ -24,6 +24,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Development mode check
+    const devRole = localStorage.getItem('userRole') as UserRole;
+    if (devRole && process.env.NODE_ENV === 'development') {
+      setRole(devRole);
+      setLoading(false);
+      
+      const targetDashboard = getDashboardByRole(devRole);
+       if (pathname === '/login' || pathname === '/signup') {
+         router.push(targetDashboard);
+       }
+      return; // Skip Firebase auth listener in dev mode if role is set
+    }
+
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
@@ -35,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Redirect based on role
           const targetDashboard = getDashboardByRole(userRole);
           if (pathname !== targetDashboard && !pathname.startsWith(targetDashboard)) {
-            router.push(targetDashboard);
+            // router.push(targetDashboard);
           }
         } else {
           setRole(null);
@@ -87,12 +101,12 @@ export const withAuth = (Component: React.ComponentType<any>, allowedRoles: User
         const router = useRouter();
 
         useEffect(() => {
-            if (!loading && !allowedRoles.includes(role)) {
+            if (!loading && role && !allowedRoles.includes(role)) {
                 router.push('/login'); // Or an access denied page
             }
         }, [loading, role, router]);
 
-        if (loading || !allowedRoles.includes(role)) {
+        if (loading || (role && !allowedRoles.includes(role))) {
             return <div>Loading...</div>; // Or a proper loader
         }
 

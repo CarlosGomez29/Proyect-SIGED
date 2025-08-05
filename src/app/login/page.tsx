@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+// import { signInWithEmailAndPassword } from 'firebase/auth';
+// import { doc, getDoc } from 'firebase/firestore';
+// import { auth, db } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,6 +18,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react"
+
+// Hardcoded test users for development
+const testUsers = [
+  { email: 'superadmin@esac.edu.do', password: 'password123', role: 'super-admin' },
+  { email: 'admin@esac.edu.do', password: 'password123', role: 'administrador' },
+  { email: 'admision@esac.edu.do', password: 'password123', role: 'admision' },
+  { email: 'instructor@esac.edu.do', password: 'password123', role: 'instructor' },
+  { email: 'alumno@esac.edu.do', password: 'password123', role: 'alumno' },
+];
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -27,6 +38,43 @@ export default function LoginForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Development login logic
+    const foundUser = testUsers.find(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (foundUser) {
+      // Store role in local storage to be picked up by AuthContext
+      localStorage.setItem('userRole', foundUser.role);
+      
+      switch (foundUser.role) {
+        case 'super-admin':
+        case 'administrador':
+          router.push('/dashboard-admin');
+          break;
+        case 'admision':
+          router.push('/dashboard-admision');
+          break;
+        case 'instructor':
+          router.push('/dashboard-instructor');
+          break;
+        case 'alumno':
+          router.push('/dashboard-alumno');
+          break;
+        default:
+          router.push('/login');
+      }
+    } else {
+      toast({
+          variant: "destructive",
+          title: "Error de Autenticación",
+          description: "Credenciales incorrectas.",
+      });
+    }
+
+    /*
+    // Original Firebase Auth Logic
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -67,6 +115,7 @@ export default function LoginForm() {
             description: "Correo o contraseña incorrectos.",
         });
     }
+    */
   };
 
   return (
@@ -80,6 +129,13 @@ export default function LoginForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-4 bg-amber-50 border-amber-200 text-amber-800">
+            <Terminal className="h-4 w-4 !text-amber-800" />
+            <AlertTitle className="font-semibold">MODO DE DESARROLLO</AlertTitle>
+            <AlertDescription className="text-xs">
+              Autenticación de prueba habilitada.
+            </AlertDescription>
+          </Alert>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
