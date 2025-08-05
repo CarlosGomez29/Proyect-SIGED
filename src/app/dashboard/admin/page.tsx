@@ -43,10 +43,10 @@ import {
   import { motion } from "framer-motion";
   
   const statCards = [
-    { title: "Nuevos Alumnos", value: "150", delta: "+11%", color: "bg-blue-500", icon: Users },
-    { title: "Cursos Activos", value: "22", delta: "-0.5%", color: "bg-purple-500", icon: BookOpen },
-    { title: "Certificados Emitidos", value: "3", delta: "+9%", color: "bg-red-500", icon: GraduationCap },
-    { title: "Inscripciones Pendientes", value: "5", delta: "+31%", color: "bg-green-500", icon: ClipboardCheck },
+    { title: "Nuevos Alumnos", value: "150", delta: "+11%", color: "bg-blue-500", icon: Users, chartType: 'bar' },
+    { title: "Cursos Activos", value: "22", delta: "-0.5%", color: "bg-purple-500", icon: BookOpen, chartType: 'pie' },
+    { title: "Certificados Emitidos", value: "3", delta: "+9%", color: "bg-red-500", icon: GraduationCap, chartType: 'bar' },
+    { title: "Inscripciones Pendientes", value: "5", delta: "+31%", color: "bg-green-500", icon: ClipboardCheck, chartType: 'pie' },
   ];
 
   const recentEnrollments = [
@@ -107,22 +107,22 @@ import {
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
               >
-                <Card className={`text-white ${card.color} overflow-hidden`}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-medium">{card.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex items-end justify-between">
-                    <div className="flex flex-col">
-                        <p className="text-3xl font-bold">{card.value}</p>
-                        <p className="text-xs opacity-80">Hoy</p>
+                <Card className={`text-white ${card.color} overflow-hidden flex flex-col`}>
+                   <CardHeader className="pb-2">
+                      <CardTitle className="text-base font-medium">{card.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex items-end justify-between">
+                      <div className="flex flex-col">
+                          <p className="text-3xl font-bold">{card.value}</p>
+                          <p className="text-xs opacity-80">Hoy</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                          <span>{card.delta}</span>
+                      </div>
+                    </CardContent>
+                    <div className="flex-grow flex items-end w-full h-[60px] opacity-50">
+                        <EnrollmentChart type={card.chartType as 'bar' | 'pie'} />
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                        <span>{card.delta}</span>
-                    </div>
-                  </CardContent>
-                  <div className="h-12 w-full">
-                    <EnrollmentChart type={card.title === "Cursos Activos" || card.title === "Inscripciones Pendientes" ? "pie" : "bar"} />
-                  </div>
                 </Card>
               </motion.div>
             ))}

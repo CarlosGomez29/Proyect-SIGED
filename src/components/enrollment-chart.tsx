@@ -32,7 +32,7 @@ const chartConfig = {
 export function EnrollmentChart({type = 'bar'}: {type?: 'bar' | 'pie'}) {
     if (type === 'pie') {
         return (
-            <ResponsiveContainer width="100%" height={60}>
+            <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                 <Pie
                     data={pieChartData}
@@ -40,8 +40,8 @@ export function EnrollmentChart({type = 'bar'}: {type?: 'bar' | 'pie'}) {
                     cy="50%"
                     startAngle={90}
                     endAngle={-270}
-                    innerRadius={15}
-                    outerRadius={25}
+                    innerRadius={20}
+                    outerRadius={30}
                     fill="#8884d8"
                     paddingAngle={0}
                     dataKey="value"
@@ -57,17 +57,15 @@ export function EnrollmentChart({type = 'bar'}: {type?: 'bar' | 'pie'}) {
     }
 
   return (
-    <ResponsiveContainer width="100%" height={60}>
-      <BarChart data={barChartData} margin={{ top: 10, right: 0, bottom: 0, left: 0 }}>
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
         <Bar
           dataKey="enrollments"
           fill="#FFFFFF"
           radius={[4, 4, 0, 0]}
-          barSize={5}
+          barSize={8}
         />
       </BarChart>
     </ResponsiveContainer>
   );
 }
-
-    
