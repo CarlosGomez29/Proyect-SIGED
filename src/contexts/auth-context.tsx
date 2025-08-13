@@ -30,14 +30,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (devRole && process.env.NODE_ENV === 'development') {
       setRole(devRole);
       setLoading(false);
-      
-      const targetDashboard = getDashboardByRole(devRole);
-       if (pathname === '/login' || pathname === '/signup') {
-         router.push(targetDashboard);
-       }
-      return; // Skip Firebase auth listener in dev mode if role is set
+      // Let pages handle redirection if needed
+      return; 
     }
-
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -47,47 +42,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (docSnap.exists()) {
           const userRole = docSnap.data().role as UserRole;
           setRole(userRole);
-          // Redirect based on role
-          const targetDashboard = getDashboardByRole(userRole);
-          if (pathname !== targetDashboard && !pathname.startsWith(targetDashboard)) {
-            // router.push(targetDashboard);
-          }
         } else {
           setRole(null);
-          router.push('/login'); // Or an error page
         }
       } else {
         setUser(null);
         setRole(null);
-        const allowedPaths = ['/login', '/signup'];
-        if (!allowedPaths.includes(pathname)) {
-            router.push('/login');
-        }
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [router, pathname]);
-
-  const getDashboardByRole = (role: UserRole) => {
-    switch (role) {
-      case 'super-admin':
-      case 'administrador':
-        return '/dashboard/admin';
-      case 'admision':
-        return '/dashboard/admision';
-      case 'instructor':
-        return '/dashboard/instructor';
-      case 'alumno':
-        return '/dashboard/alumno';
-      default:
-        return '/login';
-    }
-  };
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
+    localStorage.removeItem('userRole'); // For dev mode
+    // await auth.signOut(); // For production
     router.push('/login');
   };
 
