@@ -78,10 +78,10 @@ const WavyBg = () => (
 )
   
   const statCards = [
-    { title: "Nuevos Alumnos", description: "Gestión de alumnos", buttonText: "Detalles", fromColor: "from-blue-400", toColor: "to-blue-600", iconShape: 'circles' as const },
-    { title: "Cursos Activos", description: "Promociones limitadas", buttonText: "Configurar", fromColor: "from-cyan-400", toColor: "to-cyan-600", iconShape: 'squares' as const },
-    { title: "Certificados", description: "Emisión de certificados", buttonText: "Diseñar", fromColor: "from-emerald-400", toColor: "to-emerald-600", iconShape: 'swirl' as const },
-    { title: "Inscripciones", description: "Ver inscripciones pendientes", buttonText: "Revisar", fromColor: "from-amber-400", toColor: "to-amber-600", iconShape: 'circles' as const },
+    { title: "Nuevos Alumnos", value: "1,254", icon: Users, fromColor: "from-blue-400", toColor: "to-blue-600", iconShape: 'circles' as const },
+    { title: "Cursos Activos", value: "82", icon: ClipboardCheck, fromColor: "from-cyan-400", toColor: "to-cyan-600", iconShape: 'squares' as const },
+    { title: "Certificados", value: "4,502", icon: GraduationCap, fromColor: "from-emerald-400", toColor: "to-emerald-600", iconShape: 'swirl' as const },
+    { title: "Inscripciones", value: "+350", icon: BookOpen, fromColor: "from-amber-400", toColor: "to-amber-600", iconShape: 'circles' as const },
   ];
 
   const recentEnrollments = [
@@ -146,11 +146,9 @@ const WavyBg = () => (
                     <WavyBg />
                     <div className="relative z-10 flex justify-between items-start">
                         <div className="flex flex-col">
+                            <card.icon className="w-8 h-8 mb-2 opacity-80" />
                             <h3 className="text-xl font-bold">{card.title}</h3>
-                            <p className="text-xs opacity-80 mt-1">{card.description}</p>
-                             <Button variant="outline" className="mt-4 w-fit bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white text-xs h-8 px-3">
-                                {card.buttonText}
-                            </Button>
+                            <p className="text-3xl font-bold opacity-90 mt-2">{card.value}</p>
                         </div>
                         <div className="absolute -right-4 -top-4 opacity-80">
                            <GlassmorphismIcon shape={card.iconShape} />
