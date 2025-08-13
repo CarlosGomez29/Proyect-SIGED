@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -116,7 +115,7 @@ export default function ProfileSelectionPage() {
               <CardHeader className="flex flex-row items-center gap-4 space-y-0">
                   <profile.icon className="w-8 h-8 text-primary" />
                   <div className="flex flex-col">
-                    <CardTitle className="text-xl">{profile.name}</CardTitle>
+                    <CardTitle className="text-xl font-semibold">{profile.name}</CardTitle>
                     <CardDescription>{profile.description}</CardDescription>
                   </div>
               </CardHeader>
