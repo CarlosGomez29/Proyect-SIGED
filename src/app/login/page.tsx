@@ -23,15 +23,15 @@ import { Terminal } from "lucide-react"
 
 // Hardcoded test users for development
 const testUsers = [
-  { email: 'superadmin@esac.edu.do', password: 'password123', role: 'super-admin' },
-  { email: 'admin@esac.edu.do', password: 'password123', role: 'administrador' },
-  { email: 'admision@esac.edu.do', password: 'password123', role: 'admision' },
-  { email: 'instructor@esac.edu.do', password: 'password123', role: 'instructor' },
-  { email: 'alumno@esac.edu.do', password: 'password123', role: 'alumno' },
+  { username: 'superadmin', password: 'password123', role: 'super-admin' },
+  { username: 'admin', password: 'password123', role: 'administrador' },
+  { username: 'admision', password: 'password123', role: 'admision' },
+  { username: 'instructor', password: 'password123', role: 'instructor' },
+  { username: 'alumno', password: 'password123', role: 'alumno' },
 ];
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
@@ -41,7 +41,7 @@ export default function LoginForm() {
 
     // Development login logic
     const foundUser = testUsers.find(
-      (user) => user.email === email && user.password === password
+      (user) => user.username === username && user.password === password
     );
 
     if (foundUser) {
@@ -138,14 +138,14 @@ export default function LoginForm() {
           </Alert>
           <form onSubmit={handleLogin} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Usuario</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="m@ejemplo.com"
+                id="username"
+                type="text"
+                placeholder="nombre.usuario"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
