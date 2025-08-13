@@ -109,7 +109,7 @@ export default function RoleLoginPage({ params }: { params: { role: string } }) 
             <Button type="submit" className="w-full">
               Ingresar
             </Button>
-             <Button variant="outline" className="w-full" onClick={() => router.push('/')}>
+             <Button type="button" variant="outline" className="w-full" onClick={() => router.push('/')}>
               Volver a la selección
             </Button>
           </form>
