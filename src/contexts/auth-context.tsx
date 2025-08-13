@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -58,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleLogout = () => {
     localStorage.removeItem('userRole'); // For dev mode
     // await auth.signOut(); // For production
-    router.push('/login');
+    router.push('/');
   };
 
 
@@ -78,7 +79,7 @@ export const withAuth = (Component: React.ComponentType<any>, allowedRoles: User
 
         useEffect(() => {
             if (!loading && role && !allowedRoles.includes(role)) {
-                router.push('/login'); // Or an access denied page
+                router.push('/'); // Or an access denied page
             }
         }, [loading, role, router]);
 
