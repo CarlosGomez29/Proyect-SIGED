@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Icons } from "@/components/icons";
+import { Icons } from "@/components/ui/icons";
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignupForm() {
@@ -60,7 +60,7 @@ export default function SignupForm() {
         description: "Tu cuenta ha sido creada. Ahora puedes iniciar sesión.",
       });
 
-      router.push('/login');
+      router.push('/');
 
     } catch (error: any) {
       toast({
@@ -124,7 +124,7 @@ export default function SignupForm() {
             </Button>
             <div className="mt-4 text-center text-sm">
               ¿Ya tienes una cuenta?{" "}
-              <Link href="/login" className="underline">
+              <Link href="/" className="underline">
                 Iniciar Sesión
               </Link>
             </div>
