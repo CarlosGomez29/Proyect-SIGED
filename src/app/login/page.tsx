@@ -23,16 +23,15 @@ import { Terminal } from "lucide-react"
 
 // Hardcoded test users for development
 const testUsers = [
-  { username: 'superadmin', password: 'password123', role: 'super-admin' },
-  { username: 'admin', password: 'password123', role: 'administrador' },
-  { username: 'admision', password: 'password123', role: 'admision' },
-  { username: 'instructor', password: 'password123', role: 'instructor' },
-  { username: 'alumno', password: 'password123', role: 'alumno' },
+  { username: 'superadmin', role: 'super-admin' },
+  { username: 'admin', role: 'administrador' },
+  { username: 'admision', role: 'admision' },
+  { username: 'instructor', role: 'instructor' },
+  { username: 'alumno', role: 'alumno' },
 ];
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -41,7 +40,7 @@ export default function LoginForm() {
 
     // Development login logic
     const foundUser = testUsers.find(
-      (user) => user.username === username && user.password === password
+      (user) => user.username === username
     );
 
     if (foundUser) {
@@ -69,7 +68,7 @@ export default function LoginForm() {
       toast({
           variant: "destructive",
           title: "Error de Autenticación",
-          description: "Credenciales incorrectas.",
+          description: "Usuario incorrecto.",
       });
     }
 
@@ -125,7 +124,7 @@ export default function LoginForm() {
             <Icons.logo className="h-12 w-12 text-primary mx-auto" />
           <CardTitle className="text-2xl font-headline mt-4">Iniciar Sesión</CardTitle>
           <CardDescription>
-            Ingresa tus credenciales para acceder al panel de administración
+            Ingresa tu usuario para acceder al panel
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,7 +132,7 @@ export default function LoginForm() {
             <Terminal className="h-4 w-4 !text-amber-800" />
             <AlertTitle className="font-semibold">MODO DE DESARROLLO</AlertTitle>
             <AlertDescription className="text-xs">
-              Autenticación de prueba habilitada.
+              Autenticación de prueba habilitada sin contraseña.
             </AlertDescription>
           </Alert>
           <form onSubmit={handleLogin} className="grid gap-4">
@@ -142,25 +141,10 @@ export default function LoginForm() {
               <Input
                 id="username"
                 type="text"
-                placeholder="nombre.usuario"
+                placeholder="ej: admin, alumno, etc."
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link href="#" className="ml-auto inline-block text-sm underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input 
-                id="password" 
-                type="password" 
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <Button type="submit" className="w-full">
