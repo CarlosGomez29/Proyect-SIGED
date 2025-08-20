@@ -45,6 +45,8 @@ import {
     PaginationEllipsis
   } from "@/components/ui/pagination";
 
+const motionTableRow = motion(TableRow);
+
 const taskCards = [
     { title: "Nuevos Alumnos", description: "Recibidas 5 solicitudes", icon: Users, color: "bg-purple-500/20 text-purple-400", href: "/dashboard-admin/alumnos" },
     { title: "Cursos Activos", description: "Verifica los materiales", icon: BookCopy, color: "bg-green-500/20 text-green-400", href: "/dashboard-admin/cursos" },
@@ -147,8 +149,15 @@ export default function DashboardAdminPage() {
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                {recentEnrollments.map((enrollment) => (
-                                    <TableRow key={enrollment.name}>
+                                {recentEnrollments.map((enrollment, index) => (
+                                    <motion.tr 
+                                      key={enrollment.name}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                                      whileHover={{ scale: 1.02, zIndex: 10, transition: { type: "spring", stiffness: 300 } }}
+                                      className="hover:bg-muted/50 cursor-pointer"
+                                    >
                                         <TableCell className="font-medium">{enrollment.name}</TableCell>
                                         <TableCell>{enrollment.age}</TableCell>
                                         <TableCell className="text-muted-foreground">{enrollment.email}</TableCell>
@@ -164,7 +173,7 @@ export default function DashboardAdminPage() {
                                                 {enrollment.status}
                                             </Badge>
                                         </TableCell>
-                                    </TableRow>
+                                    </motion.tr>
                                 ))}
                                 </TableBody>
                             </Table>
