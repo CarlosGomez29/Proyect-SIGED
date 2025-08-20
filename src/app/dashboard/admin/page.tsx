@@ -202,7 +202,7 @@ const WavyBg = () => (
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ duration: 0.3 }}
-                              whileHover={{ scale: 1.01, transition: { type: "spring", stiffness: 400, damping: 10 } }}
+                              whileHover={{ y: -2, transition: { type: "spring", stiffness: 300 } }}
                             >
                                 <TableCell>
                                     <div className="flex items-center gap-3">

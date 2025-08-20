@@ -122,13 +122,13 @@ export default function DashboardAdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-1">
             {/* Main content */}
             <motion.div 
-                className="lg:col-span-3"
+                className="lg:col-span-3 flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
             >
                  {/* Recent Enrollments */}
-                <Card className="h-full flex flex-col">
+                <Card className="h-full flex flex-col flex-1">
                     <CardHeader className="flex flex-row justify-between items-center">
                         <CardTitle className="text-lg">Inscripciones Recientes</CardTitle>
                         <div className="flex items-center gap-2">
@@ -155,7 +155,7 @@ export default function DashboardAdminPage() {
                                       initial={{ opacity: 0, y: 10 }}
                                       animate={{ opacity: 1, y: 0 }}
                                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                                      whileHover={{ scale: 1.02, zIndex: 10, transition: { type: "spring", stiffness: 300 } }}
+                                      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300 } }}
                                       className="hover:bg-muted/50 cursor-pointer"
                                     >
                                         <TableCell className="font-medium">{enrollment.name}</TableCell>
@@ -187,16 +187,16 @@ export default function DashboardAdminPage() {
             </motion.div>
             {/* Side column */}
             <motion.div 
-                className="lg:col-span-2"
+                className="lg:col-span-2 flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
             >
-                <Card className="h-full flex flex-col">
+                <Card className="h-full flex flex-col flex-1">
                     <CardHeader>
                         <CardTitle className="text-lg">Estadísticas de Inscripciones por Edad</CardTitle>
                     </CardHeader>
-                    <CardContent className="flex-1">
+                    <CardContent className="flex-1 flex">
                        <EnrollmentChart />
                     </CardContent>
                 </Card>
