@@ -77,7 +77,7 @@ export default function DashboardAdminLayout({
           <SidebarContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
+                <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton
                         asChild
                         href={item.href}
@@ -98,7 +98,7 @@ export default function DashboardAdminLayout({
             </SidebarMenu>
             <SidebarMenu className="mt-auto">
                {secondaryMenuItems.map((item) => (
-                 <SidebarMenuItem key={item.href}>
+                 <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton
                         asChild
                         href={item.href}
