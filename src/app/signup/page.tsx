@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Icons } from "@/components/ui/icons";
+import { Icons } from "@/components/icons";
 import { useToast } from '@/hooks/use-toast';
 
 export default function SignupForm() {
