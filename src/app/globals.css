@@ -22,8 +22,8 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
  
-    --accent: 12.1, 83.3%, 57.8%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 262.1 83.3% 57.8%;
+    --accent-foreground: 210 40% 98%;
  
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -34,9 +34,9 @@
  
     --radius: 0.75rem;
 
-    --sidebar: 240 5.9% 95%;
+    --sidebar: 0 0% 100%;
     --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-accent: 210 40% 90%;
+    --sidebar-accent: 210 40% 96.1%;
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-primary: 262.1 83.3% 57.8%;
     --sidebar-primary-foreground: 210 40% 98%;
@@ -62,7 +62,7 @@
     --muted: 217 33% 25%;
     --muted-foreground: 215 20% 65%;
  
-    --accent: 330 84% 61%;
+    --accent: 259 95% 68%;
     --accent-foreground: 210 40% 98%;
  
     --destructive: 0 63% 31%;
@@ -74,7 +74,7 @@
 
     --sidebar: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent: 222 47% 18%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-primary: 259 95% 68%;
     --sidebar-primary-foreground: 210 40% 98%;
@@ -88,5 +88,30 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  [data-sidebar="menu-button"][data-active="true"] {
+    position: relative;
+    background-color: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-accent-foreground));
+    font-weight: 600;
+  }
+
+  [data-sidebar="menu-button"][data-active="true"]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 75%;
+    width: 4px;
+    background-color: hsl(var(--primary));
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .dark [data-sidebar="menu-button"][data-active="true"]::before {
+     background-color: hsl(var(--accent));
   }
 }

@@ -59,22 +59,17 @@ export default function DashboardAdminLayout({
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar>
-          <SidebarHeader className="p-4">
-             <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
-                    <AvatarImage src="https://placehold.co/40x40.png" alt="Vitalii Tk." data-ai-hint="person" />
-                    <AvatarFallback>VT</AvatarFallback>
-                </Avatar>
-                <div>
-                    <p className="font-semibold text-foreground">Admin User</p>
-                    <div className="flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full bg-green-500"></span>
-                        <p className="text-xs text-muted-foreground">Online</p>
-                    </div>
-                </div>
+          <SidebarHeader className="p-4 flex flex-col items-center justify-center text-center gap-3">
+             <Avatar className="h-20 w-20 border-2 border-primary">
+                <AvatarImage src="https://placehold.co/80x80.png" alt="Admin User" data-ai-hint="person" />
+                <AvatarFallback>AU</AvatarFallback>
+            </Avatar>
+            <div>
+                <p className="font-semibold text-foreground text-lg">Admin User</p>
+                <p className="text-xs text-muted-foreground">admin@esac.com</p>
             </div>
           </SidebarHeader>
-          <SidebarContent>
+          <SidebarContent className="px-4">
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
@@ -85,44 +80,60 @@ export default function DashboardAdminLayout({
                         isActive={pathname === item.href}
                         className="justify-start"
                     >
-                        <Link href={item.href} className="flex items-center justify-between w-full">
+                        <Link href={item.href} className="flex items-center w-full">
                            <div className="flex items-center gap-3">
                              <item.icon className="h-5 w-5" />
                              <span>{item.label}</span>
                            </div>
-                           {item.badge && <Badge variant="secondary" className="bg-sidebar-accent text-sidebar-accent-foreground">{item.badge}</Badge>}
                         </Link>
                     </SidebarMenuButton>
               </SidebarMenuItem>
               ))}
-            </SidebarMenu>
-            <SidebarMenu className="mt-auto">
-               {secondaryMenuItems.map((item) => (
-                 <SidebarMenuItem key={item.label}>
+               <SidebarMenuItem>
                     <SidebarMenuButton
                         asChild
-                        href={item.href}
-                        tooltip={item.label}
-                        isActive={pathname === item.href}
+                        href={"/dashboard-admin/ajustes"}
+                        tooltip={"Ajustes"}
+                        isActive={pathname === "/dashboard-admin/ajustes"}
                         className="justify-start"
                     >
-                        <Link href={item.href} className="flex items-center justify-between w-full">
+                        <Link href={"/dashboard-admin/ajustes"} className="flex items-center w-full">
                            <div className="flex items-center gap-3">
-                             <item.icon className="h-5 w-5" />
-                             <span>{item.label}</span>
+                             <Settings className="h-5 w-5" />
+                             <span>Ajustes</span>
                            </div>
-                           {item.badge && <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-none">{item.badge}</Badge>}
                         </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-               ))}
             </SidebarMenu>
           </SidebarContent>
+           <SidebarFooter className="p-4 border-none">
+              <div className="text-center">
+                  <p className="text-sm font-semibold text-foreground mb-2">Active Users</p>
+                  <div className="flex items-center justify-center -space-x-2">
+                      <Avatar className="h-8 w-8 border-2 border-background">
+                          <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person woman" />
+                          <AvatarFallback>U1</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="h-8 w-8 border-2 border-background">
+                           <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person man" />
+                          <AvatarFallback>U2</AvatarFallback>
+                      </Avatar>
+                      <Avatar className="h-8 w-8 border-2 border-background">
+                           <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person" />
+                          <AvatarFallback>U3</AvatarFallback>
+                      </Avatar>
+                       <div className="h-8 w-8 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center border-2 border-background font-semibold">
+                          +70
+                       </div>
+                  </div>
+              </div>
+          </SidebarFooter>
         </Sidebar>
         <div className="flex flex-col flex-1">
           <DashboardHeader />
           <SidebarInset>
-            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/30 dark:bg-card/20">
               {children}
             </main>
           </SidebarInset>
