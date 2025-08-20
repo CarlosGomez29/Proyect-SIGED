@@ -91,14 +91,6 @@ export default function DashboardAdminLayout({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/pagos" tooltip="Pagos">
-                  <Link href="/dashboard-admin/pagos">
-                    <Wallet />
-                    Pagos
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
                <SidebarMenuItem>
                 <SidebarMenuButton asChild href="/dashboard-admin/reportes" tooltip="Reportes">
                   <Link href="/dashboard-admin/reportes">

@@ -63,8 +63,8 @@ export default function ReportesPage() {
             <Table>
                 <TableHeader><TableRow><TableHead>Curso</TableHead><TableHead className="text-right">Nº de Alumnos</TableHead></TableRow></TableHeader>
                 <TableBody>
-                    {generatedReport.map(row => (
-                        <TableRow key={row.curso}><TableCell>{row.curso}</TableCell><TableCell className="text-right">{row.alumnos}</TableCell></TableRow>
+                    {generatedReport.map((row, index) => (
+                        <TableRow key={`${row.curso}-${index}`}><TableCell>{row.curso}</TableCell><TableCell className="text-right">{row.alumnos}</TableCell></TableRow>
                     ))}
                 </TableBody>
             </Table>
@@ -75,8 +75,8 @@ export default function ReportesPage() {
             <Table>
                 <TableHeader><TableRow><TableHead>Alumno</TableHead><TableHead>Curso</TableHead><TableHead className="text-right">Fecha de Emisión</TableHead></TableRow></TableHeader>
                 <TableBody>
-                    {generatedReport.map(row => (
-                        <TableRow key={row.alumno}><TableCell>{row.alumno}</TableCell><TableCell>{row.curso}</TableCell><TableCell className="text-right">{row.fecha}</TableCell></TableRow>
+                    {generatedReport.map((row, index) => (
+                        <TableRow key={`${row.alumno}-${index}`}><TableCell>{row.alumno}</TableCell><TableCell>{row.curso}</TableCell><TableCell className="text-right">{row.fecha}</TableCell></TableRow>
                     ))}
                 </TableBody>
             </Table>
@@ -149,5 +149,3 @@ export default function ReportesPage() {
     </motion.div>
   );
 }
-
-    

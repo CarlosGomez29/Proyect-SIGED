@@ -60,7 +60,7 @@ import {
   const recentActivity = [
       { type: "Nuevo Alumno", description: "Juan Pérez se ha registrado.", time: "hace 5 min", icon: UserPlus },
       { type: "Inscripción", description: "Maria Rodriguez se inscribió en Seguridad de la Carga Aérea.", time: "hace 15 min", icon: ClipboardCheck },
-      { type: "Pago Registrado", description: "Se registró un pago de Carlos Gomez.", time: "hace 1 hora", icon: Wallet },
+      { type: "Calificación Registrada", description: "Se registró la calificación de Carlos Gomez.", time: "hace 1 hora", icon: GraduationCap },
       { type: "Certificado Emitido", description: "Se emitió certificado para Ana Martinez.", time: "hace 3 horas", icon: FileText },
   ];
   
@@ -146,15 +146,6 @@ import {
                           <div>
                               <p className="font-medium">42 Inscripciones pendientes de aprobación</p>
                               <p className="text-sm text-muted-foreground">Revise y confirme las nuevas solicitudes.</p>
-                          </div>
-                          <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
-                      </div>
-                       <Separator />
-                      <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
-                          <AlertTriangle className="h-5 w-5 text-red-500" />
-                          <div>
-                              <p className="font-medium">18 Pagos vencidos</p>
-                              <p className="text-sm text-muted-foreground">Se requiere acción de seguimiento inmediata.</p>
                           </div>
                           <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
                       </div>
