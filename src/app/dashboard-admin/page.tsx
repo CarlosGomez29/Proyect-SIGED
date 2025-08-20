@@ -50,13 +50,6 @@ const taskCards = [
     { title: "Inscripciones", description: "Tienes nuevos mensajes", icon: ClipboardCheck, color: "bg-pink-500/20 text-pink-400" },
 ];
 
-const reportItems = [
-    { title: "Monto Reembolsado", value: "50%", color: "text-green-400", chartValue: 50 },
-    { title: "Intereses Pagados", value: "25%", color: "text-purple-400", chartValue: 25 },
-    { title: "Deuda Principal", value: "85%", color: "text-sky-400", chartValue: 85 },
-    { title: "Devolución de Multas", value: "60%", color: "text-pink-400", chartValue: 60 },
-]
-
 const recentEnrollments = [
       { name: "Abdullah Al Ahad", age: 29, email: "evgene_1982@yahoo.ru", phone: "+7 (916) 474 48 39", status: "Activo" },
       { name: "Al Shahriar Shawon", age: 48, email: "nazar_183_up@gmail.com", phone: "+7 (916) 234 48 35", status: "Vencido" },
@@ -96,34 +89,6 @@ export default function DashboardAdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main content */}
             <div className="lg:col-span-2 space-y-6">
-                 {/* Final Report */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                >
-                    <Card>
-                        <CardHeader className="flex flex-row justify-between items-center">
-                            <CardTitle className="text-lg">Resumen de Estado</CardTitle>
-                             <Button variant="ghost" size="sm">
-                                .xlsx <ChevronDown className="w-4 h-4 ml-2" />
-                            </Button>
-                        </CardHeader>
-                        <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                            {reportItems.map((item, index) => (
-                                <div key={index} className="flex flex-col items-center gap-2">
-                                    <div className="relative h-24 w-24">
-                                        <EnrollmentChart type="pie" chartValue={item.chartValue} />
-                                        <span className={`absolute inset-0 flex items-center justify-center text-xl font-bold ${item.color}`}>{item.value}</span>
-                                    </div>
-                                    <p className="text-sm font-medium">{item.title}</p>
-                                    <p className="text-xs text-muted-foreground">Avance - 20%</p>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-                </motion.section>
-
                  {/* Recent Enrollments */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
