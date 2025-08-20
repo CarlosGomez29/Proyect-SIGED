@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const profiles = [
   {
@@ -85,7 +86,10 @@ export default function ProfileSelectionPage() {
     const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
+       <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <motion.div 
         className="text-center mb-12"
         initial={{ opacity: 0, y: -30 }}
