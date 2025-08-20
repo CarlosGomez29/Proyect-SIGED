@@ -60,19 +60,44 @@ const recentEnrollments = [
       { name: "Robert K. Panez", age: 34, email: "skorieek@yandex.ru", phone: "+7 (916) 474 48 93", status: "Activo" },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+    },
+  },
+};
+
 export default function DashboardAdminPage() {
   return (
     <div className="flex flex-col flex-1 space-y-6">
        
-        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <motion.section 
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
             {taskCards.map((card, index) => (
                 <Link href={card.href} key={index}>
                     <motion.div
+                        variants={itemVariants}
                         whileHover={{ y: -5, scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" }}
                         whileTap={{ scale: 0.98 }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
                         className="h-full"
                     >
                         <Card className="bg-card hover:bg-card/80 transition-colors h-full cursor-pointer">
@@ -90,7 +115,7 @@ export default function DashboardAdminPage() {
                     </motion.div>
                 </Link>
             ))}
-        </section>
+        </motion.section>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-1">
             {/* Main content */}
