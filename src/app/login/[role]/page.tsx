@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import {
   ShieldCheck,
   UserCog,
@@ -35,11 +35,11 @@ const profileDetails: { [key: string]: { name: string; icon: React.ElementType, 
 };
 
 
-export default function RoleLoginPage({ params }: { params: { role: string } }) {
+export default function RoleLoginPage() {
   const [username, setUsername] = useState('');
   const router = useRouter();
   const { toast } = useToast();
-  const { role } = params;
+  const { role } = useParams() as { role: string };
 
   const details = profileDetails[role];
 
