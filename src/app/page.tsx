@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -83,14 +82,12 @@ const itemVariants = {
 };
 
 export default function ProfileSelectionPage() {
-    const router = useRouter();
-
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
-       <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <motion.div 
+      <motion.div
         className="text-center mb-12"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -114,25 +111,27 @@ export default function ProfileSelectionPage() {
             key={profile.role}
             variants={itemVariants}
             whileHover={{ y: -5, scale: 1.03, transition: { type: "spring", stiffness: 300 } }}
-            onClick={() => router.push(profile.href)}
+            whileTap={{ scale: 0.98 }}
           >
-            <Card className="cursor-pointer h-full transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg">
-              <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+            <Link href={profile.href} passHref>
+              <Card className="cursor-pointer h-full transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg">
+                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
                   <profile.icon className="w-8 h-8 text-primary" />
                   <div className="flex flex-col">
                     <CardTitle className="text-xl font-semibold">{profile.name}</CardTitle>
                     <CardDescription>{profile.description}</CardDescription>
                   </div>
-              </CardHeader>
-            </Card>
+                </CardHeader>
+              </Card>
+            </Link>
           </motion.div>
         ))}
       </motion.div>
-       <div className="mt-12 text-center text-sm">
-          <Link href="/signup" className="text-muted-foreground hover:text-primary transition-colors">
-              ¿No tienes una cuenta? <span className="underline">Registrarse</span>
-          </Link>
-        </div>
+      <div className="mt-12 text-center text-sm">
+        <Link href="/signup" className="text-muted-foreground hover:text-primary transition-colors">
+          ¿No tienes una cuenta? <span className="underline">Registrarse</span>
+        </Link>
+      </div>
     </div>
   );
 }
