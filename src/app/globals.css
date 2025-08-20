@@ -4,49 +4,81 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 5.9% 90%;
     --foreground: 222.2 84% 4.9%;
+
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
+ 
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
+ 
+    --primary: 262.1 83.3% 57.8%;
     --primary-foreground: 210 40% 98%;
+ 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
+ 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
+ 
+    --accent: 12.1, 83.3%, 57.8%;
     --accent-foreground: 222.2 47.4% 11.2%;
+ 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-  }
+    --ring: 262.1 83.3% 57.8%;
+ 
+    --radius: 0.75rem;
 
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-primary: 262.1 83.3% 57.8%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-ring: 262.1 83.3% 57.8%;
+  }
+ 
   .dark {
-    --background: 222 47% 11%; /* Dark Blue */
-    --foreground: 210 40% 98%; /* Almost White */
-    --card: 222 47% 15%; /* Slightly Lighter Dark Blue */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222 47% 15%;
     --card-foreground: 210 40% 98%;
+ 
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 259 95% 68%; /* Vibrant Purple */
+ 
+    --primary: 259 95% 68%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 17%; /* Darker Grayish Blue */
+ 
+    --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
+ 
     --muted: 217 33% 25%;
     --muted-foreground: 215 20% 65%;
-    --accent: 330 84% 61%; /* Pink */
+ 
+    --accent: 330 84% 61%;
     --accent-foreground: 210 40% 98%;
+ 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
+ 
     --border: 217 33% 25%;
     --input: 217 33% 22%;
     --ring: 259 95% 75%;
-    --radius: 0.5rem;
+
+    --sidebar: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-primary: 259 95% 68%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-ring: 259 95% 75%;
   }
 }
 
@@ -56,6 +88,5 @@
   }
   body {
     @apply bg-background text-foreground;
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
