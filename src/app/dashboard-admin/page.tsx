@@ -155,7 +155,7 @@ export default function DashboardAdminPage() {
                                       initial={{ opacity: 0, y: 10 }}
                                       animate={{ opacity: 1, y: 0 }}
                                       transition={{ duration: 0.3, delay: index * 0.05 }}
-                                      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300 } }}
+                                      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                                       className="hover:bg-muted/50 cursor-pointer"
                                     >
                                         <TableCell className="font-medium">{enrollment.name}</TableCell>
