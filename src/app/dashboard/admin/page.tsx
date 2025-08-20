@@ -5,7 +5,10 @@ import {
     ClipboardCheck,
     BookOpen,
     GraduationCap,
-    MoreHorizontal
+    MoreHorizontal,
+    UserCheck,
+    UserX,
+    BookMarked
   } from "lucide-react";
   
   import { Badge } from "@/components/ui/badge";
@@ -41,6 +44,7 @@ import {
   } from "@/components/ui/pagination";
   import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
   import { motion } from "framer-motion";
+  import { Progress } from "@/components/ui/progress";
 
   const GlassmorphismIcon = ({ shape }: { shape: 'circles' | 'squares' | 'swirl' }) => {
     if (shape === 'squares') {
@@ -82,6 +86,13 @@ const WavyBg = () => (
     { title: "Cursos Activos", value: "82", icon: ClipboardCheck, fromColor: "from-cyan-400", toColor: "to-cyan-600", iconShape: 'squares' as const },
     { title: "Certificados", value: "4,502", icon: GraduationCap, fromColor: "from-emerald-400", toColor: "to-emerald-600", iconShape: 'swirl' as const },
     { title: "Inscripciones", value: "+350", icon: BookOpen, fromColor: "from-amber-400", toColor: "to-amber-600", iconShape: 'circles' as const },
+  ];
+
+  const academicMetrics = [
+    { title: "Total de Estudiantes", value: "1,254", icon: Users, color: "text-blue-500", progress: 90 },
+    { title: "Estudiantes Activos", value: "1,198", icon: UserCheck, color: "text-green-500", progress: 95 },
+    { title: "Estudiantes Retirados", value: "56", icon: UserX, color: "text-red-500", progress: 5 },
+    { title: "Cursos Abiertos", value: "82", icon: BookMarked, color: "text-purple-500", progress: 60 },
   ];
 
   const recentEnrollments = [
@@ -129,32 +140,32 @@ const WavyBg = () => (
           Resumen General
         </motion.h1>
   
-        {/* Stat Cards */}
+        {/* Academic Metrics Cards */}
         <motion.section
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
         >
-            {statCards.map((card) => (
+            {academicMetrics.map((card) => (
               <motion.div
                 key={card.title}
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
               >
-                 <div className={`relative text-white rounded-xl overflow-hidden p-6 flex flex-col justify-between h-48 bg-gradient-to-br ${card.fromColor} ${card.toColor}`}>
-                    <WavyBg />
-                    <div className="relative z-10 flex justify-between items-start">
-                        <div className="flex flex-col">
-                            <card.icon className="w-8 h-8 mb-2 opacity-80" />
-                            <h3 className="text-xl font-bold">{card.title}</h3>
-                            <p className="text-3xl font-bold opacity-90 mt-2">{card.value}</p>
-                        </div>
-                        <div className="absolute -right-4 -top-4 opacity-80">
-                           <GlassmorphismIcon shape={card.iconShape} />
-                        </div>
-                    </div>
-                </div>
+                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                        <card.icon className={`h-5 w-5 ${card.color}`} />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{card.value}</div>
+                        <p className="text-xs text-muted-foreground">
+                            +2.1% from last month
+                        </p>
+                        <Progress value={card.progress} className="mt-4 h-2" />
+                    </CardContent>
+                 </Card>
               </motion.div>
             ))}
         </motion.section>
