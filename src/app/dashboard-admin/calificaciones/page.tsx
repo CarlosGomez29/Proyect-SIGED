@@ -2,15 +2,18 @@
 "use client";
 
 import React, { useState } from 'react';
-import { File, PlusCircle, Search, ChevronDown, Filter } from "lucide-react";
+import { File, PlusCircle, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { motion } from 'framer-motion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
-const calificacionesData = [
+const initialCalificacionesData = [
   { id: 1, alumno: "Juan Pérez", curso: "Seguridad de la Carga Aérea", calificacion: 95, fecha: "2024-05-10" },
   { id: 2, alumno: "María García", curso: "Mercancías Peligrosas", calificacion: 88, fecha: "2024-05-12" },
   { id: 3, alumno: "Carlos López", curso: "AVSEC para Tripulación", calificacion: 72, fecha: "2024-05-15" },
@@ -32,8 +35,26 @@ const itemVariants = {
 };
 
 export default function CalificacionesPage() {
+    const { toast } = useToast();
+    const [calificacionesData, setCalificacionesData] = useState(initialCalificacionesData);
     const [searchTerm, setSearchTerm] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
+    const handleSaveCalificacion = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const newCalificacion = {
+            id: Date.now(),
+            alumno: formData.get('alumno') as string,
+            curso: formData.get('curso') as string,
+            calificacion: parseInt(formData.get('calificacion') as string, 10),
+            fecha: new Date().toISOString().split('T')[0],
+        };
+        setCalificacionesData([...calificacionesData, newCalificacion]);
+        toast({ title: "Calificación Registrada", description: `Se ha añadido la calificación para ${newCalificacion.alumno}.` });
+        setIsModalOpen(false);
+    };
+
     const filteredCalificaciones = calificacionesData.filter(c =>
         c.alumno.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.curso.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,10 +73,37 @@ export default function CalificacionesPage() {
           <p className="text-muted-foreground">Visualiza y gestiona las calificaciones de los cursos.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Registrar Calificación
-          </Button>
+           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Registrar Calificación
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Registrar Nueva Calificación</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSaveCalificacion} className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="alumno" className="text-right">Alumno</Label>
+                            <Input id="alumno" name="alumno" placeholder="Nombre del alumno" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="curso" className="text-right">Curso</Label>
+                            <Input id="curso" name="curso" placeholder="Nombre del curso" className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="calificacion" className="text-right">Calificación</Label>
+                            <Input id="calificacion" name="calificacion" type="number" min="0" max="100" placeholder="0-100" className="col-span-3" required />
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
+                            <Button type="submit">Guardar Calificación</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
           <Button variant="outline">
             <File className="h-4 w-4 mr-2" />
             Exportar
@@ -97,7 +145,7 @@ export default function CalificacionesPage() {
                   <TableRow key={calif.id}>
                     <TableCell className="font-medium">{calif.alumno}</TableCell>
                     <TableCell>{calif.curso}</TableCell>
-                    <TableCell className="text-center font-semibold">{calif.calificacion}</TableCell>
+                    <TableCell className={`text-center font-semibold ${calif.calificacion < 80 ? 'text-red-600' : 'text-green-600'}`}>{calif.calificacion}</TableCell>
                     <TableCell className="text-right">{calif.fecha}</TableCell>
                   </TableRow>
                 ))}

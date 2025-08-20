@@ -7,15 +7,14 @@ import {
   PlusCircle,
   Search,
   ChevronDown,
+  MoreHorizontal,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -45,8 +44,12 @@ import {
 } from "@/components/ui/pagination";
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-const alumnosData = [
+
+const initialAlumnosData = [
   { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
   { id: 2, nombre: "María", apellido: "García", curso: "Mercancías Peligrosas", estado: "Activo" },
   { id: 3, nombre: "Carlos", apellido: "López", curso: "AVSEC para Tripulación", estado: "Inactivo" },
@@ -72,19 +75,52 @@ const itemVariants = {
 
 export default function AlumnosPage() {
     const { toast } = useToast();
+    const [alumnosData, setAlumnosData] = useState(initialAlumnosData);
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string[]>(["Activo", "Inactivo", "Suspendido"]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingAlumno, setEditingAlumno] = useState<any>(null);
+
 
     const handleFilterChange = (status: string) => {
         setStatusFilter(prev => 
             prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
         );
     };
+    
+    const handleSaveAlumno = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const newAlumno = {
+            id: editingAlumno ? editingAlumno.id : Date.now(),
+            nombre: formData.get('nombre') as string,
+            apellido: formData.get('apellido') as string,
+            curso: formData.get('curso') as string,
+            estado: formData.get('estado') as string,
+        };
 
-    const handleViewProfile = (nombre: string) => {
+        if (editingAlumno) {
+            setAlumnosData(alumnosData.map(a => a.id === newAlumno.id ? newAlumno : a));
+            toast({ title: "Alumno Actualizado", description: `${newAlumno.nombre} ha sido actualizado.` });
+        } else {
+            setAlumnosData([...alumnosData, newAlumno]);
+            toast({ title: "Alumno Registrado", description: `${newAlumno.nombre} ha sido añadido.` });
+        }
+        setIsModalOpen(false);
+        setEditingAlumno(null);
+    };
+
+    const handleEdit = (alumno: any) => {
+        setEditingAlumno(alumno);
+        setIsModalOpen(true);
+    };
+
+    const handleDelete = (id: number) => {
+        setAlumnosData(alumnosData.filter(a => a.id !== id));
         toast({
-            title: "Acción Simulada",
-            description: `Se mostraría el perfil detallado de ${nombre}.`,
+            variant: "destructive",
+            title: "Alumno Eliminado",
+            description: "El registro del alumno ha sido eliminado.",
         });
     };
 
@@ -106,10 +142,44 @@ export default function AlumnosPage() {
           <p className="text-muted-foreground">Busca, filtra y gestiona los perfiles de los alumnos.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Registrar Nuevo Alumno
-          </Button>
+            <Dialog open={isModalOpen} onOpenChange={(open) => {
+                setIsModalOpen(open);
+                if (!open) setEditingAlumno(null);
+            }}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Registrar Nuevo Alumno
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{editingAlumno ? 'Editar Alumno' : 'Registrar Nuevo Alumno'}</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSaveAlumno} className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="nombre" className="text-right">Nombre</Label>
+                            <Input id="nombre" name="nombre" defaultValue={editingAlumno?.nombre || ''} className="col-span-3" required />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="apellido" className="text-right">Apellido</Label>
+                            <Input id="apellido" name="apellido" defaultValue={editingAlumno?.apellido || ''} className="col-span-3" required />
+                        </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="curso" className="text-right">Curso</Label>
+                            <Input id="curso" name="curso" defaultValue={editingAlumno?.curso || ''} className="col-span-3" required />
+                        </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="estado" className="text-right">Estado</Label>
+                            <Input id="estado" name="estado" defaultValue={editingAlumno?.estado || 'Activo'} className="col-span-3" required />
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
+                            <Button type="submit">Guardar</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
           <Button variant="outline">
             <File className="h-4 w-4 mr-2" />
             Exportar
@@ -156,8 +226,7 @@ export default function AlumnosPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Apellido</TableHead>
+                  <TableHead>Nombre Completo</TableHead>
                   <TableHead className="hidden md:table-cell">Curso</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
@@ -166,8 +235,7 @@ export default function AlumnosPage() {
               <TableBody>
                 {filteredAlumnos.map((alumno) => (
                   <TableRow key={alumno.id}>
-                    <TableCell className="font-medium">{alumno.nombre}</TableCell>
-                    <TableCell>{alumno.apellido}</TableCell>
+                    <TableCell className="font-medium">{`${alumno.nombre} ${alumno.apellido}`}</TableCell>
                     <TableCell className="hidden md:table-cell">{alumno.curso}</TableCell>
                     <TableCell>
                       <Badge 
@@ -182,7 +250,34 @@ export default function AlumnosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                       <Button variant="ghost" size="sm" onClick={() => handleViewProfile(alumno.nombre)}>Ver Perfil</Button>
+                       <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => toast({ title: `Perfil de ${alumno.nombre}`})}>Ver Perfil</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(alumno)}>Editar</DropdownMenuItem>
+                           <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">Eliminar</DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta acción no se puede deshacer. Esto eliminará permanentemente el registro del alumno.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(alumno.id)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -205,3 +300,4 @@ export default function AlumnosPage() {
     </motion.div>
   );
 }
+

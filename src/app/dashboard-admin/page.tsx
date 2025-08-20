@@ -12,11 +12,8 @@ import {
     PlusCircle,
     UserPlus,
     Users,
-    Wallet,
-    BadgePercent
-  } from "lucide-react";
+} from "lucide-react";
   
-  import { Badge } from "@/components/ui/badge";
   import { Button } from "@/components/ui/button";
   import {
     Card,
@@ -25,14 +22,7 @@ import {
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
-  import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table";
+
   import {
     Tabs,
     TabsContent,
@@ -44,6 +34,7 @@ import {
   import { motion } from "framer-motion";
   import Link from "next/link";
   
+  // Mock data would typically come from a context or state management library
   const alumnosData = [
     { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
     { id: 2, nombre: "María", apellido: "García", curso: "Mercancías Peligrosas", estado: "Activo" },
@@ -68,9 +59,9 @@ import {
   const statCards = [
       { title: "Alumnos Activos", value: alumnosActivos, delta: "En tiempo real", icon: Users, link: "/dashboard-admin/alumnos" },
       { title: "Inscripciones Pendientes", value: inscripcionesPendientes, delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard-admin/inscripciones" },
-      { title: "Instructores Asignados", value: "8", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard-admin/instructores" },
-      { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "/dashboard-admin/evaluaciones" },
-      { title: "Certificados Emitidos", value: "4,502", delta: "Total histórico", icon: FileText, link: "/dashboard-admin/certificados" }
+      { title: "Instructores Asignados", value: "8", delta: "Activos en cursos", icon: GraduationCap, link: "#" },
+      { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "#" },
+      { title: "Certificados Emitidos", value: "4,502", delta: "Total histórico", icon: FileText, link: "/dashboard-admin/calificaciones" }
   ];
   
   const quickActions = [
@@ -108,14 +99,16 @@ import {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card className="hover:shadow-lg transition-shadow duration-300">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                    <card.icon className={`h-4 w-4 text-muted-foreground ${card.color}`} />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold">{card.value}</div>
-                    <p className="text-xs text-muted-foreground">{card.delta}</p>
-                  </CardContent>
+                    <Link href={card.link} passHref>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 cursor-pointer">
+                            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                            <card.icon className={`h-4 w-4 text-muted-foreground ${card.color}`} />
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{card.value}</div>
+                            <p className="text-xs text-muted-foreground">{card.delta}</p>
+                        </CardContent>
+                    </Link>
                 </Card>
               </motion.div>
             ))}
@@ -165,23 +158,27 @@ import {
                 <TabsContent value="alerts">
                   <Card>
                     <CardContent className="p-4 space-y-4">
-                      <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
-                          <AlertTriangle className="h-5 w-5 text-amber-500" />
-                          <div>
-                              <p className="font-medium">{inscripcionesPendientes} Inscripciones pendientes de aprobación</p>
-                              <p className="text-sm text-muted-foreground">Revise y confirme las nuevas solicitudes.</p>
+                       <Link href="/dashboard-admin/inscripciones" className="block">
+                          <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50 cursor-pointer">
+                              <AlertTriangle className="h-5 w-5 text-amber-500" />
+                              <div>
+                                  <p className="font-medium">{inscripcionesPendientes} Inscripciones pendientes de aprobación</p>
+                                  <p className="text-sm text-muted-foreground">Revise y confirme las nuevas solicitudes.</p>
+                              </div>
+                              <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
                           </div>
-                          <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
-                      </div>
+                       </Link>
                        <Separator />
-                       <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
-                          <AlertTriangle className="h-5 w-5 text-blue-500" />
-                          <div>
-                              <p className="font-medium">5 cursos inician la próxima semana</p>
-                              <p className="text-sm text-muted-foreground">Prepare la logística y bienvenida.</p>
+                       <Link href="/dashboard-admin/cursos" className="block">
+                          <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50 cursor-pointer">
+                              <AlertTriangle className="h-5 w-5 text-blue-500" />
+                              <div>
+                                  <p className="font-medium">5 cursos inician la próxima semana</p>
+                                  <p className="text-sm text-muted-foreground">Prepare la logística y bienvenida.</p>
+                              </div>
+                              <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
                           </div>
-                          <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
-                      </div>
+                        </Link>
                     </CardContent>
                   </Card>
                 </TabsContent>
