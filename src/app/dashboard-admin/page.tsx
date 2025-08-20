@@ -1,5 +1,6 @@
 
 "use client";
+import Link from "next/link";
 import {
     Activity,
     BookCopy,
@@ -45,10 +46,10 @@ import {
   } from "@/components/ui/pagination";
 
 const taskCards = [
-    { title: "Nuevos Alumnos", description: "Recibidas 5 solicitudes", icon: Users, color: "bg-purple-500/20 text-purple-400" },
-    { title: "Cursos Activos", description: "Verifica los materiales", icon: BookCopy, color: "bg-green-500/20 text-green-400" },
-    { title: "Certificados", description: "Tienes 20 nuevos mensajes", icon: GraduationCap, color: "bg-blue-500/20 text-blue-400" },
-    { title: "Inscripciones", description: "Tienes nuevos mensajes", icon: ClipboardCheck, color: "bg-pink-500/20 text-pink-400" },
+    { title: "Nuevos Alumnos", description: "Recibidas 5 solicitudes", icon: Users, color: "bg-purple-500/20 text-purple-400", href: "/dashboard-admin/alumnos" },
+    { title: "Cursos Activos", description: "Verifica los materiales", icon: BookCopy, color: "bg-green-500/20 text-green-400", href: "/dashboard-admin/cursos" },
+    { title: "Certificados", description: "Tienes 20 nuevos mensajes", icon: GraduationCap, color: "bg-blue-500/20 text-blue-400", href: "/dashboard-admin/calificaciones" },
+    { title: "Inscripciones", description: "Tienes nuevos mensajes", icon: ClipboardCheck, color: "bg-pink-500/20 text-pink-400", href: "/dashboard-admin/inscripciones" },
 ];
 
 const recentEnrollments = [
@@ -65,25 +66,29 @@ export default function DashboardAdminPage() {
        
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {taskCards.map((card, index) => (
-                <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                    <Card className="bg-card hover:bg-card/80 transition-colors">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                             <div className={`p-2 rounded-md ${card.color}`}>
-                                <card.icon className="w-5 h-5"/>
-                            </div>
-                            <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
-                        </CardHeader>
-                        <CardContent>
-                            <h3 className="text-lg font-semibold">{card.title}</h3>
-                            <p className="text-sm text-muted-foreground">{card.description}</p>
-                        </CardContent>
-                    </Card>
-                </motion.div>
+                <Link href={card.href} key={index}>
+                    <motion.div
+                        whileHover={{ y: -5, scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="h-full"
+                    >
+                        <Card className="bg-card hover:bg-card/80 transition-colors h-full cursor-pointer">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <div className={`p-2 rounded-md ${card.color}`}>
+                                    <card.icon className="w-5 h-5"/>
+                                </div>
+                                <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <h3 className="text-lg font-semibold">{card.title}</h3>
+                                <p className="text-sm text-muted-foreground">{card.description}</p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                </Link>
             ))}
         </section>
 
@@ -199,3 +204,5 @@ function CustomPagination() {
         </Pagination>
     )
 }
+
+    
