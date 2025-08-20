@@ -61,7 +61,7 @@ const recentEnrollments = [
 
 export default function DashboardAdminPage() {
   return (
-    <div className="flex-1 space-y-6">
+    <div className="flex flex-col flex-1 space-y-6">
        
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {taskCards.map((card, index) => (
@@ -87,24 +87,25 @@ export default function DashboardAdminPage() {
             ))}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-1">
             {/* Main content */}
-            <div className="lg:col-span-3 space-y-6">
+            <motion.div 
+                className="lg:col-span-3"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+            >
                  {/* Recent Enrollments */}
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                     <Card>
-                        <CardHeader className="flex flex-row justify-between items-center">
-                            <CardTitle className="text-lg">Inscripciones Recientes</CardTitle>
-                            <div className="flex items-center gap-2">
-                                <Badge variant="secondary" className="bg-card-foreground/10 text-card-foreground">212 Alumnos</Badge>
-                                <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
-                            </div>
-                        </CardHeader>
-                        <CardContent>
+                <Card className="h-full flex flex-col">
+                    <CardHeader className="flex flex-row justify-between items-center">
+                        <CardTitle className="text-lg">Inscripciones Recientes</CardTitle>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-card-foreground/10 text-card-foreground">212 Alumnos</Badge>
+                            <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex-1 flex flex-col">
+                        <div className="flex-1">
                             <Table>
                                 <TableHeader>
                                 <TableRow>
@@ -137,33 +138,30 @@ export default function DashboardAdminPage() {
                                 ))}
                                 </TableBody>
                             </Table>
-                            <div className="flex items-center justify-between mt-4">
-                                <p className="text-xs text-muted-foreground">Mostrar por página: 100</p>
-                                <CustomPagination />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-            </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                            <p className="text-xs text-muted-foreground">Mostrar por página: 100</p>
+                            <CustomPagination />
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
             {/* Side column */}
-            <div className="lg:col-span-2 space-y-6">
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg">Estadísticas de Inscripciones por Edad</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="h-60">
-                               <EnrollmentChart />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </motion.section>
-            </div>
+            <motion.div 
+                className="lg:col-span-2"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+            >
+                <Card className="h-full flex flex-col">
+                    <CardHeader>
+                        <CardTitle className="text-lg">Estadísticas de Inscripciones por Edad</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                       <EnrollmentChart />
+                    </CardContent>
+                </Card>
+            </motion.div>
         </div>
     </div>
   );
