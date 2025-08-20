@@ -42,18 +42,40 @@ import {
   import { EnrollmentChart } from "@/components/enrollment-chart";
   import { Separator } from "@/components/ui/separator";
   import { motion } from "framer-motion";
+  import Link from "next/link";
   
+  const alumnosData = [
+    { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
+    { id: 2, nombre: "María", apellido: "García", curso: "Mercancías Peligrosas", estado: "Activo" },
+    { id: 3, nombre: "Carlos", apellido: "López", curso: "AVSEC para Tripulación", estado: "Inactivo" },
+    { id: 4, nombre: "Ana", apellido: "Martínez", curso: "Manejo de Crisis", estado: "Activo" },
+    { id: 5, nombre: "Luis", apellido: "Hernández", curso: "Seguridad Aeroportuaria", estado: "Suspendido" },
+    { id: 6, nombre: "Laura", apellido: "Gómez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
+    { id: 7, nombre: "José", apellido: "Díaz", curso: "Mercancías Peligrosas", estado: "Activo" },
+  ];
+  
+  const inscripcionesData = [
+    { id: 1, alumno: "Carlos López", curso: "Seguridad Aeroportuaria", fecha: "2024-05-20", estado: "Pendiente" },
+    { id: 2, alumno: "Ana Martínez", curso: "Manejo de Crisis", fecha: "2024-05-19", estado: "Aprobada" },
+    { id: 3, alumno: "Luis Hernández", curso: "Mercancías Peligrosas", fecha: "2024-05-18", estado: "Rechazada" },
+    { id: 4, alumno: "Laura Gómez", curso: "AVSEC para Tripulación", fecha: "2024-05-17", estado: "Pendiente" },
+    { id: 5, alumno: "José Díaz", curso: "Seguridad de la Carga Aérea", fecha: "2024-05-16", estado: "Aprobada" },
+  ];
+
+  const alumnosActivos = alumnosData.filter(a => a.estado === 'Activo').length;
+  const inscripcionesPendientes = inscripcionesData.filter(i => i.estado === 'Pendiente').length;
+
   const statCards = [
-      { title: "Alumnos Activos", value: "1,254", delta: "+20.1% mes anterior", icon: Users, link: "/dashboard-admin/alumnos" },
-      { title: "Inscripciones Pendientes", value: "42", delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard-admin/inscripciones" },
-      { title: "Instructores Asignados", value: "58", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard-admin/instructores" },
+      { title: "Alumnos Activos", value: alumnosActivos, delta: "En tiempo real", icon: Users, link: "/dashboard-admin/alumnos" },
+      { title: "Inscripciones Pendientes", value: inscripcionesPendientes, delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard-admin/inscripciones" },
+      { title: "Instructores Asignados", value: "8", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard-admin/instructores" },
       { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "/dashboard-admin/evaluaciones" },
       { title: "Certificados Emitidos", value: "4,502", delta: "Total histórico", icon: FileText, link: "/dashboard-admin/certificados" }
   ];
   
   const quickActions = [
-      { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard-admin/alumnos/nuevo" },
-      { label: "Crear Nuevo Curso", icon: BookCopy, link: "/dashboard-admin/cursos/nuevo" },
+      { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard-admin/alumnos" },
+      { label: "Crear Nuevo Curso", icon: BookCopy, link: "/dashboard-admin/cursos" },
       { label: "Gestionar Inscripciones", icon: ClipboardCheck, link: "/dashboard-admin/inscripciones" },
   ];
   
@@ -118,10 +140,12 @@ import {
                     transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                      whileHover={{ scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 10 } }}
                   >
-                    <Button variant="outline" className="h-24 flex-col gap-2 justify-center text-sm w-full">
-                      <action.icon className="h-6 w-6" />
-                      <span>{action.label}</span>
-                    </Button>
+                    <Link href={action.link} passHref>
+                        <Button variant="outline" className="h-24 flex-col gap-2 justify-center text-sm w-full">
+                          <action.icon className="h-6 w-6" />
+                          <span>{action.label}</span>
+                        </Button>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -144,7 +168,7 @@ import {
                       <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
                           <AlertTriangle className="h-5 w-5 text-amber-500" />
                           <div>
-                              <p className="font-medium">42 Inscripciones pendientes de aprobación</p>
+                              <p className="font-medium">{inscripcionesPendientes} Inscripciones pendientes de aprobación</p>
                               <p className="text-sm text-muted-foreground">Revise y confirme las nuevas solicitudes.</p>
                           </div>
                           <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
@@ -166,7 +190,7 @@ import {
                     <CardContent className="p-4 space-y-2">
                       {recentActivity.map((item, index) => (
                            <motion.div 
-                            key={item.description}
+                            key={`${item.description}-${index}`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
@@ -211,5 +235,3 @@ import {
     );
   }
   
-
-    

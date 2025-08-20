@@ -44,6 +44,7 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 const alumnosData = [
   { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
@@ -70,6 +71,7 @@ const itemVariants = {
 
 
 export default function AlumnosPage() {
+    const { toast } = useToast();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string[]>(["Activo", "Inactivo", "Suspendido"]);
 
@@ -77,6 +79,13 @@ export default function AlumnosPage() {
         setStatusFilter(prev => 
             prev.includes(status) ? prev.filter(s => s !== status) : [...prev, status]
         );
+    };
+
+    const handleViewProfile = (nombre: string) => {
+        toast({
+            title: "Acción Simulada",
+            description: `Se mostraría el perfil detallado de ${nombre}.`,
+        });
     };
 
     const filteredAlumnos = alumnosData.filter(alumno => 
@@ -173,7 +182,7 @@ export default function AlumnosPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                       <Button variant="ghost" size="sm">Ver Perfil</Button>
+                       <Button variant="ghost" size="sm" onClick={() => handleViewProfile(alumno.nombre)}>Ver Perfil</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -196,5 +205,3 @@ export default function AlumnosPage() {
     </motion.div>
   );
 }
-
-    

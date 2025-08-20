@@ -1,5 +1,8 @@
 
+"use client";
+
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 import {
   BookOpenCheck,
   ClipboardList,
@@ -29,11 +32,23 @@ import {
 import { Icons } from "@/components/icons";
 import DashboardHeader from "@/components/dashboard-header";
 
+const menuItems = [
+    { href: "/dashboard-admin", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/dashboard-admin/alumnos", icon: UsersRound, label: "Alumnos" },
+    { href: "/dashboard-admin/cursos", icon: Library, label: "Cursos" },
+    { href: "/dashboard-admin/inscripciones", icon: ClipboardList, label: "Inscripciones" },
+    { href: "/dashboard-admin/calificaciones", icon: GraduationCap, label: "Calificaciones" },
+    { href: "/dashboard-admin/reportes", icon: BarChartHorizontal, label: "Reportes" },
+];
+
 export default function DashboardAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const pathname = usePathname();
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -46,65 +61,27 @@ export default function DashboardAdminLayout({
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  href="/dashboard-admin"
-                  tooltip="Dashboard"
-                  isActive
-                >
-                  <Link href="/dashboard-admin">
-                    <LayoutDashboard />
-                    Dashboard
-                  </Link>
-                </SidebarMenuButton>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                        asChild
+                        href={item.href}
+                        tooltip={item.label}
+                        isActive={pathname === item.href}
+                    >
+                        <Link href={item.href}>
+                            <item.icon />
+                            {item.label}
+                        </Link>
+                    </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/alumnos" tooltip="Alumnos">
-                  <Link href="/dashboard-admin/alumnos">
-                    <UsersRound />
-                    Alumnos
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/cursos" tooltip="Cursos">
-                  <Link href="/dashboard-admin/cursos">
-                    <Library />
-                    Cursos
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/inscripciones" tooltip="Inscripciones">
-                  <Link href="/dashboard-admin/inscripciones">
-                    <ClipboardList />
-                    Inscripciones
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/calificaciones" tooltip="Calificaciones">
-                  <Link href="/dashboard-admin/calificaciones">
-                    <GraduationCap />
-                    Calificaciones
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/reportes" tooltip="Reportes">
-                  <Link href="/dashboard-admin/reportes">
-                    <BarChartHorizontal />
-                    Reportes
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
             <SidebarMenu>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/ajustes" tooltip="Ajustes">
+                <SidebarMenuButton asChild href="/dashboard-admin/ajustes" tooltip="Ajustes" isActive={pathname === '/dashboard-admin/ajustes'}>
                   <Link href="/dashboard-admin/ajustes">
                     <Settings />
                     Ajustes

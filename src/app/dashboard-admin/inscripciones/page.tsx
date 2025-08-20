@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle2, XCircle, MoreHorizontal, Clock, Filter } from "lucide-react";
 import { motion } from 'framer-motion';
 
-const inscripcionesData = [
+const initialInscripcionesData = [
   { id: 1, alumno: "Carlos López", curso: "Seguridad Aeroportuaria", fecha: "2024-05-20", estado: "Pendiente" },
   { id: 2, alumno: "Ana Martínez", curso: "Manejo de Crisis", fecha: "2024-05-19", estado: "Aprobada" },
   { id: 3, alumno: "Luis Hernández", curso: "Mercancías Peligrosas", fecha: "2024-05-18", estado: "Rechazada" },
@@ -33,9 +33,14 @@ const itemVariants = {
 };
 
 export default function InscripcionesPage() {
+  const [inscripciones, setInscripciones] = useState(initialInscripcionesData);
   const [filter, setFilter] = useState("Pendiente");
 
-  const filteredInscripciones = inscripcionesData.filter(i => 
+  const handleUpdateStatus = (id: number, newStatus: "Aprobada" | "Rechazada") => {
+    setInscripciones(inscripciones.map(i => i.id === id ? { ...i, estado: newStatus } : i));
+  };
+
+  const filteredInscripciones = inscripciones.filter(i => 
     filter === 'Todas' ? true : i.estado === filter
   );
 
@@ -100,10 +105,10 @@ export default function InscripcionesPage() {
                     <TableCell className="text-right">
                        {inscripcion.estado === 'Pendiente' && (
                         <div className="flex gap-2 justify-end">
-                            <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700">
+                            <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => handleUpdateStatus(inscripcion.id, 'Aprobada')}>
                                 <CheckCircle2 className="h-4 w-4 mr-2" /> Aprobar
                             </Button>
-                             <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700">
+                             <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => handleUpdateStatus(inscripcion.id, 'Rechazada')}>
                                 <XCircle className="h-4 w-4 mr-2" /> Rechazar
                             </Button>
                         </div>
@@ -122,5 +127,3 @@ export default function InscripcionesPage() {
     </motion.div>
   );
 }
-
-    
