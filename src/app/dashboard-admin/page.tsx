@@ -2,233 +2,236 @@
 "use client";
 import {
     Activity,
-    AlertTriangle,
-    ArrowRight,
     BookCopy,
-    CalendarClock,
+    ChevronDown,
     ClipboardCheck,
-    FileText,
     GraduationCap,
-    PlusCircle,
-    UserPlus,
-    Users,
+    MoreHorizontal,
+    Users
 } from "lucide-react";
-  
-  import { Button } from "@/components/ui/button";
-  import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-  } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { EnrollmentChart } from "@/components/enrollment-chart";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+  } from "@/components/ui/pagination";
 
-  import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
-  } from "@/components/ui/tabs";
-  import { EnrollmentChart } from "@/components/enrollment-chart";
-  import { Separator } from "@/components/ui/separator";
-  import { motion } from "framer-motion";
-  import Link from "next/link";
-  
-  // Mock data would typically come from a context or state management library
-  const alumnosData = [
-    { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
-    { id: 2, nombre: "María", apellido: "García", curso: "Mercancías Peligrosas", estado: "Activo" },
-    { id: 3, nombre: "Carlos", apellido: "López", curso: "AVSEC para Tripulación", estado: "Inactivo" },
-    { id: 4, nombre: "Ana", apellido: "Martínez", curso: "Manejo de Crisis", estado: "Activo" },
-    { id: 5, nombre: "Luis", apellido: "Hernández", curso: "Seguridad Aeroportuaria", estado: "Suspendido" },
-    { id: 6, nombre: "Laura", apellido: "Gómez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
-    { id: 7, nombre: "José", apellido: "Díaz", curso: "Mercancías Peligrosas", estado: "Activo" },
-  ];
-  
-  const inscripcionesData = [
-    { id: 1, alumno: "Carlos López", curso: "Seguridad Aeroportuaria", fecha: "2024-05-20", estado: "Pendiente" },
-    { id: 2, alumno: "Ana Martínez", curso: "Manejo de Crisis", fecha: "2024-05-19", estado: "Aprobada" },
-    { id: 3, alumno: "Luis Hernández", curso: "Mercancías Peligrosas", fecha: "2024-05-18", estado: "Rechazada" },
-    { id: 4, alumno: "Laura Gómez", curso: "AVSEC para Tripulación", fecha: "2024-05-17", estado: "Pendiente" },
-    { id: 5, alumno: "José Díaz", curso: "Seguridad de la Carga Aérea", fecha: "2024-05-16", estado: "Aprobada" },
-  ];
+const taskCards = [
+    { title: "Nuevos Alumnos", description: "Recibidas 5 solicitudes", icon: Users, color: "bg-purple-500/20 text-purple-400" },
+    { title: "Cursos Activos", description: "Verifica los materiales", icon: BookCopy, color: "bg-green-500/20 text-green-400" },
+    { title: "Certificados", description: "Tienes 20 nuevos mensajes", icon: GraduationCap, color: "bg-blue-500/20 text-blue-400" },
+    { title: "Inscripciones", description: "Tienes nuevos mensajes", icon: ClipboardCheck, color: "bg-pink-500/20 text-pink-400" },
+];
 
-  const alumnosActivos = alumnosData.filter(a => a.estado === 'Activo').length;
-  const inscripcionesPendientes = inscripcionesData.filter(i => i.estado === 'Pendiente').length;
+const reportItems = [
+    { title: "Monto Reembolsado", value: "50%", color: "text-green-400", chartValue: 50 },
+    { title: "Intereses Pagados", value: "25%", color: "text-purple-400", chartValue: 25 },
+    { title: "Deuda Principal", value: "85%", color: "text-sky-400", chartValue: 85 },
+    { title: "Devolución de Multas", value: "60%", color: "text-pink-400", chartValue: 60 },
+]
 
-  const statCards = [
-      { title: "Alumnos Activos", value: alumnosActivos, delta: "En tiempo real", icon: Users, link: "/dashboard-admin/alumnos" },
-      { title: "Inscripciones Pendientes", value: inscripcionesPendientes, delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard-admin/inscripciones" },
-      { title: "Instructores Asignados", value: "8", delta: "Activos en cursos", icon: GraduationCap, link: "#" },
-      { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "#" },
-      { title: "Certificados Emitidos", value: "4,502", delta: "Total histórico", icon: FileText, link: "/dashboard-admin/calificaciones" }
-  ];
-  
-  const quickActions = [
-      { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard-admin/alumnos" },
-      { label: "Crear Nuevo Curso", icon: BookCopy, link: "/dashboard-admin/cursos" },
-      { label: "Gestionar Inscripciones", icon: ClipboardCheck, link: "/dashboard-admin/inscripciones" },
-  ];
-  
-  const recentActivity = [
-      { type: "Nuevo Alumno", description: "Juan Pérez se ha registrado.", time: "hace 5 min", icon: UserPlus },
-      { type: "Inscripción", description: "Maria Rodriguez se inscribió en Seguridad de la Carga Aérea.", time: "hace 15 min", icon: ClipboardCheck },
-      { type: "Calificación Registrada", description: "Se registró la calificación de Carlos Gomez.", time: "hace 1 hora", icon: GraduationCap },
-      { type: "Certificado Emitido", description: "Se emitió certificado para Ana Martinez.", time: "hace 3 horas", icon: FileText },
-  ];
-  
-  export default function DashboardAdminPage() {
-    return (
-      <div className="flex flex-1 flex-col gap-6">
-        <h1 className="text-3xl font-bold font-headline tracking-tight">
-          Dashboard Principal del Administrador
-        </h1>
-  
-        {/* Visión General y Métricas Clave */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="grid gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-5">
-            {statCards.map((card, index) => (
-              <motion.div
-                key={card.title}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card className="hover:shadow-lg transition-shadow duration-300">
-                    <Link href={card.link} passHref>
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 cursor-pointer">
-                            <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                            <card.icon className={`h-4 w-4 text-muted-foreground ${card.color}`} />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{card.value}</div>
-                            <p className="text-xs text-muted-foreground">{card.delta}</p>
-                        </CardContent>
-                    </Link>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
-  
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            {/* Acciones Rápidas */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <h2 className="text-xl font-semibold font-headline mb-4">Acciones Rápidas</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {quickActions.map((action, index) => (
-                  <motion.div
-                    key={action.label}
+const recentEnrollments = [
+      { name: "Abdullah Al Ahad", age: 29, email: "evgene_1982@yahoo.ru", phone: "+7 (916) 474 48 39", status: "Activo" },
+      { name: "Al Shahriar Shawon", age: 48, email: "nazar_183_up@gmail.com", phone: "+7 (916) 234 48 35", status: "Vencido" },
+      { name: "Lyn R. Ramos", age: 19, email: "mizzz@mail.ru", phone: "+7 (916) 234 62 31", status: "Cerrado" },
+      { name: "Katherine A. Stanfill", age: 29, email: "evgene_1982@yahoo.ru", phone: "+7 (919) 284 53 31", status: "Cerrado" },
+      { name: "Robert K. Panez", age: 34, email: "skorieek@yandex.ru", phone: "+7 (916) 474 48 93", status: "Activo" },
+];
+
+export default function DashboardAdminPage() {
+  return (
+    <div className="flex-1 space-y-6">
+       
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {taskCards.map((card, index) => (
+                <motion.div
+                    key={index}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                     whileHover={{ scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 10 } }}
-                  >
-                    <Link href={action.link} passHref>
-                        <Button variant="outline" className="h-24 flex-col gap-2 justify-center text-sm w-full">
-                          <action.icon className="h-6 w-6" />
-                          <span>{action.label}</span>
-                        </Button>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-  
-            {/* Alertas y Actividad Reciente */}
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <Tabs defaultValue="alerts">
-                <TabsList>
-                  <TabsTrigger value="alerts">Alertas y Notificaciones</TabsTrigger>
-                  <TabsTrigger value="activity">Actividad Reciente</TabsTrigger>
-                </TabsList>
-                <TabsContent value="alerts">
-                  <Card>
-                    <CardContent className="p-4 space-y-4">
-                       <Link href="/dashboard-admin/inscripciones" className="block">
-                          <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50 cursor-pointer">
-                              <AlertTriangle className="h-5 w-5 text-amber-500" />
-                              <div>
-                                  <p className="font-medium">{inscripcionesPendientes} Inscripciones pendientes de aprobación</p>
-                                  <p className="text-sm text-muted-foreground">Revise y confirme las nuevas solicitudes.</p>
-                              </div>
-                              <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
-                          </div>
-                       </Link>
-                       <Separator />
-                       <Link href="/dashboard-admin/cursos" className="block">
-                          <div className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50 cursor-pointer">
-                              <AlertTriangle className="h-5 w-5 text-blue-500" />
-                              <div>
-                                  <p className="font-medium">5 cursos inician la próxima semana</p>
-                                  <p className="text-sm text-muted-foreground">Prepare la logística y bienvenida.</p>
-                              </div>
-                              <Button variant="ghost" size="sm" className="ml-auto"><ArrowRight className="h-4 w-4"/></Button>
-                          </div>
-                        </Link>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="activity">
-                   <Card>
-                    <CardContent className="p-4 space-y-2">
-                      {recentActivity.map((item, index) => (
-                           <motion.div 
-                            key={`${item.description}-${index}`}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                            className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
-                              <item.icon className="h-5 w-5 text-muted-foreground" />
-                              <div className="flex-grow">
-                                  <p className="font-medium">{item.type}</p>
-                                  <p className="text-sm text-muted-foreground">{item.description}</p>
-                              </div>
-                              <p className="text-xs text-muted-foreground">{item.time}</p>
-                          </motion.div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </motion.section>
-          </div>
-  
-          {/* Estadísticas y Tendencias */}
-          <div className="lg:col-span-1 space-y-6">
-            <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-               <h2 className="text-xl font-semibold font-headline mb-4">Tendencia de Inscripciones</h2>
-              <Card>
-                <CardHeader>
-                   <CardDescription>
-                      Análisis de inscripciones en los últimos 6 meses.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <EnrollmentChart />
-                </CardContent>
-              </Card>
-            </motion.section>
-          </div>
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                    <Card className="bg-card hover:bg-card/80 transition-colors">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                             <div className={`p-2 rounded-md ${card.color}`}>
+                                <card.icon className="w-5 h-5"/>
+                            </div>
+                            <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
+                        </CardHeader>
+                        <CardContent>
+                            <h3 className="text-lg font-semibold">{card.title}</h3>
+                            <p className="text-sm text-muted-foreground">{card.description}</p>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            ))}
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main content */}
+            <div className="lg:col-span-2 space-y-6">
+                 {/* Final Report */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                    <Card>
+                        <CardHeader className="flex flex-row justify-between items-center">
+                            <CardTitle className="text-lg">Resumen de Estado</CardTitle>
+                             <Button variant="ghost" size="sm">
+                                .xlsx <ChevronDown className="w-4 h-4 ml-2" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {reportItems.map((item, index) => (
+                                <div key={index} className="flex flex-col items-center gap-2">
+                                    <div className="relative h-24 w-24">
+                                        <EnrollmentChart type="pie" chartValue={item.chartValue} />
+                                        <span className={`absolute inset-0 flex items-center justify-center text-xl font-bold ${item.color}`}>{item.value}</span>
+                                    </div>
+                                    <p className="text-sm font-medium">{item.title}</p>
+                                    <p className="text-xs text-muted-foreground">Avance - 20%</p>
+                                </div>
+                            ))}
+                        </CardContent>
+                    </Card>
+                </motion.section>
+
+                 {/* Recent Enrollments */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                     <Card>
+                        <CardHeader className="flex flex-row justify-between items-center">
+                            <CardTitle className="text-lg">Inscripciones Recientes</CardTitle>
+                            <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="bg-card-foreground/10 text-card-foreground">212 Alumnos</Badge>
+                                <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                <TableRow>
+                                    <TableHead>Cliente</TableHead>
+                                    <TableHead>Edad</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Teléfono</TableHead>
+                                    <TableHead>Estado</TableHead>
+                                </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                {recentEnrollments.map((enrollment) => (
+                                    <TableRow key={enrollment.name}>
+                                        <TableCell className="font-medium">{enrollment.name}</TableCell>
+                                        <TableCell>{enrollment.age}</TableCell>
+                                        <TableCell className="text-muted-foreground">{enrollment.email}</TableCell>
+                                        <TableCell className="text-muted-foreground">{enrollment.phone}</TableCell>
+                                        <TableCell>
+                                            <Badge 
+                                                className={`border-none capitalize ${
+                                                enrollment.status === 'Activo' ? 'bg-green-500/20 text-green-400' : 
+                                                enrollment.status === 'Vencido' ? 'bg-red-500/20 text-red-400' : 
+                                                'bg-gray-500/20 text-gray-400'
+                                                }`}
+                                            >
+                                                {enrollment.status}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                            <div className="flex items-center justify-between mt-4">
+                                <p className="text-xs text-muted-foreground">Mostrar por página: 100</p>
+                                <CustomPagination />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
+            </div>
+            {/* Side column */}
+            <div className="lg:col-span-1 space-y-6">
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Estadísticas de Inscripciones por Edad</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-60">
+                               <EnrollmentChart />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </motion.section>
+            </div>
         </div>
-      </div>
-    );
-  }
-  
+    </div>
+  );
+}
+
+function CustomPagination() {
+    return (
+        <Pagination className="w-auto mx-0 justify-end">
+            <PaginationContent>
+            <PaginationItem>
+                <PaginationPrevious href="#" className="h-8 w-8" />
+            </PaginationItem>
+            <PaginationItem>
+                <PaginationLink href="#" className="h-8 w-8">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+                <PaginationLink href="#" className="h-8 w-8">2</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+                <PaginationLink href="#" isActive className="h-8 w-8 bg-primary text-primary-foreground border-primary">3</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+                 <PaginationLink href="#" className="h-8 w-8">...</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+                <PaginationLink href="#" className="h-8 w-8">8</PaginationLink>
+            </PaginationItem>
+             <PaginationItem>
+                <PaginationLink href="#" className="h-8 w-8">9</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+                <PaginationNext href="#" className="h-8 w-8" />
+            </PaginationItem>
+            </PaginationContent>
+        </Pagination>
+    )
+}

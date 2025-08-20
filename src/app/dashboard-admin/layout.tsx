@@ -9,12 +9,11 @@ import {
   LayoutDashboard,
   Settings,
   UsersRound,
-  Wallet,
-  BarChartHorizontal,
   GraduationCap,
   Library,
-  UserPlus,
-  FileText,
+  BarChartHorizontal,
+  MessageSquare,
+  HelpCircle
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,15 +30,22 @@ import {
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
 import DashboardHeader from "@/components/dashboard-header";
+import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
     { href: "/dashboard-admin", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/dashboard-admin/inscripciones", icon: ClipboardList, label: "Inscripciones", badge: "130" },
     { href: "/dashboard-admin/alumnos", icon: UsersRound, label: "Alumnos" },
     { href: "/dashboard-admin/cursos", icon: Library, label: "Cursos" },
-    { href: "/dashboard-admin/inscripciones", icon: ClipboardList, label: "Inscripciones" },
     { href: "/dashboard-admin/calificaciones", icon: GraduationCap, label: "Calificaciones" },
     { href: "/dashboard-admin/reportes", icon: BarChartHorizontal, label: "Reportes" },
 ];
+
+const secondaryMenuItems = [
+    { href: "#", icon: MessageSquare, label: "Chat", badge: "4" },
+    { href: "/dashboard-admin/ajustes", icon: Settings, label: "Ajustes" },
+    { href: "#", icon: HelpCircle, label: "FAQ", badge: "1" },
+]
 
 export default function DashboardAdminLayout({
   children,
@@ -51,12 +57,21 @@ export default function DashboardAdminLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-background">
         <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2 p-2">
-              <Icons.logo className="h-8 w-8 text-primary" />
-              <h1 className="text-xl font-semibold font-headline">ESAC Manager</h1>
+          <SidebarHeader className="p-4">
+             <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                    <AvatarImage src="https://placehold.co/40x40.png" alt="Vitalii Tk." data-ai-hint="person" />
+                    <AvatarFallback>VT</AvatarFallback>
+                </Avatar>
+                <div>
+                    <p className="font-semibold text-foreground">Admin User</p>
+                    <div className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                        <p className="text-xs text-muted-foreground">Online</p>
+                    </div>
+                </div>
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -68,33 +83,46 @@ export default function DashboardAdminLayout({
                         href={item.href}
                         tooltip={item.label}
                         isActive={pathname === item.href}
+                        className="justify-start"
                     >
-                        <Link href={item.href}>
-                            <item.icon />
-                            {item.label}
+                        <Link href={item.href} className="flex items-center justify-between w-full">
+                           <div className="flex items-center gap-3">
+                             <item.icon className="h-5 w-5" />
+                             <span>{item.label}</span>
+                           </div>
+                           {item.badge && <Badge variant="secondary" className="bg-sidebar-accent text-sidebar-accent-foreground">{item.badge}</Badge>}
                         </Link>
                     </SidebarMenuButton>
               </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <SidebarMenu>
-               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="/dashboard-admin/ajustes" tooltip="Ajustes" isActive={pathname === '/dashboard-admin/ajustes'}>
-                  <Link href="/dashboard-admin/ajustes">
-                    <Settings />
-                    Ajustes
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            <SidebarMenu className="mt-auto">
+               {secondaryMenuItems.map((item) => (
+                 <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                        asChild
+                        href={item.href}
+                        tooltip={item.label}
+                        isActive={pathname === item.href}
+                        className="justify-start"
+                    >
+                        <Link href={item.href} className="flex items-center justify-between w-full">
+                           <div className="flex items-center gap-3">
+                             <item.icon className="h-5 w-5" />
+                             <span>{item.label}</span>
+                           </div>
+                           {item.badge && <Badge variant="destructive" className="bg-red-500/20 text-red-400 border-none">{item.badge}</Badge>}
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+               ))}
             </SidebarMenu>
-          </SidebarFooter>
+          </SidebarContent>
         </Sidebar>
         <div className="flex flex-col flex-1">
           <DashboardHeader />
           <SidebarInset>
-            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
               {children}
             </main>
           </SidebarInset>

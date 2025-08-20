@@ -52,6 +52,8 @@ const PaginationLink = ({
         variant: isActive ? "outline" : "ghost",
         size,
       }),
+      "bg-card text-foreground hover:bg-muted",
+      isActive && "bg-primary text-primary-foreground hover:bg-primary/90",
       className
     )}
     {...props}
