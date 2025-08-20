@@ -41,6 +41,7 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
+    PaginationEllipsis
   } from "@/components/ui/pagination";
 
 const taskCards = [
@@ -86,9 +87,9 @@ export default function DashboardAdminPage() {
             ))}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Main content */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
                  {/* Recent Enrollments */}
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -145,7 +146,7 @@ export default function DashboardAdminPage() {
                 </motion.section>
             </div>
             {/* Side column */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-2 space-y-6">
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -182,10 +183,10 @@ function CustomPagination() {
                 <PaginationLink href="#" className="h-8 w-8">2</PaginationLink>
             </PaginationItem>
             <PaginationItem>
-                <PaginationLink href="#" isActive className="h-8 w-8 bg-primary text-primary-foreground border-primary">3</PaginationLink>
+                <PaginationLink href="#" isActive className="h-8 w-8">3</PaginationLink>
             </PaginationItem>
             <PaginationItem>
-                 <PaginationLink href="#" className="h-8 w-8">...</PaginationLink>
+                <PaginationEllipsis className="h-8 w-8" />
             </PaginationItem>
             <PaginationItem>
                 <PaginationLink href="#" className="h-8 w-8">8</PaginationLink>
