@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from "recharts";
@@ -61,9 +62,9 @@ export function EnrollmentChart({type = 'bar'}: {type?: 'bar' | 'pie'}) {
       <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 0, left: 10 }}>
         <Bar
           dataKey="enrollments"
-          fill="#FFFFFF"
+          fill="hsl(var(--primary))"
           radius={[4, 4, 0, 0]}
-          barSize={8}
+          barSize={20}
         />
       </BarChart>
     </ResponsiveContainer>
