@@ -7,7 +7,6 @@ import {
     BookCopy,
     CalendarClock,
     ClipboardCheck,
-    FilePlus2,
     FileText,
     GraduationCap,
     PlusCircle,
@@ -45,19 +44,17 @@ import {
   import { motion } from "framer-motion";
   
   const statCards = [
-      { title: "Alumnos Activos", value: "1,254", delta: "+20.1% mes anterior", icon: Users, link: "/dashboard/alumnos" },
-      { title: "Inscripciones Pendientes", value: "42", delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard/inscripciones" },
-      { title: "Pagos Vencidos", value: "18", delta: "Necesitan seguimiento", icon: Wallet, color: "text-red-500", link: "/dashboard/pagos" },
-      { title: "Instructores Asignados", value: "58", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard/instructores" },
-      { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "/dashboard/evaluaciones" },
+      { title: "Alumnos Activos", value: "1,254", delta: "+20.1% mes anterior", icon: Users, link: "/dashboard-admin/alumnos" },
+      { title: "Inscripciones Pendientes", value: "42", delta: "Requieren aprobación", icon: ClipboardCheck, color: "text-amber-500", link: "/dashboard-admin/inscripciones" },
+      { title: "Instructores Asignados", value: "58", delta: "Activos en cursos", icon: GraduationCap, link: "/dashboard-admin/instructores" },
+      { title: "Próximas Evaluaciones", value: "9", delta: "En los próximos 7 días", icon: CalendarClock, link: "/dashboard-admin/evaluaciones" },
+      { title: "Certificados Emitidos", value: "4,502", delta: "Total histórico", icon: FileText, link: "/dashboard-admin/certificados" }
   ];
   
   const quickActions = [
-      { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard/alumnos/nuevo" },
-      { label: "Registrar Pago", icon: Wallet, link: "/dashboard/pagos/nuevo" },
-      { label: "Emitir Certificado", icon: FileText, link: "/dashboard/certificados/emitir" },
-      { label: "Gestionar Instructores", icon: GraduationCap, link: "/dashboard/instructores" },
-      { label: "Subir Material de Curso", icon: FilePlus2, link: "/dashboard/cursos/material" },
+      { label: "Registrar Alumno", icon: UserPlus, link: "/dashboard-admin/alumnos/nuevo" },
+      { label: "Crear Nuevo Curso", icon: BookCopy, link: "/dashboard-admin/cursos/nuevo" },
+      { label: "Gestionar Inscripciones", icon: ClipboardCheck, link: "/dashboard-admin/inscripciones" },
   ];
   
   const recentActivity = [
@@ -88,7 +85,7 @@ import {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card>
+                <Card className="hover:shadow-lg transition-shadow duration-300">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
                     <card.icon className={`h-4 w-4 text-muted-foreground ${card.color}`} />
@@ -112,15 +109,16 @@ import {
               transition={{ duration: 0.5, delay: 0.2 }}
             >
               <h2 className="text-xl font-semibold font-headline mb-4">Acciones Rápidas</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {quickActions.map((action, index) => (
                   <motion.div
                     key={action.label}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                     whileHover={{ scale: 1.03, transition: { type: 'spring', stiffness: 400, damping: 10 } }}
                   >
-                    <Button variant="outline" className="h-20 flex-col gap-2 justify-center text-sm w-full">
+                    <Button variant="outline" className="h-24 flex-col gap-2 justify-center text-sm w-full">
                       <action.icon className="h-6 w-6" />
                       <span>{action.label}</span>
                     </Button>
@@ -137,7 +135,7 @@ import {
             >
               <Tabs defaultValue="alerts">
                 <TabsList>
-                  <TabsTrigger value="alerts">Alertas y Notificaciones Críticas</TabsTrigger>
+                  <TabsTrigger value="alerts">Alertas y Notificaciones</TabsTrigger>
                   <TabsTrigger value="activity">Actividad Reciente</TabsTrigger>
                 </TabsList>
                 <TabsContent value="alerts">
@@ -222,3 +220,5 @@ import {
     );
   }
   
+
+    
