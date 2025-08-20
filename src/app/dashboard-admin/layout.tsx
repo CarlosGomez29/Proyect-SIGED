@@ -33,18 +33,18 @@ import DashboardHeader from "@/components/dashboard-header";
 import { Badge } from "@/components/ui/badge";
 
 const menuItems = [
-    { href: "/dashboard-admin", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/dashboard-admin/inscripciones", icon: ClipboardList, label: "Inscripciones", badge: "130" },
-    { href: "/dashboard-admin/alumnos", icon: UsersRound, label: "Alumnos" },
-    { href: "/dashboard-admin/cursos", icon: Library, label: "Cursos" },
-    { href: "/dashboard-admin/calificaciones", icon: GraduationCap, label: "Calificaciones" },
-    { href: "/dashboard-admin/reportes", icon: BarChartHorizontal, label: "Reportes" },
+    { href: "/dashboard-admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList, badge: "130" },
+    { href: "/dashboard-admin/alumnos", label: "Alumnos", icon: UsersRound },
+    { href: "/dashboard-admin/cursos", label: "Cursos", icon: Library },
+    { href: "/dashboard-admin/calificaciones", label: "Calificaciones", icon: GraduationCap },
+    { href: "/dashboard-admin/reportes", label: "Reportes", icon: BarChartHorizontal },
 ];
 
 const secondaryMenuItems = [
-    { href: "#", icon: MessageSquare, label: "Chat", badge: "4" },
-    { href: "/dashboard-admin/ajustes", icon: Settings, label: "Ajustes" },
-    { href: "#", icon: HelpCircle, label: "FAQ", badge: "1" },
+    { href: "#chat", label: "Chat", icon: MessageSquare, badge: "4" },
+    { href: "/dashboard-admin/ajustes", label: "Ajustes", icon: Settings },
+    { href: "#faq", label: "FAQ", icon: HelpCircle, badge: "1" },
 ]
 
 export default function DashboardAdminLayout({
