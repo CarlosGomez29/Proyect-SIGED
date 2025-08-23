@@ -195,16 +195,17 @@ const WavyBg = () => (
                         </TableRow>
                         </TableHeader>
                         <TableBody>
-                        {recentEnrollments.map((enrollment) => (
-                           <motion.tr 
+                        {recentEnrollments.map((enrollment, index) => (
+                           <TableRow 
                               key={enrollment.name}
                               className="hover:bg-muted/50 transition-colors"
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.3 }}
-                              whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                             >
-                                <TableCell>
+                                <motion.td 
+                                  className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                                >
                                     <div className="flex items-center gap-3">
                                         <Avatar className="h-8 w-8">
                                             <AvatarImage src={enrollment.avatar} alt={enrollment.name} data-ai-hint={enrollment['data-ai-hint']} />
@@ -215,8 +216,13 @@ const WavyBg = () => (
                                           <span className="text-muted-foreground text-xs md:hidden">{enrollment.course}</span>
                                         </div>
                                     </div>
-                                </TableCell>
-                                <TableCell>
+                                </motion.td>
+                                <motion.td 
+                                   className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                   initial={{ opacity: 0, y: 10 }}
+                                   animate={{ opacity: 1, y: 0 }}
+                                   transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
+                                >
                                     <Badge 
                                         variant={enrollment.status === 'Aprobado' ? 'default' : enrollment.status === 'Pendiente' ? 'secondary' : 'destructive'}
                                         className={
@@ -227,10 +233,25 @@ const WavyBg = () => (
                                     >
                                         {enrollment.status}
                                     </Badge>
-                                </TableCell>
-                                <TableCell className="hidden md:table-cell">{enrollment.course}</TableCell>
-                                <TableCell className="hidden lg:table-cell text-right">{enrollment.date}</TableCell>
-                                <TableCell className="text-center">
+                                </motion.td>
+                                <motion.td 
+                                  className="hidden md:table-cell p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.04 }}
+                                >{enrollment.course}</motion.td>
+                                <motion.td 
+                                  className="hidden lg:table-cell text-right p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.06 }}
+                                >{enrollment.date}</motion.td>
+                                <motion.td 
+                                  className="text-center p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.08 }}
+                                >
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -244,8 +265,8 @@ const WavyBg = () => (
                                         <DropdownMenuItem>Rechazar</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                </TableCell>
-                            </motion.tr>
+                                </motion.td>
+                            </TableRow>
                         ))}
                         </TableBody>
                     </Table>
@@ -302,3 +323,5 @@ const WavyBg = () => (
       )
   }
   
+
+    

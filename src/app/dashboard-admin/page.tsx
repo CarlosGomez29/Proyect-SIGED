@@ -150,19 +150,40 @@ export default function DashboardAdminPage() {
                                 </TableHeader>
                                 <TableBody>
                                 {recentEnrollments.map((enrollment, index) => (
-                                    <motion.tr 
+                                    <TableRow
                                       key={enrollment.name}
-                                      initial={{ opacity: 0, y: 10 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                                      whileHover={{ y: -2, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                                       className="hover:bg-muted/50 cursor-pointer"
                                     >
-                                        <TableCell className="font-medium">{enrollment.name}</TableCell>
-                                        <TableCell>{enrollment.age}</TableCell>
-                                        <TableCell className="text-muted-foreground">{enrollment.email}</TableCell>
-                                        <TableCell className="text-muted-foreground">{enrollment.phone}</TableCell>
-                                        <TableCell>
+                                        <motion.td
+                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"
+                                          initial={{ opacity: 0, y: 10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                                        >{enrollment.name}</motion.td>
+                                        <motion.td
+                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                          initial={{ opacity: 0, y: 10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
+                                        >{enrollment.age}</motion.td>
+                                        <motion.td
+                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground"
+                                          initial={{ opacity: 0, y: 10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.04 }}
+                                        >{enrollment.email}</motion.td>
+                                        <motion.td
+                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground"
+                                          initial={{ opacity: 0, y: 10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.06 }}
+                                        >{enrollment.phone}</motion.td>
+                                        <motion.td
+                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
+                                          initial={{ opacity: 0, y: 10 }}
+                                          animate={{ opacity: 1, y: 0 }}
+                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.08 }}
+                                        >
                                             <Badge 
                                                 className={`border-none capitalize ${
                                                 enrollment.status === 'Activo' ? 'bg-green-500/20 text-green-400' : 
@@ -172,8 +193,8 @@ export default function DashboardAdminPage() {
                                             >
                                                 {enrollment.status}
                                             </Badge>
-                                        </TableCell>
-                                    </motion.tr>
+                                        </motion.td>
+                                    </TableRow>
                                 ))}
                                 </TableBody>
                             </Table>
@@ -238,5 +259,7 @@ function CustomPagination() {
         </Pagination>
     )
 }
+
+    
 
     
