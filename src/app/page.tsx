@@ -77,7 +77,7 @@ export default function WelcomePage() {
             </Link>
           </Button>
           <Button size="lg" variant="secondary" className="w-64">
-            Preinscribirse como Estudiante
+            Preinscripción
           </Button>
         </motion.div>
       </motion.div>
