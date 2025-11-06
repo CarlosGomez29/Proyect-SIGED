@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,16 @@ const itemVariants = {
 export default function WelcomePage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
+        <Image
+            src="https://scontent-mia3-2.xx.fbcdn.net/v/t51.75761-15/472886842_18316761754166708_5441275870719636355_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Af3ARebzWyoQ7kNvwGdcUaA&_nc_oc=Adniowp876a0ZToJ8swAXJh0s9gejlmNBoCOH-ynfyyPaqo99hECiEvmI43wt-HHMh18qYSrBuBtOnlPF-XghMEo&_nc_zt=23&_nc_ht=scontent-mia3-2.xx&_nc_gid=j0DCcsxWiDEF9vNzTiUiNg&oh=00_Afj0BcG5Zw-XKh2f5ReqxXXfPWuFYjpEaoWXS1RZXUS1eA&oe=69129172"
+            alt="Background"
+            layout="fill"
+            objectFit="cover"
+            className="z-0 filter brightness-50"
+            priority
+        />
       <motion.div
-        className="text-center"
+        className="relative z-10 text-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -45,14 +54,14 @@ export default function WelcomePage() {
         </motion.div>
 
         <motion.h1
-          className="text-5xl font-bold font-headline mt-6 text-foreground"
+          className="text-5xl font-bold font-headline mt-6 text-white drop-shadow-lg"
           variants={itemVariants}
         >
           SIGED - DIGEV
         </motion.h1>
 
         <motion.p
-          className="text-muted-foreground mt-3 text-lg max-w-xl"
+          className="text-neutral-200 mt-3 text-lg max-w-xl drop-shadow-md"
           variants={itemVariants}
         >
           Sistema Integral de Gestión de Estudiantes y Docentes.
