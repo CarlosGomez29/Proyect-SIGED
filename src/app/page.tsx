@@ -50,7 +50,7 @@ const profiles = [
   },
   {
     role: "alumno",
-    name: "Estudiantes",
+    name: "Estudiante",
     description: "Portal del estudiante",
     icon: GraduationCap,
     href: "/login/alumno",
@@ -94,10 +94,10 @@ export default function ProfileSelectionPage() {
         transition={{ duration: 0.5 }}
       >
         <Icons.logo className="h-20 w-20 text-primary mx-auto" />
-        <h1 className="text-4xl font-bold font-headline mt-4">SIGED - DIGEV</h1>
         <p className="text-muted-foreground mt-2 text-md font-medium">
           Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
         </p>
+        <h1 className="text-4xl font-bold font-headline mt-4">SIGED - DIGEV</h1>
         <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
          Sistema Integral de Gestion de Estudiantes y Docentes
         </p>
