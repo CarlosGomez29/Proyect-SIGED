@@ -75,7 +75,7 @@ export default function WelcomePage() {
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="w-64 bg-transparent text-white hover:bg-white/10 hover:text-white">
+          <Button asChild size="lg" variant="secondary" className="w-64">
             <Link href="/preinscripcion">
               Preinscribirse como Estudiante
             </Link>
