@@ -1,7 +1,6 @@
 
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,9 +20,8 @@ import {
 } from "@/components/ui/select";
 import { Icons } from "@/components/icons";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
 
-export default function PreinscripcionPage() {
+export default function PreinscripcionForm() {
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,15 +33,7 @@ export default function PreinscripcionPage() {
   };
 
   return (
-    <div className="relative flex items-center justify-center min-h-screen bg-background overflow-hidden p-4">
-        <Image
-            src="https://scontent-mia3-2.xx.fbcdn.net/v/t51.75761-15/472886842_18316761754166708_5441275870719636355_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Af3ARebzWyoQ7kNvwGdcUaA&_nc_oc=Adniowp876a0ZToJ8swAXJh0s9gejlmNBoCOH-ynfyyPaqo99hECiEvmI43wt-HHMh18qYSrBuBtOnlPF-XghMEo&_nc_zt=23&_nc_ht=scontent-mia3-2.xx&_nc_gid=j0DCcsxWiDEF9vNzTiUiNg&oh=00_Afj0BcG5Zw-XKh2f5ReqxXXfPWuFYjpEaoWXS1RZXUS1eA&oe=69129172"
-            alt="Background"
-            fill
-            priority
-            className="z-0 object-cover filter brightness-50 blur-sm"
-        />
-      <Card className="mx-auto max-w-md z-10 bg-black/60 backdrop-blur-md border border-white/20 text-white">
+      <Card className="mx-auto w-full max-w-md z-10 bg-black/60 backdrop-blur-md border border-white/20 text-white">
         <CardHeader className="text-center">
           <Icons.logo className="h-16 w-16 text-primary mx-auto" />
           <CardTitle className="text-2xl font-headline mt-4">Formulario de Preinscripción</CardTitle>
@@ -94,6 +84,5 @@ export default function PreinscripcionPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
   );
 }

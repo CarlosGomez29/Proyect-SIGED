@@ -1,12 +1,15 @@
 
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import PreinscripcionForm from "@/components/preinscripcion-form";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -75,11 +78,16 @@ export default function WelcomePage() {
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
-          <Button asChild size="lg" variant="secondary" className="w-64">
-            <Link href="/preinscripcion">
-              Preinscribirse como Estudiante
-            </Link>
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+                <Button size="lg" variant="secondary" className="w-64">
+                    Preinscribirse como Estudiante
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-transparent border-none shadow-none p-0 max-w-md">
+                <PreinscripcionForm />
+            </DialogContent>
+          </Dialog>
         </motion.div>
       </motion.div>
     </div>
