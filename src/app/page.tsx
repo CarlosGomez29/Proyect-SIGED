@@ -76,7 +76,7 @@ export default function WelcomePage() {
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </Button>
-          <Button size="lg" variant="secondary" className="w-64">
+          <Button size="lg" variant="secondary" className="w-64 bg-gray-500/50 hover:bg-gray-500/70">
             Preinscripción
           </Button>
         </motion.div>
