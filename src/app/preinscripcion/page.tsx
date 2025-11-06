@@ -91,11 +91,6 @@ export default function PreinscripcionPage() {
             <Button type="submit" className="w-full mt-2">
               Enviar Preinscripción
             </Button>
-            <Button asChild variant="outline" className="w-full bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link href="/">
-                    Volver al Inicio
-                </Link>
-            </Button>
           </form>
         </CardContent>
       </Card>
