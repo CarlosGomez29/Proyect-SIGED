@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
@@ -83,53 +84,62 @@ const itemVariants = {
 
 export default function ProfileSelectionPage() {
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <div className="absolute top-4 right-4">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
+      <Image
+        src="https://scontent.fsdq5-1.fna.fbcdn.net/v/t1.6435-9/83095305_1205978922944167_2162496796377481216_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=Whlmi5PpokMQ7kNvwEabxFu&_nc_oc=Admbe5N-viKhBWzlwWA984DXzYRhbua_WHmvAWBtTALZJ2g2VMkh6wmr7mcywl8jjJU&_nc_zt=23&_nc_ht=scontent.fsdq5-1.fna&_nc_gid=pjqiQM0rqci9QWjOUD59vw&oh=00_AfiNaGyW2wNI3MJnJniCqh2nThkVIAF_kxOjtIfJ16yZZg&oe=693415C4"
+        alt="Background"
+        layout="fill"
+        objectFit="cover"
+        className="z-0 filter blur-sm brightness-50"
+      />
+      <div className="absolute top-4 right-4 z-10">
         <ThemeToggle />
       </div>
-      <motion.div
-        className="text-center mb-12"
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Icons.logo className="h-20 w-20 text-primary mx-auto" />
-        <p className="text-muted-foreground mt-2 text-md font-medium">
-          Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
-        </p>
-        <h1 className="text-4xl font-bold font-headline mt-4">SIGED - DIGEV</h1>
-        <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
-         Sistema Integral de Gestion de Estudiantes y Docentes
-        </p>
-      </motion.div>
+      <div className="relative z-10 flex flex-col items-center justify-center w-full">
+        <motion.div
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Icons.logo className="h-20 w-20 text-primary mx-auto" />
+          <h1 className="text-4xl font-bold font-headline mt-4 text-white drop-shadow-lg">SIGED - DIGEV</h1>
+           <p className="text-neutral-200 mt-2 text-md font-medium max-w-2xl drop-shadow-md">
+            Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
+          </p>
+          <p className="text-neutral-300 mt-2 text-lg max-w-2xl drop-shadow-md">
+            Sistema Integral de Gestion de Estudiantes y Docentes
+          </p>
+        </motion.div>
 
-      <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {profiles.map((profile) => (
-          <motion.div
-            key={profile.role}
-            variants={itemVariants}
-            whileHover={{ y: -5, scale: 1.03, transition: { type: "spring", stiffness: 300 } }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <Link href={profile.href} passHref>
-              <Card className="cursor-pointer h-full transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg">
-                <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-                  <profile.icon className="w-8 h-8 text-primary" />
-                  <div className="flex flex-col">
-                    <CardTitle className="text-xl font-semibold">{profile.name}</CardTitle>
-                    <CardDescription>{profile.description}</CardDescription>
-                  </div>
-                </CardHeader>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
-      </motion.div>
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {profiles.map((profile) => (
+            <motion.div
+              key={profile.role}
+              variants={itemVariants}
+              whileHover={{ y: -5, scale: 1.03, transition: { type: "spring", stiffness: 300 } }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Link href={profile.href} passHref>
+                <Card className="cursor-pointer h-full transition-all duration-300 bg-black/30 backdrop-blur-sm border-white/20 text-white hover:bg-black/50 hover:shadow-primary/20 hover:shadow-lg">
+                  <CardHeader className="flex flex-row items-center gap-4 space-y-0">
+                    <profile.icon className="w-8 h-8 text-primary" />
+                    <div className="flex flex-col">
+                      <CardTitle className="text-xl font-semibold">{profile.name}</CardTitle>
+                      <CardDescription className="text-neutral-300">{profile.description}</CardDescription>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 }
