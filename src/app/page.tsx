@@ -40,7 +40,7 @@ export default function WelcomePage() {
             alt="Background"
             fill
             priority
-            className="z-0 object-cover filter brightness-50"
+            className="z-0 object-cover filter brightness-50 blur-sm"
         />
       <motion.div
         className="relative z-10 text-center"
@@ -68,11 +68,16 @@ export default function WelcomePage() {
           Modernizando la educación para un futuro más brillante.
         </motion.p>
 
-        <motion.div className="mt-10" variants={itemVariants}>
-          <Button asChild size="lg" className="group">
+        <motion.div className="mt-10 flex flex-col items-center gap-4" variants={itemVariants}>
+          <Button asChild size="lg" className="group w-64">
             <Link href="/login">
               Iniciar Sesión
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="w-64 bg-transparent text-white hover:bg-white/10 hover:text-white">
+            <Link href="/preinscripcion">
+              Preinscribirse como Estudiante
             </Link>
           </Button>
         </motion.div>
