@@ -43,14 +43,14 @@ const profiles = [
   },
   {
     role: "instructor",
-    name: "Instructor",
-    description: "Gestión de cursos y alumnos",
+    name: "Docente",
+    description: "Gestión de cursos y estudiantes",
     icon: BookUser,
     href: "/login/instructor",
   },
   {
     role: "alumno",
-    name: "Alumno",
+    name: "Estudiantes",
     description: "Portal del estudiante",
     icon: GraduationCap,
     href: "/login/alumno",

@@ -30,8 +30,8 @@ const profileDetails: { [key: string]: { name: string; icon: React.ElementType, 
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin' },
   'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin' },
   'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision' },
-  'instructor': { name: 'Instructor', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor' },
-  'alumno': { name: 'Alumno', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno' },
+  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno' },
 };
 
 
