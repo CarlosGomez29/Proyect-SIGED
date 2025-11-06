@@ -85,6 +85,7 @@ export default function WelcomePage() {
                 </Button>
             </DialogTrigger>
             <DialogContent className="bg-transparent border-none shadow-none p-0 max-w-md">
+                <span className="sr-only">Formulario de Preinscripción</span>
                 <PreinscripcionForm />
             </DialogContent>
           </Dialog>
