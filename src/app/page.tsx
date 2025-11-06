@@ -90,6 +90,7 @@ export default function ProfileSelectionPage() {
         layout="fill"
         objectFit="cover"
         className="z-0 filter blur-sm brightness-50"
+        priority
       />
       <div className="relative z-10 flex flex-col items-center justify-center w-full">
         <motion.div
@@ -100,7 +101,7 @@ export default function ProfileSelectionPage() {
         >
           <Icons.logo className="h-20 w-20 text-primary mx-auto" />
           <h1 className="text-4xl font-bold font-headline mt-4 text-white drop-shadow-lg">SIGED - DIGEV</h1>
-           <p className="text-neutral-200 mt-2 text-md font-medium max-w-2xl drop-shadow-md">
+          <p className="text-neutral-200 mt-2 text-md font-medium max-w-2xl drop-shadow-md">
             Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
           </p>
           <p className="text-neutral-300 mt-2 text-lg max-w-2xl drop-shadow-md">
@@ -122,7 +123,7 @@ export default function ProfileSelectionPage() {
               whileTap={{ scale: 0.98 }}
             >
               <Link href={profile.href} passHref>
-                <Card className="cursor-pointer h-full transition-all duration-300 bg-black/70 backdrop-blur-md border border-white/20 text-white hover:bg-black/80 hover:border-white/40 hover:shadow-primary/20 hover:shadow-lg">
+                <Card className="cursor-pointer h-full transition-all duration-300 bg-black/60 backdrop-blur-md border border-white/20 text-white hover:bg-black/70 hover:border-white/40 hover:shadow-primary/20 hover:shadow-lg">
                   <CardHeader className="flex flex-row items-center gap-4 space-y-0">
                     <profile.icon className="w-8 h-8 text-primary" />
                     <div className="flex flex-col">
