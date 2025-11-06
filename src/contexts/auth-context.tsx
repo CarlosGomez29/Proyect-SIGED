@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, loading, role, handleLogout }}>
-      {loading ? <div>Loading...</div> : children}
+      {children}
     </AuthContext.Provider>
   );
 };
