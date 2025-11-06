@@ -52,7 +52,7 @@ export default function RoleLoginPage() {
                     <CardDescription>El perfil seleccionado no existe.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <Button onClick={() => router.push('/')} className="w-full">Volver a la selección</Button>
+                     <Button onClick={() => router.push('/login')} className="w-full">Volver a la selección</Button>
                 </CardContent>
             </Card>
         </div>
@@ -109,7 +109,7 @@ export default function RoleLoginPage() {
             <Button type="submit" className="w-full">
               Ingresar
             </Button>
-             <Button type="button" variant="outline" className="w-full" onClick={() => router.push('/')}>
+             <Button type="button" variant="outline" className="w-full" onClick={() => router.push('/login')}>
               Volver a la selección
             </Button>
           </form>
