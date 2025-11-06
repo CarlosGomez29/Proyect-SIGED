@@ -18,7 +18,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 const profiles = [
   {
@@ -92,9 +91,6 @@ export default function ProfileSelectionPage() {
         objectFit="cover"
         className="z-0 filter blur-sm brightness-50"
       />
-      <div className="absolute top-4 right-4 z-10">
-        <ThemeToggle />
-      </div>
       <div className="relative z-10 flex flex-col items-center justify-center w-full">
         <motion.div
           className="text-center mb-8"
