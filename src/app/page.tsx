@@ -101,9 +101,6 @@ export default function ProfileSelectionPage() {
         <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
          Sistema Integral de Gestion de Estudiantes y Docentes
         </p>
-        <p className="text-muted-foreground mt-4 text-md">
-          Selecciona tu perfil para continuar
-        </p>
       </motion.div>
 
       <motion.div
