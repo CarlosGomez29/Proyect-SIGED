@@ -224,12 +224,7 @@ const WavyBg = () => (
                                    transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
                                 >
                                     <Badge 
-                                        variant={enrollment.status === 'Aprobado' ? 'default' : enrollment.status === 'Pendiente' ? 'secondary' : 'destructive'}
-                                        className={
-                                            enrollment.status === 'Aprobado' ? 'bg-green-100 dark:bg-green-800/20 text-green-800 dark:text-green-300' :
-                                            enrollment.status === 'Pendiente' ? 'bg-amber-100 dark:bg-amber-800/20 text-amber-800 dark:text-amber-300' :
-                                            'bg-red-100 dark:bg-red-800/20 text-red-800 dark:text-red-300'
-                                        }
+                                        variant={enrollment.status === 'Aprobado' ? 'success' : enrollment.status === 'Pendiente' ? 'secondary' : 'destructive'}
                                     >
                                         {enrollment.status}
                                     </Badge>
@@ -323,5 +318,3 @@ const WavyBg = () => (
       )
   }
   
-
-    
