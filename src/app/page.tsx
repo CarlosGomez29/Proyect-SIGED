@@ -130,11 +130,6 @@ export default function ProfileSelectionPage() {
           </motion.div>
         ))}
       </motion.div>
-      <div className="mt-12 text-center text-sm">
-        <Link href="/signup" className="text-muted-foreground hover:text-primary transition-colors">
-          ¿No tienes una cuenta? <span className="underline">Registrarse</span>
-        </Link>
-      </div>
     </div>
   );
 }
