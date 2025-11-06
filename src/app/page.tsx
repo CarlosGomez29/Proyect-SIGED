@@ -54,7 +54,7 @@ export default function WelcomePage() {
         </motion.div>
 
         <motion.h1
-          className="text-5xl font-extrabold font-headline mt-6 text-white drop-shadow-lg"
+          className="text-5xl font-bold font-headline mt-6 text-white drop-shadow-lg"
           variants={itemVariants}
         >
           SIGED - DIGEV
