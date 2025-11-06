@@ -10,6 +10,7 @@ import {
   UserPlus,
   BookUser,
   GraduationCap,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Card,
@@ -18,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
+import { Button } from "@/components/ui/button";
 
 const profiles = [
   {
@@ -135,6 +137,19 @@ export default function ProfileSelectionPage() {
               </Link>
             </motion.div>
           ))}
+        </motion.div>
+        <motion.div 
+            className="mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+        >
+            <Button asChild variant="outline" className="bg-transparent text-white hover:bg-white/10 hover:text-white">
+                <Link href="/">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver al Inicio
+                </Link>
+            </Button>
         </motion.div>
       </div>
     </div>
