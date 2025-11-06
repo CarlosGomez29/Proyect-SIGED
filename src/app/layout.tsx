@@ -5,8 +5,8 @@ import { AuthProvider } from '@/contexts/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'ESAC Manager',
-  description: 'Sistema de Gestión Administrativa para la Escuela de Seguridad de la Aviación Civil',
+  title: 'SIGED',
+  description: 'Sistema Integral de Gestion Educativa y Docente (SIGED) para la Direccion General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policia Nacional',
 };
 
 export default function RootLayout({

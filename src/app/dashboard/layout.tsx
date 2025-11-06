@@ -44,7 +44,7 @@ export default function DashboardLayout({
           <SidebarHeader>
              <div className="flex items-center gap-2 p-2" data-sidebar="header-content">
                 <Icons.logo className="h-8 w-8 text-primary" />
-                <span className="text-xl font-semibold font-headline">ESAC</span>
+                <span className="text-xl font-semibold font-headline">SIGED</span>
              </div>
           </SidebarHeader>
           <SidebarContent>

@@ -94,8 +94,11 @@ export default function ProfileSelectionPage() {
         transition={{ duration: 0.5 }}
       >
         <Icons.logo className="h-20 w-20 text-primary mx-auto" />
-        <h1 className="text-4xl font-bold font-headline mt-6">Bienvenido a ESAC Manager</h1>
-        <p className="text-muted-foreground mt-2 text-lg">
+        <h1 className="text-4xl font-bold font-headline mt-6">Bienvenido a SIGED</h1>
+        <p className="text-muted-foreground mt-2 text-lg max-w-2xl">
+         Direccion General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policia Nacional
+        </p>
+        <p className="text-muted-foreground mt-4 text-md">
           Selecciona tu perfil para continuar
         </p>
       </motion.div>
