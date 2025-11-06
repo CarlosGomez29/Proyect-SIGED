@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
@@ -6,7 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'SIGED',
-  description: 'Sistema Integral de Gestion Educativa y Docente (SIGED) para la Direccion General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policia Nacional',
+  description: 'Sistema Integral de Gestion de Estudiantes y Docentes',
 };
 
 export default function RootLayout({
