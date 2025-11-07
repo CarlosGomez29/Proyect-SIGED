@@ -141,7 +141,7 @@ export default function ProfileSelectionPage() {
               whileTap={{ scale: 0.98 }}
             >
               <Link href={profile.href} passHref>
-                <Card className="cursor-pointer h-full transition-all duration-300 bg-black/60 backdrop-blur-md border border-white/20 text-white hover:bg-black/70 hover:border-white/40 hover:shadow-primary/20 hover:shadow-lg">
+                <Card className="cursor-pointer h-full transition-all duration-300 bg-black/50 backdrop-blur-md border border-white/20 text-white hover:bg-black/60 hover:border-white/40 hover:shadow-primary/20 hover:shadow-lg">
                   <CardHeader className="flex flex-row items-center gap-4 space-y-0">
                     <profile.icon className="w-8 h-8 text-primary" />
                     <div className="flex flex-col">
