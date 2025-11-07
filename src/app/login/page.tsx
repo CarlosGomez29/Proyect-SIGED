@@ -94,6 +94,22 @@ export default function ProfileSelectionPage() {
         className="z-0 filter blur-sm brightness-50"
         priority
       />
+
+      <div className="absolute top-4 left-4 z-20">
+        <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+        >
+            <Button asChild variant="ghost" className="bg-transparent text-white hover:bg-white/10 hover:text-white">
+                <Link href="/">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver al Inicio
+                </Link>
+            </Button>
+        </motion.div>
+      </div>
+
       <div className="relative z-10 flex flex-col items-center justify-center w-full">
         <motion.div
           className="text-center mb-8"
@@ -137,19 +153,6 @@ export default function ProfileSelectionPage() {
               </Link>
             </motion.div>
           ))}
-        </motion.div>
-        <motion.div 
-            className="mt-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-        >
-            <Button asChild variant="outline" className="bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <Link href="/">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Volver al Inicio
-                </Link>
-            </Button>
         </motion.div>
       </div>
     </div>
