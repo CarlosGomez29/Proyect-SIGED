@@ -54,6 +54,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        'blue-500': '#3b82f6',
+        'green-500': '#22c55e',
+        'teal-500': '#14b8a6',
+        'sky-500': '#0ea5e9'
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -84,6 +88,13 @@ export default {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      boxShadow: {
+        'primary/20': '0 10px 30px -10px hsl(var(--primary) / 0.2)',
+        'blue-500/20': '0 10px 30px -10px rgba(59, 130, 246, 0.2)',
+        'green-500/20': '0 10px 30px -10px rgba(34, 197, 94, 0.2)',
+        'teal-500/20': '0 10px 30px -10px rgba(20, 184, 166, 0.2)',
+        'sky-500/20': '0 10px 30px -10px rgba(14, 165, 233, 0.2)',
+      }
     },
   },
   plugins: [require('tailwindcss-animate')],

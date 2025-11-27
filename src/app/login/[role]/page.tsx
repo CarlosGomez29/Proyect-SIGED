@@ -12,7 +12,8 @@ import {
   GraduationCap,
   Terminal,
   User,
-  Lock
+  Lock,
+  ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,12 +23,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const profileDetails: { [key: string]: { name: string; icon: React.ElementType, user: string, dashboard: string, accentColor: string } } = {
-  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary' },
-  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500' },
-  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500' },
-  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500' },
-  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500' },
+const profileDetails: { [key: string]: { name: string; icon: React.ElementType, user: string, dashboard: string, accentColor: string, shadowColor: string } } = {
+  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20' },
+  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20' },
+  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20' },
+  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20' },
 };
 
 
@@ -42,11 +43,16 @@ export default function RoleLoginPage() {
 
   if (!details) {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-background">
-             <div className="mx-auto max-w-sm bg-background/80 backdrop-blur-sm p-8 rounded-xl border border-white/10">
-                <h1 className="text-2xl font-bold text-white">Perfil no válido</h1>
-                <p className="text-muted-foreground mt-2">El perfil seleccionado no existe.</p>
-                <Button onClick={() => router.push('/login')} className="w-full mt-6">Volver a la selección</Button>
+        <div className="flex items-center justify-center min-h-screen bg-background p-4">
+             <div className="relative z-10 w-full max-w-md">
+                <div className="bg-black/50 backdrop-blur-lg rounded-2xl border border-white/10 shadow-2xl p-8">
+                    <h1 className="text-2xl font-bold text-white text-center">Perfil no válido</h1>
+                    <p className="text-muted-foreground mt-2 text-center">El perfil seleccionado no existe.</p>
+                    <Button onClick={() => router.push('/login')} className="w-full mt-6">
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Volver a la selección
+                    </Button>
+                </div>
             </div>
         </div>
     )
@@ -80,14 +86,14 @@ export default function RoleLoginPage() {
       />
        <Button asChild variant="ghost" className="absolute top-4 left-4 z-20 bg-transparent text-white hover:bg-white/10 hover:text-white">
             <Link href="/login">
-                <Lock className="mr-2 h-4 w-4" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver
             </Link>
         </Button>
 
       <div className="relative z-10 flex flex-col items-center w-full max-w-md">
         
-        <div className="w-full bg-black/30 backdrop-blur-lg rounded-2xl border border-white/10 shadow-2xl shadow-black/40">
+        <div className={`w-full bg-black/30 backdrop-blur-lg rounded-2xl border border-white/10 shadow-2xl ${details.shadowColor}`}>
             <div className="flex flex-col items-center p-8">
                  <div className={`relative flex h-24 w-24 items-center justify-center rounded-full bg-white/10 border border-white/20 shadow-lg mb-6 ${details.accentColor}`}>
                     <div className="absolute inset-0 rounded-full bg-current opacity-20 blur-xl"></div>
