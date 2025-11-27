@@ -17,18 +17,17 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const profileDetails: { [key: string]: { name: string; icon: React.ElementType, user: string, dashboard: string, accentColor: string, shadowColor: string } } = {
-  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20' },
-  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20' },
-  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20' },
-  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20' },
-  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20' },
+const profileDetails: { [key: string]: { name: string; icon: React.ElementType; user: string; dashboard: string; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
+  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
+  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Portal de Administrador' },
+  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Portal de Admisiones' },
+  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Portal de Docente' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Portal de Estudiante' },
 };
 
 
@@ -99,7 +98,7 @@ export default function RoleLoginPage() {
                     <div className="absolute inset-0 rounded-full bg-current opacity-20 blur-xl"></div>
                     <Icon className="h-12 w-12" />
                 </div>
-                 <h1 className="text-2xl font-bold text-center">¡Bienvenido de vuelta!</h1>
+                 <h1 className="text-2xl font-bold text-center">{details.welcomeMessage}</h1>
                  <p className="text-muted-foreground text-center text-sm">Portal de {details.name}</p>
                  
                 <Alert className="mt-6 mb-4 bg-primary/20 border-primary/30 text-white">
