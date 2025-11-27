@@ -129,11 +129,7 @@ export default function RoleLoginPage() {
                         />
                     </div>
 
-                    <div className="flex items-center justify-between text-sm mt-2">
-                        <div className="flex items-center gap-2">
-                             <Checkbox id="remember-me" className="border-white/30"/>
-                             <Label htmlFor="remember-me" className="text-muted-foreground font-normal">Recuérdame</Label>
-                        </div>
+                    <div className="flex items-center justify-end text-sm mt-2">
                         <Link href="#" className="text-primary hover:underline">
                             ¿Olvidaste tu contraseña?
                         </Link>
