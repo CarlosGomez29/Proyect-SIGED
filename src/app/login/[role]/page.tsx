@@ -10,33 +10,30 @@ import {
   UserPlus,
   BookUser,
   GraduationCap,
-  Terminal
+  Terminal,
+  User,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Icons } from "@/components/icons";
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Image from 'next/image';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const profileDetails: { [key: string]: { name: string; icon: React.ElementType, user: string, dashboard: string } } = {
-  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin' },
-  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin' },
-  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision' },
-  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor' },
-  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno' },
+const profileDetails: { [key: string]: { name: string; icon: React.ElementType, user: string, dashboard: string, accentColor: string } } = {
+  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary' },
+  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500' },
+  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500' },
+  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500' },
 };
 
 
 export default function RoleLoginPage() {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
   const { toast } = useToast();
   const { role } = useParams() as { role: string };
@@ -46,15 +43,11 @@ export default function RoleLoginPage() {
   if (!details) {
     return (
         <div className="flex items-center justify-center min-h-screen bg-background">
-             <Card className="mx-auto max-w-sm">
-                <CardHeader>
-                    <CardTitle>Perfil no válido</CardTitle>
-                    <CardDescription>El perfil seleccionado no existe.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <Button onClick={() => router.push('/login')} className="w-full">Volver a la selección</Button>
-                </CardContent>
-            </Card>
+             <div className="mx-auto max-w-sm bg-background/80 backdrop-blur-sm p-8 rounded-xl border border-white/10">
+                <h1 className="text-2xl font-bold text-white">Perfil no válido</h1>
+                <p className="text-muted-foreground mt-2">El perfil seleccionado no existe.</p>
+                <Button onClick={() => router.push('/login')} className="w-full mt-6">Volver a la selección</Button>
+            </div>
         </div>
     )
   }
@@ -69,7 +62,7 @@ export default function RoleLoginPage() {
       toast({
           variant: "destructive",
           title: "Error de Autenticación",
-          description: "Nombre de usuario incorrecto para este perfil.",
+          description: "Nombre de usuario o contraseña incorrectos.",
       });
     }
   };
@@ -77,44 +70,89 @@ export default function RoleLoginPage() {
   const Icon = details.icon;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader className="text-center">
-            <Icon className="h-12 w-12 text-primary mx-auto" />
-          <CardTitle className="text-2xl font-headline mt-4">Portal de {details.name}</CardTitle>
-          <CardDescription>
-            Ingresa tu usuario para acceder al panel
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Alert className="mb-4 bg-amber-50 border-amber-200 text-amber-800">
-            <Terminal className="h-4 w-4 !text-amber-800" />
-            <AlertTitle className="font-semibold">MODO DE DESARROLLO</AlertTitle>
-            <AlertDescription className="text-xs">
-              Autenticación de prueba sin contraseña. Usuario: <strong>{details.user}</strong>
-            </AlertDescription>
-          </Alert>
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">Usuario</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Ingresa tu nombre de usuario"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
+    <div className="relative flex items-center justify-center min-h-screen bg-background text-white p-4">
+       <Image
+        src="https://scontent-mia3-2.xx.fbcdn.net/v/t51.75761-15/472886842_18316761754166708_5441275870719636355_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Af3ARebzWyoQ7kNvwGdcUaA&_nc_oc=Adniowp876a0ZToJ8swAXJh0s9gejlmNBoCOH-ynfyyPaqo99hECiEvmI43wt-HHMh18qYSrBuBtOnlPF-XghMEo&_nc_zt=23&_nc_ht=scontent-mia3-2.xx&_nc_gid=j0DCcsxWiDEF9vNzTiUiNg&oh=00_Afj0BcG5Zw-XKh2f5ReqxXXfPWuFYjpEaoWXS1RZXUS1eA&oe=69129172"
+        alt="Background"
+        fill
+        priority
+        className="z-0 object-cover filter brightness-50 blur-md"
+      />
+       <Button asChild variant="ghost" className="absolute top-4 left-4 z-20 bg-transparent text-white hover:bg-white/10 hover:text-white">
+            <Link href="/login">
+                <Lock className="mr-2 h-4 w-4" />
+                Volver
+            </Link>
+        </Button>
+
+      <div className="relative z-10 flex flex-col items-center w-full max-w-md">
+        
+        <div className="w-full bg-black/30 backdrop-blur-lg rounded-2xl border border-white/10 shadow-2xl shadow-black/40">
+            <div className="flex flex-col items-center p-8">
+                 <div className={`relative flex h-24 w-24 items-center justify-center rounded-full bg-white/10 border border-white/20 shadow-lg mb-6 ${details.accentColor}`}>
+                    <div className="absolute inset-0 rounded-full bg-current opacity-20 blur-xl"></div>
+                    <Icon className="h-12 w-12" />
+                </div>
+                 <h1 className="text-2xl font-bold text-center">¡Bienvenido de vuelta!</h1>
+                 <p className="text-muted-foreground text-center text-sm">Portal de {details.name}</p>
+                 
+                <Alert className="mt-6 mb-4 bg-primary/20 border-primary/30 text-white">
+                    <Terminal className="h-4 w-4 !text-primary" />
+                    <AlertTitle className="font-semibold">Modo Desarrollo</AlertTitle>
+                    <AlertDescription className="text-xs">
+                    Usuario: <strong>{details.user}</strong> (sin contraseña)
+                    </AlertDescription>
+                </Alert>
+          
+                <form onSubmit={handleLogin} className="grid gap-4 w-full mt-4">
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            id="username"
+                            type="text"
+                            placeholder="Nombre de usuario"
+                            required
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
+                     <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            id="password"
+                            type="password"
+                            placeholder="Contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm mt-2">
+                        <div className="flex items-center gap-2">
+                             <Checkbox id="remember-me" className="border-white/30"/>
+                             <Label htmlFor="remember-me" className="text-muted-foreground font-normal">Recuérdame</Label>
+                        </div>
+                        <Link href="#" className="text-primary hover:underline">
+                            ¿Olvidaste tu contraseña?
+                        </Link>
+                    </div>
+
+                    <Button type="submit" className="w-full mt-4 text-base py-6">
+                        Ingresar
+                    </Button>
+                </form>
+
+                 <div className="mt-8 text-center text-sm text-muted-foreground">
+                    ¿No eres miembro aún?{" "}
+                    <Link href="/signup" className="underline text-primary hover:text-primary/80">
+                        Regístrate
+                    </Link>
+                </div>
             </div>
-            <Button type="submit" className="w-full">
-              Ingresar
-            </Button>
-             <Button type="button" variant="outline" className="w-full" onClick={() => router.push('/login')}>
-              Volver a la selección
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
