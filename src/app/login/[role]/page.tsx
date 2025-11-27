@@ -143,13 +143,6 @@ export default function RoleLoginPage() {
                         Ingresar
                     </Button>
                 </form>
-
-                 <div className="mt-8 text-center text-sm text-muted-foreground">
-                    ¿No eres miembro aún?{" "}
-                    <Link href="/signup" className="underline text-primary hover:text-primary/80">
-                        Regístrate
-                    </Link>
-                </div>
             </div>
         </div>
       </div>
