@@ -66,7 +66,7 @@ export default function DashboardAdminLayout({
             </Avatar>
             <div>
                 <p className="font-semibold text-foreground text-lg">Admin User</p>
-                <p className="text-xs text-muted-foreground">admin@esac.com</p>
+                <p className="text-xs text-muted-foreground">admin@digev.mil.do</p>
             </div>
           </SidebarHeader>
           <SidebarContent className="px-4">
