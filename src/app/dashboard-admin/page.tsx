@@ -79,7 +79,7 @@ export default function DashboardAdminPage() {
             <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-md border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
               {academicPeriod}
             </Badge>
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black font-headline text-white mb-3 tracking-tighter">
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-black font-headline text-white mb-3 tracking-tighter">
               {activeRecinto}
             </h1>
             <p className="text-lg md:text-xl text-white/80 font-medium max-w-2xl leading-relaxed">
