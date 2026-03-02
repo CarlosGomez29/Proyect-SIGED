@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
         hostname: 'scontent.fhex4-2.fna.fbcdn.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'digev.mil.do',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
