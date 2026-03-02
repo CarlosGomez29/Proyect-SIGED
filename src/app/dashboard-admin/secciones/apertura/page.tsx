@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from "react";
@@ -251,7 +250,6 @@ export default function AperturaSeccionesPage() {
                           <Progress 
                             value={ocupacionPorcentaje} 
                             className={`h-1.5 ${ocupacionPorcentaje > 90 ? "bg-destructive/10" : "bg-muted"}`} 
-                            // @ts-ignore - custom class to progress indicator
                             indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"}
                           />
                         </div>
