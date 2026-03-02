@@ -1,0 +1,17 @@
+
+{
+  "hero_institutional": {
+    "url": "https://picsum.photos/seed/digev1/1200/400",
+    "width": 1200,
+    "height": 400,
+    "alt": "Sede Central Escuela Vocacional",
+    "hint": "school building"
+  },
+  "workshop_secondary": {
+    "url": "https://picsum.photos/seed/workshop/600/400",
+    "width": 600,
+    "height": 400,
+    "alt": "Taller de Formación Técnica",
+    "hint": "vocational workshop"
+  }
+}

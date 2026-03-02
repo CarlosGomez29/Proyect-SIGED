@@ -1,265 +1,163 @@
 
 "use client";
+
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import {
-    Activity,
-    BookCopy,
-    ChevronDown,
-    ClipboardCheck,
-    GraduationCap,
-    MoreHorizontal,
-    Users
+import { 
+  Users, 
+  BookOpen, 
+  GraduationCap, 
+  ClipboardCheck, 
+  PlusCircle, 
+  UserPlus, 
+  FileStack,
+  ArrowRight,
+  ShieldCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { EnrollmentChart } from "@/components/enrollment-chart";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-    PaginationEllipsis
-  } from "@/components/ui/pagination";
-
-const motionTableRow = motion(TableRow);
-
-const taskCards = [
-    { title: "Nuevos Alumnos", description: "Recibidas 5 solicitudes", icon: Users, color: "bg-purple-500/20 text-purple-400", href: "/dashboard-admin/alumnos" },
-    { title: "Cursos Activos", description: "Verifica los materiales", icon: BookCopy, color: "bg-green-500/20 text-green-400", href: "/dashboard-admin/cursos" },
-    { title: "Certificados", description: "Tienes 20 nuevos mensajes", icon: GraduationCap, color: "bg-blue-500/20 text-blue-400", href: "/dashboard-admin/calificaciones" },
-    { title: "Inscripciones", description: "Tienes nuevos mensajes", icon: ClipboardCheck, color: "bg-pink-500/20 text-pink-400", href: "/dashboard-admin/inscripciones" },
-];
-
-const recentEnrollments = [
-      { name: "Abdullah Al Ahad", age: 29, email: "evgene_1982@yahoo.ru", phone: "+7 (916) 474 48 39", status: "Activo" },
-      { name: "Al Shahriar Shawon", age: 48, email: "nazar_183_up@gmail.com", phone: "+7 (916) 234 48 35", status: "Vencido" },
-      { name: "Lyn R. Ramos", age: 19, email: "mizzz@mail.ru", phone: "+7 (916) 234 62 31", status: "Cerrado" },
-      { name: "Katherine A. Stanfill", age: 29, email: "evgene_1982@yahoo.ru", phone: "+7 (919) 284 53 31", status: "Cerrado" },
-      { name: "Robert K. Panez", age: 34, email: "skorieek@yandex.ru", phone: "+7 (916) 474 48 93", status: "Activo" },
-];
+import { Badge } from "@/components/ui/badge";
+import images from "@/app/lib/placeholder-images.json";
 
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+    transition: { staggerChildren: 0.1 }
+  }
 };
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-    },
-  },
+  visible: { y: 0, opacity: 1 }
 };
 
 export default function DashboardAdminPage() {
-  return (
-    <div className="flex flex-col flex-1 space-y-6">
-       
-        <motion.section 
-            className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-        >
-            {taskCards.map((card, index) => (
-                <Link href={card.href} key={index}>
-                    <motion.div
-                        variants={itemVariants}
-                        whileHover={{ y: -5, scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" }}
-                        whileTap={{ scale: 0.98 }}
-                        className="h-full"
-                    >
-                        <Card className="bg-card hover:bg-card/80 transition-colors h-full cursor-pointer">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <div className={`p-2 rounded-md ${card.color}`}>
-                                    <card.icon className="w-5 h-5"/>
-                                </div>
-                                <MoreHorizontal className="w-5 h-5 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <h3 className="text-lg font-semibold">{card.title}</h3>
-                                <p className="text-sm text-muted-foreground">{card.description}</p>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                </Link>
-            ))}
-        </motion.section>
+  const metrics = [
+    { title: "Estudiantes Activos", value: "1,254", icon: Users, color: "text-blue-500", trend: "+2.5%" },
+    { title: "Secciones Abiertas", value: "82", icon: BookOpen, color: "text-emerald-500", trend: "+4" },
+    { title: "Docentes Activos", value: "45", icon: ShieldCheck, color: "text-purple-500", trend: "Estable" },
+    { title: "Inscripciones Período", value: "350", icon: ClipboardCheck, color: "text-amber-500", trend: "+12%" },
+  ];
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 flex-1">
-            {/* Main content */}
-            <motion.div 
-                className="lg:col-span-3 flex flex-col"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-            >
-                 {/* Recent Enrollments */}
-                <Card className="h-full flex flex-col flex-1">
-                    <CardHeader className="flex flex-row justify-between items-center">
-                        <CardTitle className="text-lg">Inscripciones Recientes</CardTitle>
-                        <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="bg-card-foreground/10 text-card-foreground">212 Alumnos</Badge>
-                            <MoreHorizontal className="w-5 h-5 text-muted-foreground cursor-pointer" />
-                        </div>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex flex-col">
-                        <div className="flex-1">
-                            <Table>
-                                <TableHeader>
-                                <TableRow>
-                                    <TableHead>Cliente</TableHead>
-                                    <TableHead>Edad</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Teléfono</TableHead>
-                                    <TableHead>Estado</TableHead>
-                                </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                {recentEnrollments.map((enrollment, index) => (
-                                    <TableRow
-                                      key={enrollment.name}
-                                      className="hover:bg-muted/50 cursor-pointer"
-                                    >
-                                        <motion.td
-                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 font-medium"
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3, delay: index * 0.05 }}
-                                        >{enrollment.name}</motion.td>
-                                        <motion.td
-                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
-                                        >{enrollment.age}</motion.td>
-                                        <motion.td
-                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground"
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.04 }}
-                                        >{enrollment.email}</motion.td>
-                                        <motion.td
-                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0 text-muted-foreground"
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.06 }}
-                                        >{enrollment.phone}</motion.td>
-                                        <motion.td
-                                          className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                          initial={{ opacity: 0, y: 10 }}
-                                          animate={{ opacity: 1, y: 0 }}
-                                          transition={{ duration: 0.3, delay: index * 0.05 + 0.08 }}
-                                        >
-                                            <Badge 
-                                                className={`border-none capitalize ${
-                                                enrollment.status === 'Activo' ? 'bg-green-500/20 text-green-400' : 
-                                                enrollment.status === 'Vencido' ? 'bg-red-500/20 text-red-400' : 
-                                                'bg-gray-500/20 text-gray-400'
-                                                }`}
-                                            >
-                                                {enrollment.status}
-                                            </Badge>
-                                        </motion.td>
-                                    </TableRow>
-                                ))}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                            <p className="text-xs text-muted-foreground">Mostrar por página: 100</p>
-                            <CustomPagination />
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
-            {/* Side column */}
-            <motion.div 
-                className="lg:col-span-2 flex flex-col"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-            >
-                <Card className="h-full flex flex-col flex-1">
-                    <CardHeader>
-                        <CardTitle className="text-lg">Estadísticas de Inscripciones por Edad</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 flex">
-                       <EnrollmentChart />
-                    </CardContent>
-                </Card>
-            </motion.div>
+  const quickActions = [
+    { title: "Nueva Inscripción", href: "/dashboard-admin/inscripciones", icon: ClipboardCheck, description: "Procesar solicitud web o manual" },
+    { title: "Crear Estudiante", href: "/dashboard-admin/alumnos", icon: UserPlus, description: "Registrar expediente completo" },
+    { title: "Aperturar Sección", href: "/dashboard-admin/secciones/apertura", icon: PlusCircle, description: "Configurar nueva oferta académica" },
+    { title: "Reportes Avanzados", href: "/dashboard-admin/reportes", icon: FileStack, description: "Análisis y estadísticas del período" },
+  ];
+
+  return (
+    <motion.div 
+      className="space-y-8 pb-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* 1. Hero Institucional */}
+      <motion.section variants={itemVariants} className="relative h-80 w-full rounded-2xl overflow-hidden shadow-2xl">
+        <Image 
+          src={images.hero_institutional.url} 
+          alt={images.hero_institutional.alt}
+          fill
+          className="object-cover"
+          priority
+          data-ai-hint={images.hero_institutional.hint}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center px-12">
+          <Badge className="w-fit mb-4 bg-primary/80 backdrop-blur-md border-none px-4 py-1">Período Académico 2024-2</Badge>
+          <h1 className="text-4xl md:text-5xl font-bold font-headline text-white mb-2 drop-shadow-lg">
+            Sistema de Gestión Académica
+          </h1>
+          <p className="text-xl text-neutral-200 font-medium max-w-2xl drop-shadow-md">
+            Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
+          </p>
         </div>
-    </div>
+      </motion.section>
+
+      {/* 2. Métricas Principales */}
+      <motion.section variants={containerVariants} className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        {metrics.map((metric) => (
+          <motion.div key={metric.title} variants={itemVariants}>
+            <Card className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                <metric.icon className={`h-5 w-5 ${metric.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{metric.value}</div>
+                <p className="text-xs text-green-600 font-medium mt-1">
+                  {metric.trend} <span className="text-muted-foreground font-normal">vs. mes anterior</span>
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </motion.section>
+
+      {/* 3. Accesos Rápidos */}
+      <motion.section variants={itemVariants} className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold font-headline tracking-tight">Procesos Clave</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {quickActions.map((action) => (
+            <Link key={action.title} href={action.href} className="group">
+              <Card className="h-full border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
+                <CardContent className="pt-6">
+                  <div className="mb-4 rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <action.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-1">{action.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {action.description}
+                  </p>
+                  <div className="mt-4 flex items-center text-primary text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                    Ir ahora <ArrowRight className="ml-1 h-3 w-3" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* 4. Sección Institucional Secundaria */}
+      <motion.section variants={itemVariants}>
+        <Card className="overflow-hidden border-none bg-muted/30">
+          <div className="grid md:grid-cols-2">
+            <div className="relative h-64 md:h-auto overflow-hidden">
+              <Image 
+                src={images.workshop_secondary.url} 
+                alt={images.workshop_secondary.alt}
+                fill
+                className="object-cover transition-transform hover:scale-105 duration-700"
+                data-ai-hint={images.workshop_secondary.hint}
+              />
+            </div>
+            <div className="p-8 flex flex-col justify-center space-y-4">
+              <h2 className="text-2xl font-bold font-headline text-primary">Nuestra Misión</h2>
+              <p className="text-muted-foreground leading-relaxed text-lg">
+                Proporcionar una formación técnico-profesional de excelencia a los miembros de las instituciones castrenses y a la clase civil, fomentando el desarrollo socioeconómico del país a través de la capacitación integral y valores éticos.
+              </p>
+              <div className="flex items-center gap-4 pt-2">
+                <div className="flex -space-x-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="h-10 w-10 rounded-full border-4 border-background bg-muted flex items-center justify-center text-[10px] font-bold overflow-hidden">
+                      <Image src={`https://picsum.photos/seed/stu${i}/40/40`} alt="User" width={40} height={40} />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  +100,000 egresados han transformado su futuro con nosotros.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </motion.section>
+    </motion.div>
   );
 }
-
-function CustomPagination() {
-    return (
-        <Pagination className="w-auto mx-0 justify-end">
-            <PaginationContent>
-            <PaginationItem>
-                <PaginationPrevious href="#" className="h-8 w-8" />
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationLink href="#" className="h-8 w-8">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationLink href="#" className="h-8 w-8">2</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationLink href="#" isActive className="h-8 w-8">3</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationEllipsis className="h-8 w-8" />
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationLink href="#" className="h-8 w-8">8</PaginationLink>
-            </PaginationItem>
-             <PaginationItem>
-                <PaginationLink href="#" className="h-8 w-8">9</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-                <PaginationNext href="#" className="h-8 w-8" />
-            </PaginationItem>
-            </PaginationContent>
-        </Pagination>
-    )
-}
-
-    
-
-    
