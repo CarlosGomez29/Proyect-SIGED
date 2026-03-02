@@ -4,16 +4,22 @@
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import {
-  BookOpenCheck,
-  ClipboardList,
   LayoutDashboard,
-  Settings,
-  UsersRound,
-  GraduationCap,
+  Users,
+  PlusCircle,
   Library,
-  BarChartHorizontal,
-  MessageSquare,
-  HelpCircle
+  Trash2,
+  UsersRound,
+  UserPlus,
+  ClipboardList,
+  Globe,
+  UserMinus,
+  GraduationCap,
+  Search,
+  Activity,
+  History,
+  BarChart3,
+  FileStack,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -28,110 +34,131 @@ import {
   SidebarFooter,
   SidebarInset,
 } from "@/components/ui/sidebar";
-import { Icons } from "@/components/icons";
 import DashboardHeader from "@/components/dashboard-header";
-import { Badge } from "@/components/ui/badge";
 
-const menuItems = [
-    { href: "/dashboard-admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList, badge: "130" },
-    { href: "/dashboard-admin/alumnos", label: "Alumnos", icon: UsersRound },
-    { href: "/dashboard-admin/cursos", label: "Cursos", icon: Library },
-    { href: "/dashboard-admin/calificaciones", label: "Calificaciones", icon: GraduationCap },
-    { href: "/dashboard-admin/reportes", label: "Reportes", icon: BarChartHorizontal },
+const academicOffering = [
+    { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
+    { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
+    { href: "/dashboard-admin/cursos", label: "Gestión de Secciones", icon: Library },
+    { href: "/dashboard-admin/secciones/limpieza", label: "Eliminar Sección Vacía", icon: Trash2 },
 ];
 
-const secondaryMenuItems = [
-    { href: "#chat", label: "Chat", icon: MessageSquare, badge: "4" },
-    { href: "/dashboard-admin/ajustes", label: "Ajustes", icon: Settings },
-    { href: "#faq", label: "FAQ", icon: HelpCircle, badge: "1" },
-]
+const studentsModule = [
+    { href: "/dashboard-admin/alumnos", label: "Gestión de Estudiantes", icon: UsersRound },
+    { href: "/dashboard-admin/solicitudes", label: "Solicitudes de Ingreso", icon: UserPlus },
+];
+
+const academicManagement = [
+    { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
+    { href: "/dashboard-admin/inscripciones-web", label: "Inscripciones Web", icon: Globe },
+    { href: "/dashboard-admin/inscripciones/liberar", label: "Liberar Inscripción", icon: UserMinus },
+    { href: "/dashboard-admin/calificaciones", label: "Calificaciones", icon: GraduationCap },
+];
+
+const reportsModule = [
+    { href: "/dashboard-admin/consultas", label: "Consultas", icon: Search },
+    { href: "/dashboard-admin/ocupacion", label: "Ocupación", icon: Activity },
+    { href: "/dashboard-admin/historicos", label: "Históricos", icon: History },
+    { href: "/dashboard-admin/graficas", label: "Gráficas", icon: BarChart3 },
+    { href: "/dashboard-admin/reportes", label: "Reportes Avanzados", icon: FileStack },
+];
 
 export default function DashboardAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   const pathname = usePathname();
+
+  const renderMenuItems = (items: any[]) => (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.label}>
+          <SidebarMenuButton
+            asChild
+            tooltip={item.label}
+            isActive={pathname === item.href}
+          >
+            <Link href={item.href} className="flex items-center gap-3">
+              <item.icon className="h-4 w-4" />
+              <span>{item.label}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
 
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <Sidebar>
-          <SidebarHeader className="p-4 flex flex-col items-center justify-center text-center gap-3">
-             <Avatar className="h-20 w-20 border-2 border-primary">
-                <AvatarImage src="https://placehold.co/80x80.png" alt="Admin User" data-ai-hint="person" />
-                <AvatarFallback>AU</AvatarFallback>
+        <Sidebar className="border-r">
+          <SidebarHeader className="p-6 flex flex-col items-center justify-center text-center gap-3">
+            <Avatar className="h-16 w-16 border-2 border-primary/20">
+              <AvatarImage src="https://placehold.co/80x80.png" alt="Admin" data-ai-hint="person" />
+              <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <div>
-                <p className="font-semibold text-foreground text-lg">Admin User</p>
-                <p className="text-xs text-muted-foreground">admin@digev.mil.do</p>
+              <p className="font-bold text-foreground text-sm">Administrador</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Gestión Académica</p>
             </div>
           </SidebarHeader>
-          <SidebarContent className="px-4">
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton
-                        asChild
-                        tooltip={item.label}
-                        isActive={pathname === item.href}
-                        className="justify-start"
-                    >
-                        <Link href={item.href} className="flex items-center w-full">
-                           <div className="flex items-center gap-3">
-                             <item.icon className="h-5 w-5" />
-                             <span>{item.label}</span>
-                           </div>
-                        </Link>
-                    </SidebarMenuButton>
-              </SidebarMenuItem>
-              ))}
-               <SidebarMenuItem>
-                    <SidebarMenuButton
-                        asChild
-                        tooltip={"Ajustes"}
-                        isActive={pathname === "/dashboard-admin/ajustes"}
-                        className="justify-start"
-                    >
-                        <Link href={"/dashboard-admin/ajustes"} className="flex items-center w-full">
-                           <div className="flex items-center gap-3">
-                             <Settings className="h-5 w-5" />
-                             <span>Ajustes</span>
-                           </div>
-                        </Link>
-                    </SidebarMenuButton>
+          
+          <SidebarContent className="px-4 py-2 space-y-6">
+            <div>
+              <p className="px-2 mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">General</p>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Dashboard" isActive={pathname === "/dashboard-admin"}>
+                    <Link href="/dashboard-admin" className="flex items-center gap-3">
+                      <LayoutDashboard className="h-4 w-4" />
+                      <span>Resumen General</span>
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
-            </SidebarMenu>
+              </SidebarMenu>
+            </div>
+
+            <div>
+              <p className="px-2 mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Oferta Académica</p>
+              {renderMenuItems(academicOffering)}
+            </div>
+
+            <div>
+              <p className="px-2 mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Estudiantes</p>
+              {renderMenuItems(studentsModule)}
+            </div>
+
+            <div>
+              <p className="px-2 mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Gestión Académica</p>
+              {renderMenuItems(academicManagement)}
+            </div>
+
+            <div>
+              <p className="px-2 mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Reportes e Indicadores</p>
+              {renderMenuItems(reportsModule)}
+            </div>
           </SidebarContent>
-           <SidebarFooter className="p-4 border-none">
-              <div className="text-center">
-                  <p className="text-sm font-semibold text-foreground mb-2">Active Users</p>
-                  <div className="flex items-center justify-center -space-x-2">
-                      <Avatar className="h-8 w-8 border-2 border-background">
-                          <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person woman" />
-                          <AvatarFallback>U1</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-background">
-                           <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person man" />
-                          <AvatarFallback>U2</AvatarFallback>
-                      </Avatar>
-                      <Avatar className="h-8 w-8 border-2 border-background">
-                           <AvatarImage src="https://placehold.co/32x32.png" data-ai-hint="person" />
-                          <AvatarFallback>U3</AvatarFallback>
-                      </Avatar>
-                       <div className="h-8 w-8 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center border-2 border-background font-semibold">
-                          +70
-                       </div>
-                  </div>
+
+          <SidebarFooter className="p-6 border-t bg-muted/20">
+            <div className="flex items-center justify-between">
+              <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                  <Avatar key={i} className="h-6 w-6 border-2 border-background">
+                    <AvatarImage src={`https://placehold.co/32x32.png?text=${i}`} />
+                    <AvatarFallback>U</AvatarFallback>
+                  </Avatar>
+                ))}
               </div>
+              <span className="text-[10px] font-medium text-muted-foreground">+72 Activos</span>
+            </div>
           </SidebarFooter>
         </Sidebar>
+
         <div className="flex flex-col flex-1">
           <DashboardHeader />
           <SidebarInset>
-            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-muted/30 dark:bg-card/20">
+            <main className="flex-1 p-4 lg:p-8 bg-muted/5">
               {children}
             </main>
           </SidebarInset>
