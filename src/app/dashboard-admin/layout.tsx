@@ -75,7 +75,6 @@ export default function DashboardAdminLayout({
                 <SidebarMenuItem key={item.label}>
                     <SidebarMenuButton
                         asChild
-                        href={item.href}
                         tooltip={item.label}
                         isActive={pathname === item.href}
                         className="justify-start"
@@ -92,7 +91,6 @@ export default function DashboardAdminLayout({
                <SidebarMenuItem>
                     <SidebarMenuButton
                         asChild
-                        href={"/dashboard-admin/ajustes"}
                         tooltip={"Ajustes"}
                         isActive={pathname === "/dashboard-admin/ajustes"}
                         className="justify-start"
