@@ -20,12 +20,12 @@ import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from 'next/image';
-import { Checkbox } from '@/components/ui/checkbox';
+import images from "@/app/lib/placeholder-images.json";
 
 const profileDetails: { [key: string]: { name: string; icon: React.ElementType; user: string; dashboard: string; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
   'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador' },
-  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido, a Admisiones' },
+  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones' },
   'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
   'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante' },
 };
@@ -77,11 +77,12 @@ export default function RoleLoginPage() {
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-background text-white p-4">
        <Image
-        src="https://scontent-mia3-2.xx.fbcdn.net/v/t51.75761-15/472886842_18316761754166708_5441275870719636355_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Af3ARebzWyoQ7kNvwGdcUaA&_nc_oc=Adniowp876a0ZToJ8swAXJh0s9gejlmNBoCOH-ynfyyPaqo99hECiEvmI43wt-HHMh18qYSrBuBtOnlPF-XghMEo&_nc_zt=23&_nc_ht=scontent-mia3-2.xx&_nc_gid=j0DCcsxWiDEF9vNzTiUiNg&oh=00_Afj0BcG5Zw-XKh2f5ReqxXXfPWuFYjpEaoWXS1RZXUS1eA&oe=69129172"
+        src={images.hero_institutional.url}
         alt="Background"
         fill
         priority
         className="z-0 object-cover filter brightness-50 blur-md"
+        data-ai-hint={images.hero_institutional.hint}
       />
        <Button asChild variant="ghost" className="absolute top-4 left-4 z-20 bg-transparent text-white hover:bg-white/10 hover:text-white">
             <Link href="/login">

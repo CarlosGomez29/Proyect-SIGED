@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import images from "@/app/lib/placeholder-images.json";
 
 const profiles = [
   {
@@ -87,12 +88,13 @@ export default function ProfileSelectionPage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
       <Image
-        src="https://scontent.fsdq5-1.fna.fbcdn.net/v/t1.6435-9/83095305_1205978922944167_2162496796377481216_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=Whlmi5PpokMQ7kNvwEabxFu&_nc_oc=Admbe5N-viKhBWzlwWA984DXzYRhbua_WHmvAWBtTALZJ2g2VMkh6wmr7mcywl8jjJU&_nc_zt=23&_nc_ht=scontent.fsdq5-1.fna&_nc_gid=pjqiQM0rqci9QWjOUD59vw&oh=00_AfiNaGyW2wNI3MJnJniCqh2nThkVIAF_kxOjtIfJ16yZZg&oe=693415C4"
+        src={images.hero_institutional.url}
         alt="Background"
         layout="fill"
         objectFit="cover"
         className="z-0 filter blur-sm brightness-50"
         priority
+        data-ai-hint={images.hero_institutional.hint}
       />
 
       <div className="absolute top-4 left-4 z-20">
