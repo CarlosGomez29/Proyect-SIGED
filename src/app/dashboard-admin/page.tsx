@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -51,71 +50,85 @@ export default function DashboardAdminPage() {
 
   return (
     <motion.div 
-      className="space-y-8 pb-8"
+      className="space-y-10 pb-12"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      {/* 1. Hero Institucional */}
-      <motion.section variants={itemVariants} className="relative h-80 w-full rounded-2xl overflow-hidden shadow-2xl">
+      {/* 1. Hero Institucional Estilo Apple */}
+      <motion.section variants={itemVariants} className="relative h-[400px] w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
         <Image 
           src={images.hero_institutional.url} 
           alt={images.hero_institutional.alt}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-[2s] hover:scale-105"
           priority
           data-ai-hint={images.hero_institutional.hint}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center px-12">
-          <Badge className="w-fit mb-4 bg-primary/80 backdrop-blur-md border-none px-4 py-1">Período Académico 2024-2</Badge>
-          <h1 className="text-4xl md:text-5xl font-bold font-headline text-white mb-2 drop-shadow-lg">
-            Sistema de Gestión Académica
-          </h1>
-          <p className="text-xl text-neutral-200 font-medium max-w-2xl drop-shadow-md">
-            Dirección General de las Escuelas Vocacionales de las Fuerzas Armadas y de la Policía Nacional
-          </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-12">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-md border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
+              Período Académico 2024-2
+            </Badge>
+            <h1 className="text-4xl md:text-6xl font-black font-headline text-white mb-3 tracking-tighter">
+              Gestión Académica
+            </h1>
+            <p className="text-lg md:text-xl text-white/80 font-medium max-w-2xl leading-relaxed">
+              Dirección General de las Escuelas Vocacionales FF.AA. y P.N.
+            </p>
+          </motion.div>
         </div>
       </motion.section>
 
-      {/* 2. Métricas Principales */}
+      {/* 2. Métricas Estilo Widget */}
       <motion.section variants={containerVariants} className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => (
-          <motion.div key={metric.title} variants={itemVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+          <motion.div key={metric.title} variants={itemVariants} whileHover={{ y: -5 }}>
+            <Card className="glass-card hover:bg-card/90 transition-all duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                <metric.icon className={`h-5 w-5 ${metric.color}`} />
+                <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{metric.title}</CardTitle>
+                <div className={`p-2 rounded-xl bg-primary/5 ${metric.color}`}>
+                  <metric.icon className="h-4 w-4" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{metric.value}</div>
-                <p className="text-xs text-green-600 font-medium mt-1">
-                  {metric.trend} <span className="text-muted-foreground font-normal">vs. mes anterior</span>
-                </p>
+                <div className="text-3xl font-black tracking-tighter">{metric.value}</div>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-success/10 text-success">
+                    {metric.trend}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-medium italic">este mes</span>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </motion.section>
 
-      {/* 3. Accesos Rápidos */}
-      <motion.section variants={itemVariants} className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold font-headline tracking-tight">Procesos Clave</h2>
+      {/* 3. Procesos Estilo App Store */}
+      <motion.section variants={itemVariants} className="space-y-6">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-2xl font-black font-headline tracking-tighter">Procesos Clave</h2>
+          <Button variant="ghost" size="sm" className="text-primary font-bold">Ver todos</Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action) => (
             <Link key={action.title} href={action.href} className="group">
-              <Card className="h-full border-dashed hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
-                <CardContent className="pt-6">
-                  <div className="mb-4 rounded-full bg-primary/10 w-12 h-12 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                    <action.icon className="h-6 w-6" />
+              <Card className="h-full glass-card hover:ring-2 hover:ring-primary/20 transition-all duration-300">
+                <CardContent className="pt-8">
+                  <div className="mb-6 rounded-2xl bg-primary/5 w-14 h-14 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-inner">
+                    <action.icon className="h-7 w-7" />
                   </div>
-                  <h3 className="font-bold text-lg mb-1">{action.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <h3 className="font-bold text-lg mb-2 tracking-tight">{action.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                     {action.description}
                   </p>
-                  <div className="mt-4 flex items-center text-primary text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                    Ir ahora <ArrowRight className="ml-1 h-3 w-3" />
+                  <div className="mt-6 flex items-center text-primary text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-[-10px] group-hover:translate-x-0">
+                    Comenzar <ArrowRight className="ml-2 h-3 w-3" />
                   </div>
                 </CardContent>
               </Card>
@@ -124,34 +137,38 @@ export default function DashboardAdminPage() {
         </div>
       </motion.section>
 
-      {/* 4. Sección Institucional Secundaria */}
+      {/* 4. Sección Visión Modernizada */}
       <motion.section variants={itemVariants}>
-        <Card className="overflow-hidden border-none bg-muted/30">
+        <Card className="overflow-hidden glass-card rounded-[2.5rem]">
           <div className="grid md:grid-cols-2">
-            <div className="relative h-64 md:h-auto overflow-hidden">
+            <div className="relative h-80 md:h-auto overflow-hidden">
               <Image 
                 src={images.workshop_secondary.url} 
                 alt={images.workshop_secondary.alt}
                 fill
-                className="object-cover transition-transform hover:scale-105 duration-700"
+                className="object-cover transition-transform duration-[3s] hover:scale-110"
                 data-ai-hint={images.workshop_secondary.hint}
               />
+              <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent hidden md:block" />
             </div>
-            <div className="p-8 flex flex-col justify-center space-y-4">
-              <h2 className="text-2xl font-bold font-headline text-primary">Nuestra Visión</h2>
-              <p className="text-muted-foreground leading-relaxed text-lg">
-                Una Organización que como parte del Sistema Nacional de Formación y Promoción Técnico Profesional de Trabajadores, sea reconocida por la calidad de sus programas dirigidos al desarrollo Humano de los dominicanos y dominicanas, de preparar mano de obra calificada para satisfacer las necesidades productivas nacionales y por el fomento de una cultura de emprendedurismo de los miembros de las Fuerzas Armadas, de la Policía Nacional y de la sociedad en general que cursan sus programas.
+            <div className="p-12 flex flex-col justify-center space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest w-fit">
+                Nuestra Identidad
+              </div>
+              <h2 className="text-3xl font-black font-headline text-primary tracking-tighter">Visión Institucional</h2>
+              <p className="text-muted-foreground leading-relaxed text-lg font-medium italic border-l-4 border-primary/20 pl-6">
+                "Una Organización reconocida por la calidad de sus programas dirigidos al desarrollo Humano de los dominicanos, preparando mano de obra calificada y fomentando el emprendedurismo."
               </p>
-              <div className="flex items-center gap-4 pt-2">
+              <div className="flex items-center gap-6 pt-4">
                 <div className="flex -space-x-3">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-10 w-10 rounded-full border-4 border-background bg-muted flex items-center justify-center text-[10px] font-bold overflow-hidden">
-                      <Image src={`https://picsum.photos/seed/stu${i}/40/40`} alt="User" width={40} height={40} />
+                    <div key={i} className="h-12 w-12 rounded-full border-4 border-background bg-muted flex items-center justify-center overflow-hidden shadow-lg transition-transform hover:scale-110 hover:z-10 cursor-pointer">
+                      <Image src={`https://picsum.photos/seed/stu${i}/40/40`} alt="User" width={48} height={48} />
                     </div>
                   ))}
                 </div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  +100,000 egresados han transformado su futuro con nosotros.
+                <p className="text-xs font-bold text-muted-foreground tracking-tight">
+                  +100k graduados transformando el país.
                 </p>
               </div>
             </div>
