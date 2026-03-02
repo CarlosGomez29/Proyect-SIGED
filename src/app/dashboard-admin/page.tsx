@@ -138,9 +138,9 @@ export default function DashboardAdminPage() {
               />
             </div>
             <div className="p-8 flex flex-col justify-center space-y-4">
-              <h2 className="text-2xl font-bold font-headline text-primary">Nuestra Misión</h2>
+              <h2 className="text-2xl font-bold font-headline text-primary">Nuestra Visión</h2>
               <p className="text-muted-foreground leading-relaxed text-lg">
-                Proporcionar una formación técnico-profesional de excelencia a los miembros de las instituciones castrenses y a la clase civil, fomentando el desarrollo socioeconómico del país a través de la capacitación integral y valores éticos.
+                Una Organización que como parte del Sistema Nacional de Formación y Promoción Técnico Profesional de Trabajadores, sea reconocida por la calidad de sus programas dirigidos al desarrollo Humano de los dominicanos y dominicanas, de preparar mano de obra calificada para satisfacer las necesidades productivas nacionales y por el fomento de una cultura de emprendedurismo de los miembros de las Fuerzas Armadas, de la Policía Nacional y de la sociedad en general que cursan sus programas.
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <div className="flex -space-x-3">
