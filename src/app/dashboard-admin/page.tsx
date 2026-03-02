@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from "react";
@@ -34,6 +35,10 @@ const itemVariants = {
 };
 
 export default function DashboardAdminPage() {
+  // En el futuro, este valor vendrá del contexto del usuario o de la configuración del recinto
+  const activeRecinto = "Escuela Vocacional Santo Domingo Este";
+  const academicPeriod = "Período Académico 2024-2";
+
   const metrics = [
     { title: "Estudiantes Activos", value: "1,254", icon: Users, color: "text-blue-500", trend: "+2.5%" },
     { title: "Secciones Abiertas", value: "82", icon: BookOpen, color: "text-emerald-500", trend: "+4" },
@@ -72,10 +77,10 @@ export default function DashboardAdminPage() {
             transition={{ delay: 0.5 }}
           >
             <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-md border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
-              Período Académico 2024-2
+              {academicPeriod}
             </Badge>
-            <h1 className="text-4xl md:text-6xl font-black font-headline text-white mb-3 tracking-tighter">
-              Gestión Académica
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-black font-headline text-white mb-3 tracking-tighter">
+              {activeRecinto}
             </h1>
             <p className="text-lg md:text-xl text-white/80 font-medium max-w-2xl leading-relaxed">
               Dirección General de las Escuelas Vocacionales FF.AA. y P.N.
