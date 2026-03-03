@@ -60,7 +60,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import {
     Pagination,
@@ -357,8 +357,14 @@ export default function AperturaSeccionesPage() {
 
   const handleExport = async (format: 'excel' | 'pdf' | 'word') => {
     const periodo = "2024-2";
-    const date = new Date().toISOString().split('T')[0];
-    const fileName = `Secciones_${periodo}_${date}`;
+    const now = new Date();
+    
+    // Formato de fecha y hora solicitado: DD/MM/AAAA – HH:MM AM/PM
+    const dateStr = now.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const timeStr = now.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const fullGenerationDate = `Fecha de generación: ${dateStr} – ${timeStr.toUpperCase()}`;
+    
+    const fileName = `Secciones_${periodo}_${now.toISOString().split('T')[0]}`;
     const totalRegistros = filteredSecciones.length;
 
     const dataToExport = filteredSecciones.map(s => ({
@@ -387,7 +393,7 @@ export default function AperturaSeccionesPage() {
           ["“TODO POR LA PATRIA”"],
           [""],
           [`LISTADO DE SECCIONES – PERÍODO ${periodo}`],
-          [`Fecha de generación: ${new Date().toLocaleString()}`],
+          [fullGenerationDate],
           [""]
         ];
         const worksheet = utils.aoa_to_sheet(headerRows);
@@ -419,8 +425,13 @@ export default function AperturaSeccionesPage() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
         doc.text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.text(fullGenerationDate, 14, 78);
+
         autoTable(doc, {
-          startY: 82,
+          startY: 85,
           head: [['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.']],
           body: dataToExport.map(row => Object.values(row)),
           headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
@@ -443,7 +454,8 @@ export default function AperturaSeccionesPage() {
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "SANTO DOMINGO, ESTE.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`, bold: true, size: 24, color: "26658C" })], spacing: { before: 200, after: 400 } }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`, bold: true, size: 24, color: "26658C" })], spacing: { before: 200, after: 100 } }),
+              new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fullGenerationDate, size: 18, color: "666666" })], spacing: { after: 300 } }),
               new Table({
                 width: { size: 100, type: WidthType.PERCENTAGE },
                 rows: [
