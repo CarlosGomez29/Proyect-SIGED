@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -8,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
-import images from "@/app/lib/placeholder-images.json";
+import images from "@/app/lib/placeholder-images";
 
 const containerVariants = {
   hidden: { opacity: 0 },

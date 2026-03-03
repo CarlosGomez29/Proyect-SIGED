@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -20,7 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import images from "@/app/lib/placeholder-images.json";
+import images from "@/app/lib/placeholder-images";
 
 const profiles = [
   {

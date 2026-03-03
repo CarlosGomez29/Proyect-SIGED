@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -20,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from 'next/image';
-import images from "@/app/lib/placeholder-images.json";
+import images from "@/app/lib/placeholder-images";
 
 const profileDetails: { [key: string]: { name: string; icon: React.ElementType; user: string; dashboard: string; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },

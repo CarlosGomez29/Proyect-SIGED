@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -19,7 +18,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import images from "@/app/lib/placeholder-images.json";
+import images from "@/app/lib/placeholder-images";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,12 +62,12 @@ export default function DashboardAdminPage() {
       {/* 1. Hero Institucional Estilo Apple */}
       <motion.section variants={itemVariants} className="relative h-[400px] w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
         <Image 
-          src={images.hero_institutional.url} 
-          alt={images.hero_institutional.alt}
+          src={images.workshop_secondary.url} 
+          alt={images.workshop_secondary.alt}
           fill
           className="object-cover transition-transform duration-[2s] hover:scale-105"
           priority
-          data-ai-hint={images.hero_institutional.hint}
+          data-ai-hint={images.workshop_secondary.hint}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-12">
           <motion.div
@@ -148,11 +147,11 @@ export default function DashboardAdminPage() {
           <div className="grid md:grid-cols-2">
             <div className="relative h-80 md:h-auto overflow-hidden">
               <Image 
-                src={images.workshop_secondary.url} 
-                alt={images.workshop_secondary.alt}
+                src={images.hero_institutional.url} 
+                alt={images.hero_institutional.alt}
                 fill
                 className="object-cover transition-transform duration-[3s] hover:scale-110"
-                data-ai-hint={images.workshop_secondary.hint}
+                data-ai-hint={images.hero_institutional.hint}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent hidden md:block" />
             </div>
