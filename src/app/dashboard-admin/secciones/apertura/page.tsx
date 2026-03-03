@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   PlusCircle,
   FileDown,
@@ -10,14 +10,11 @@ import {
   MoreHorizontal,
   Eye,
   Edit,
-  XCircle,
   BookOpen,
-  Calendar as CalendarIcon,
   Clock,
   Users,
-  Check,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +22,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import {
   Table,
@@ -41,7 +36,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -66,7 +60,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
-// Datos maestros (Simulados para la arquitectura)
+// Datos maestros (Simulados)
 const PERIODOS_MAESTROS = [
   { id: "2024-2", nombre: "Período 2024-2 (Trimestral)", inicio: "2024-06-01", fin: "2024-08-31" },
   { id: "2024-S2", nombre: "Período 2024-S2 (Semestral)", inicio: "2024-07-01", fin: "2024-12-31" },
@@ -107,9 +101,13 @@ const initialSecciones = [
     programa: "DIGEP Directo",
     docente: "Juan Pérez",
     horario: "Lun-Vie 08:00 - 12:00",
+    dias: ["lun", "mar", "mie", "jue", "vie"],
+    horaInicio: "08:00",
+    horaFin: "12:00",
     estado: "Abierta",
     inscritos: 32,
     capacidad: 40,
+    periodoId: "2024-2",
   },
   {
     id: "SEC-002",
@@ -117,9 +115,13 @@ const initialSecciones = [
     programa: "DIGEP-INFOTEP",
     docente: "María García",
     horario: "Sáb 09:00 - 17:00",
+    dias: ["sab"],
+    horaInicio: "09:00",
+    horaFin: "17:00",
     estado: "En proceso",
     inscritos: 15,
     capacidad: 20,
+    periodoId: "2024-2",
   },
 ];
 
@@ -140,7 +142,10 @@ export default function AperturaSeccionesPage() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [secciones, setSecciones] = useState(initialSecciones);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
 
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -155,8 +160,8 @@ export default function AperturaSeccionesPage() {
   });
 
   const selectedPeriodo = useMemo(() => 
-    PERIODOS_MAESTROS.find(p => p.id === formData.periodoId),
-    [formData.periodoId]
+    PERIODOS_MAESTROS.find(p => p.id === (isEditDialogOpen ? selectedSeccion?.periodoId : formData.periodoId)),
+    [formData.periodoId, selectedSeccion, isEditDialogOpen]
   );
 
   const formatDate = (dateStr: string) => {
@@ -192,13 +197,57 @@ export default function AperturaSeccionesPage() {
       programa: "DIGEP Directo",
       docente: formData.docente,
       horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
+      dias: formData.dias,
+      horaInicio: formData.horaInicio,
+      horaFin: formData.horaFin,
       estado: formData.estado,
       inscritos: 0,
       capacidad: parseInt(formData.capacidad),
+      periodoId: formData.periodoId,
     };
 
     setSecciones([newSeccion, ...secciones]);
-    setIsDialogOpen(false);
+    setIsCreateDialogOpen(false);
+    resetForm();
+
+    toast({
+      title: "Sección creada",
+      description: `La sección ${newId} ha sido creada exitosamente.`,
+    });
+  };
+
+  const handleUpdateSeccion = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedSeccion) return;
+
+    const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+    
+    const updatedSecciones = secciones.map(s => {
+      if (s.id === selectedSeccion.id) {
+        return {
+          ...s,
+          docente: formData.docente,
+          capacidad: parseInt(formData.capacidad),
+          dias: formData.dias,
+          horaInicio: formData.horaInicio,
+          horaFin: formData.horaFin,
+          horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
+        };
+      }
+      return s;
+    });
+
+    setSecciones(updatedSecciones);
+    setIsEditDialogOpen(false);
+    resetForm();
+
+    toast({
+      title: "Sección actualizada",
+      description: `Los cambios en la sección ${selectedSeccion.id} han sido guardados.`,
+    });
+  };
+
+  const resetForm = () => {
     setFormData({
       periodoId: "",
       curso: "",
@@ -209,11 +258,27 @@ export default function AperturaSeccionesPage() {
       horaFin: "12:00",
       estado: "Abierta",
     });
+    setSelectedSeccion(null);
+  };
 
-    toast({
-      title: "Sección creada",
-      description: `La sección ${newId} ha sido creada exitosamente.`,
+  const openViewDetails = (seccion: any) => {
+    setSelectedSeccion(seccion);
+    setIsViewDialogOpen(true);
+  };
+
+  const openEditSection = (seccion: any) => {
+    setSelectedSeccion(seccion);
+    setFormData({
+      periodoId: seccion.periodoId,
+      curso: seccion.curso,
+      docente: seccion.docente,
+      capacidad: seccion.capacidad.toString(),
+      dias: seccion.dias || [],
+      horaInicio: seccion.horaInicio || "08:00",
+      horaFin: seccion.horaFin || "12:00",
+      estado: seccion.estado,
     });
+    setIsEditDialogOpen(true);
   };
 
   const getStatusBadge = (estado: string) => {
@@ -255,9 +320,9 @@ export default function AperturaSeccionesPage() {
             <FileDown className="mr-2 h-4 w-4" /> Exportar
           </Button>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="font-bold shadow-lg shadow-primary/20 uppercase tracking-wider text-[10px] h-9">
+              <Button size="sm" onClick={resetForm} className="font-bold shadow-lg shadow-primary/20 uppercase tracking-wider text-[10px] h-9">
                 <PlusCircle className="mr-2 h-4 w-4" /> Nueva Sección
               </Button>
             </DialogTrigger>
@@ -362,7 +427,6 @@ export default function AperturaSeccionesPage() {
                       </div>
                     </div>
 
-                    {/* Horario - Ahora ocupa el ancho completo para evitar solapamientos */}
                     <div className="space-y-3 md:col-span-2">
                       <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 - 18:00)</Label>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
@@ -400,7 +464,6 @@ export default function AperturaSeccionesPage() {
                       </div>
                     </div>
 
-                    {/* Fechas - Ocupa el ancho completo con formato DD/MM/YYYY */}
                     <div className="space-y-3 md:col-span-2">
                       <Label className="text-xs font-bold uppercase opacity-60">Vigencia del Período (Fechas Automáticas)</Label>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
@@ -523,18 +586,19 @@ export default function AperturaSeccionesPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48 rounded-xl border-border/50 p-2 shadow-xl">
-                            <DropdownMenuItem className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
+                            <DropdownMenuItem 
+                              onClick={() => openViewDetails(seccion)}
+                              className="rounded-lg flex items-center gap-2 py-2 cursor-pointer"
+                            >
                               <Eye className="h-4 w-4 opacity-70" />
                               <span className="font-medium text-sm">Ver detalles</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
+                            <DropdownMenuItem 
+                              onClick={() => openEditSection(seccion)}
+                              className="rounded-lg flex items-center gap-2 py-2 cursor-pointer"
+                            >
                               <Edit className="h-4 w-4 opacity-70" />
                               <span className="font-medium text-sm">Editar sección</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="opacity-50" />
-                            <DropdownMenuItem className="rounded-lg flex items-center gap-2 py-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
-                              <XCircle className="h-4 w-4" />
-                              <span className="font-bold text-sm">Cerrar sección</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -544,18 +608,249 @@ export default function AperturaSeccionesPage() {
                 })}
               </TableBody>
             </Table>
-            {filteredSecciones.length === 0 && (
-              <div className="py-20 text-center space-y-3">
-                <Search className="h-12 w-12 text-muted-foreground/30 mx-auto" />
-                <p className="text-muted-foreground font-medium">No se encontraron secciones para "{searchTerm}"</p>
-                <Button variant="link" onClick={() => setSearchTerm("")} className="text-primary font-bold">
-                  Limpiar búsqueda
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* MODAL: VER DETALLES (SOLO LECTURA) */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] border-border/50 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tight">Detalles de la Sección</DialogTitle>
+            <DialogDescription className="font-medium">Vista informativa de la planificación académica.</DialogDescription>
+          </DialogHeader>
+          {selectedSeccion && (
+            <div className="space-y-8 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* BLOQUE INFORMACIÓN ACADÉMICA */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    Información Académica
+                  </div>
+                  <div className="space-y-3 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Período Académico</Label>
+                      <p className="text-sm font-semibold">{PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.nombre}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Curso</Label>
+                      <p className="text-sm font-semibold">{selectedSeccion.curso}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Programa</Label>
+                      <p className="text-sm font-semibold">{selectedSeccion.programa}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Docente Asignado</Label>
+                      <p className="text-sm font-semibold">{selectedSeccion.docente}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BLOQUE CONFIGURACIÓN */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    Configuración y Ocupación
+                  </div>
+                  <div className="space-y-3 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Capacidad y Llenado</Label>
+                      <div className="flex justify-between text-xs font-bold mb-1">
+                        <span>{selectedSeccion.inscritos} de {selectedSeccion.capacidad} estudiantes</span>
+                        <span>{calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%</span>
+                      </div>
+                      <Progress 
+                        value={calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)} 
+                        className="h-1.5" 
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Horario</Label>
+                      <p className="text-sm font-semibold">{selectedSeccion.horario}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-[10px] font-bold uppercase opacity-50">Fecha Inicio</Label>
+                        <p className="text-sm font-semibold">{formatDate(PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.inicio || "")}</p>
+                      </div>
+                      <div>
+                        <Label className="text-[10px] font-bold uppercase opacity-50">Fecha Fin</Label>
+                        <p className="text-sm font-semibold">{formatDate(PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.fin || "")}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase opacity-50">Estado Actual</Label>
+                      <div className="mt-1">{getStatusBadge(selectedSeccion.estado)}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" className="rounded-xl font-bold uppercase text-[10px] tracking-widest h-11 px-8">Cerrar</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL: EDITAR SECCIÓN (PERMISOS LIMITADOS) */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-border/50 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black tracking-tight">Editar Sección Académica</DialogTitle>
+            <DialogDescription className="font-medium text-muted-foreground">
+              Actualiza el docente, capacidad u horario. Los datos académicos del período son inalterables.
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedSeccion && (
+            <form onSubmit={handleUpdateSeccion} className="space-y-8 py-6">
+              {/* BLOQUE 1 — Información Académica (SOLO LECTURA) */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                  <div className="h-4 w-1 bg-primary rounded-full" />
+                  Bloque 1: Información Académica (Solo Lectura)
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 opacity-70">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Período Académico</Label>
+                    <div className="h-11 flex items-center px-4 rounded-xl bg-muted/40 font-semibold text-sm border border-border/30">
+                      {PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.nombre}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Curso</Label>
+                    <div className="h-11 flex items-center px-4 rounded-xl bg-muted/40 font-semibold text-sm border border-border/30">
+                      {selectedSeccion.curso}
+                    </div>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="docente-edit" className="text-xs font-bold uppercase opacity-60 text-foreground opacity-100">Docente Asignado (Editable)</Label>
+                    <Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}>
+                      <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
+                        <SelectValue placeholder="Buscar docente..." />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        {DOCENTES_MAESTROS.map((d) => (
+                          <SelectItem key={d} value={d}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              {/* BLOQUE 2 — Configuración de la Sección (EDITABLE LIMITADO) */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                  <div className="h-4 w-1 bg-primary rounded-full" />
+                  Bloque 2: Configuración de la Sección
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <Label htmlFor="capacidad-edit" className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label>
+                    <div className="relative">
+                      <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        id="capacidad-edit" 
+                        type="number" 
+                        min="1" 
+                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        value={formData.capacidad}
+                        onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label>
+                    <div className="flex flex-wrap gap-3">
+                      {DIAS_SEMANA.map((dia) => (
+                        <div key={dia.id} className="flex items-center space-x-2">
+                          <Checkbox 
+                            id={`edit-${dia.id}`} 
+                            checked={formData.dias.includes(dia.id)}
+                            onCheckedChange={(checked) => {
+                              const newDias = checked 
+                                ? [...formData.dias, dia.id]
+                                : formData.dias.filter(d => d !== dia.id);
+                              setFormData({ ...formData, dias: newDias });
+                            }}
+                          />
+                          <label htmlFor={`edit-${dia.id}`} className="text-xs font-medium cursor-pointer text-muted-foreground">{dia.label}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 md:col-span-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 - 18:00)</Label>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                      <div className="flex-1 space-y-1.5">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
+                        <div className="relative">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            type="time" 
+                            min="08:00" 
+                            max="18:00" 
+                            className="pl-10 h-11 rounded-xl bg-background" 
+                            value={formData.horaInicio}
+                            onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-1.5">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Salida</span>
+                        <div className="relative">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            type="time" 
+                            min="08:00" 
+                            max="18:00" 
+                            className="pl-10 h-11 rounded-xl bg-background" 
+                            value={formData.horaFin}
+                            onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 md:col-span-2 opacity-60">
+                    <Label className="text-xs font-bold uppercase opacity-60">Vigencia del Período (Solo Lectura)</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/10 p-4 rounded-2xl border border-border/50">
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] text-muted-foreground font-black uppercase">Inicio</span>
+                        <div className="h-11 flex items-center px-4 rounded-xl bg-muted/20 font-mono text-sm">
+                          {formatDate(selectedPeriodo?.inicio || "")}
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] text-muted-foreground font-black uppercase">Fin</span>
+                        <div className="h-11 flex items-center px-4 rounded-xl bg-muted/20 font-mono text-sm">
+                          {formatDate(selectedPeriodo?.fin || "")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="gap-3 pt-8 border-t border-border/30">
+                <DialogClose asChild>
+                  <Button variant="ghost" className="rounded-xl font-bold uppercase text-[10px] tracking-widest h-11 px-6">Cancelar</Button>
+                </DialogClose>
+                <Button type="submit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20 h-11 px-10">Guardar Cambios</Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
