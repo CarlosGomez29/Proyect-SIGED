@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -13,6 +12,9 @@ import {
   BookOpen,
   Clock,
   Users,
+  FileText,
+  File,
+  FileSpreadsheet,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -183,8 +185,144 @@ export default function AperturaSeccionesPage() {
   const filteredSecciones = secciones.filter(
     (s) =>
       s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.docente.toLowerCase().includes(searchTerm.toLowerCase())
+      s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.programa.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const calculateOcupacion = (inscritos: number, capacidad: number) => {
+    return Math.round((inscritos / capacidad) * 100);
+  };
+
+  const handleExport = async (format: 'excel' | 'pdf' | 'word') => {
+    const periodo = "2024-2";
+    const date = new Date().toISOString().split('T')[0];
+    const fileName = `Secciones_${periodo}_${date}`;
+
+    const dataToExport = filteredSecciones.map(s => ({
+      Curso: s.curso,
+      Programa: s.programa,
+      Docente: s.docente,
+      Horario: s.horario,
+      Estado: s.estado,
+      Capacidad: s.capacidad,
+      Inscritos: s.inscritos,
+      Ocupación: `${calculateOcupacion(s.inscritos, s.capacidad)}%`
+    }));
+
+    toast({
+      title: "Generando archivo",
+      description: `Preparando exportación a ${format.toUpperCase()}...`,
+    });
+
+    try {
+      if (format === 'excel') {
+        const { utils, writeFile } = await import('xlsx');
+        const worksheet = utils.json_to_sheet(dataToExport);
+        const workbook = utils.book_new();
+        utils.book_append_sheet(workbook, worksheet, "Secciones");
+        writeFile(workbook, `${fileName}.xlsx`);
+      } else if (format === 'pdf') {
+        const { default: jsPDF } = await import('jspdf');
+        const { default: autoTable } = await import('jspdf-autotable');
+        const doc = new jsPDF('landscape');
+        
+        doc.setFontSize(18);
+        doc.text(`Listado de Secciones – Período ${periodo}`, 14, 15);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 22);
+        
+        autoTable(doc, {
+          startY: 25,
+          head: [['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.']],
+          body: dataToExport.map(row => Object.values(row)),
+          headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
+          styles: { fontSize: 8 },
+        });
+        
+        doc.save(`${fileName}.pdf`);
+      } else if (format === 'word') {
+        const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, TextRun, AlignmentType, BorderStyle } = await import('docx');
+        const { saveAs } = await import('file-saver');
+
+        const doc = new Document({
+          sections: [{
+            children: [
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`,
+                    bold: true,
+                    size: 28,
+                    color: "26658C"
+                  }),
+                ],
+              }),
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({
+                    text: `Generado el: ${new Date().toLocaleString()}`,
+                    size: 18,
+                    italics: true,
+                  }),
+                ],
+                spacing: { after: 400 },
+              }),
+              new Table({
+                width: { size: 100, type: WidthType.PERCENTAGE },
+                rows: [
+                  new TableRow({
+                    children: [
+                      'Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.'
+                    ].map(h => new TableCell({
+                      children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, color: "FFFFFF" })], alignment: AlignmentType.CENTER })],
+                      shading: { fill: "26658C" },
+                      verticalAlign: "center",
+                      borders: {
+                        top: { style: BorderStyle.SINGLE, size: 1 },
+                        bottom: { style: BorderStyle.SINGLE, size: 1 },
+                        left: { style: BorderStyle.SINGLE, size: 1 },
+                        right: { style: BorderStyle.SINGLE, size: 1 },
+                      }
+                    }))
+                  }),
+                  ...dataToExport.map(row => new TableRow({
+                    children: Object.values(row).map(v => new TableCell({
+                      children: [new Paragraph({ text: String(v), size: 16 })],
+                      verticalAlign: "center",
+                      borders: {
+                        top: { style: BorderStyle.SINGLE, size: 1 },
+                        bottom: { style: BorderStyle.SINGLE, size: 1 },
+                        left: { style: BorderStyle.SINGLE, size: 1 },
+                        right: { style: BorderStyle.SINGLE, size: 1 },
+                      }
+                    }))
+                  }))
+                ]
+              })
+            ]
+          }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${fileName}.docx`);
+      }
+      
+      toast({
+        title: "Exportación exitosa",
+        description: `El archivo ${fileName} ha sido descargado.`,
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error de exportación",
+        description: "Hubo un problema al generar el archivo.",
+      });
+    }
+  };
 
   const handleCreateSeccion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -308,10 +446,6 @@ export default function AperturaSeccionesPage() {
     }
   };
 
-  const calculateOcupacion = (inscritos: number, capacidad: number) => {
-    return Math.round((inscritos / capacidad) * 100);
-  };
-
   return (
     <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
       {/* 1. Encabezado del módulo */}
@@ -330,9 +464,28 @@ export default function AperturaSeccionesPage() {
           <Button variant="outline" size="sm" className="hidden sm:flex font-bold uppercase tracking-wider text-[10px] h-9">
             <Filter className="mr-2 h-4 w-4" /> Filtros
           </Button>
-          <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
-            <FileDown className="mr-2 h-4 w-4" /> Exportar
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
+                <FileDown className="mr-2 h-4 w-4" /> Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 rounded-xl border-border/50 p-2 shadow-xl">
+              <DropdownMenuItem onClick={() => handleExport('word')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
+                <FileText className="h-4 w-4 opacity-70" />
+                <span className="font-medium text-sm">Exportar a Word</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('pdf')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
+                <File className="h-4 w-4 opacity-70" />
+                <span className="font-medium text-sm">Exportar a PDF</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
+                <FileSpreadsheet className="h-4 w-4 opacity-70" />
+                <span className="font-medium text-sm">Exportar a Excel</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
