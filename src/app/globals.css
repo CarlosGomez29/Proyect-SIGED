@@ -4,72 +4,94 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Gris seda cálido */
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 221.2 83.2% 20%; /* Azul Institucional profundo */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* MODO CLARO - Ligero, fresco, moderno */
+    --background: 185 30% 96%; /* Tinte muy claro de #A7EBF2 */
+    --foreground: 215 60% 12%; /* Contraste profundo */
+    
+    --card: 185 20% 99%; /* Blanco suavizado con tinte azulado */
+    --card-foreground: 215 60% 12%;
+    
+    --popover: 185 20% 99%;
+    --popover-foreground: 215 60% 12%;
+    
+    --primary: 203 57% 35%; /* #26658C */
+    --primary-foreground: 185 71% 98%;
+    
+    --secondary: 185 30% 90%;
+    --secondary-foreground: 203 96% 18%; /* #023859 */
+    
+    --muted: 185 20% 92%;
+    --muted-foreground: 203 40% 45%;
+    
+    --accent: 185 40% 92%;
+    --accent-foreground: 203 57% 35%;
+    
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
+    
     --success: 160 44% 41%;
     --success-foreground: 210 40% 98%;
-    --info: 179 40% 61%;
-    --info-foreground: 221 68% 11%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 20%;
-    --radius: 1rem; /* Radio estilo Apple */
+    
+    --info: 185 71% 50%;
+    --info-foreground: 215 60% 12%;
+    
+    --border: 185 25% 88%; /* Borde suave azulado */
+    --input: 185 25% 88%;
+    --ring: 203 57% 35%;
+    
+    --radius: 1rem;
 
-    --sidebar: 0 0% 100%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-accent: 210 40% 96.1%;
-    --sidebar-accent-foreground: 221.2 83.2% 20%;
-    --sidebar-primary: 221.2 83.2% 20%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-ring: 221.2 83.2% 20%;
-    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar: 203 45% 30%; /* Profundidad de #26658C */
+    --sidebar-foreground: 185 71% 95%;
+    --sidebar-primary: 190 48% 54%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 203 55% 38%;
+    --sidebar-accent-foreground: 185 71% 98%;
+    --sidebar-border: 203 45% 35%;
+    --sidebar-ring: 190 48% 54%;
   }
  
   .dark {
-    --background: 240 10% 4%; /* Deep Charcoal */
-    --foreground: 0 0% 98%;
-    --card: 240 10% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 4%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
+    /* MODO OSCURO - Elegante, tecnológico, profundo */
+    --background: 215 45% 7%; /* Suavizado de #011C40 */
+    --foreground: 185 30% 90%; /* Gris azulado claro de #A7EBF2 */
+    
+    --card: 215 35% 11%; /* Ligeramente más claro que fondo */
+    --card-foreground: 185 30% 90%;
+    
+    --popover: 215 40% 9%;
+    --popover-foreground: 185 30% 90%;
+    
+    --primary: 190 48% 54%; /* #54ACBF - Más luminoso para contraste */
+    --primary-foreground: 215 45% 5%;
+    
+    --secondary: 203 96% 18%; /* #023859 */
+    --secondary-foreground: 185 71% 80%;
+    
+    --muted: 215 30% 15%;
+    --muted-foreground: 185 15% 65%;
+    
+    --accent: 203 96% 25%;
+    --accent-foreground: 190 48% 54%;
+    
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    
     --success: 160 44% 41%;
     --success-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217.2 91.2% 59.8%;
     
-    --sidebar: 240 10% 4%;
-    --sidebar-foreground: 240 5% 64.9%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-primary: 217.2 91.2% 59.8%;
-    --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    --sidebar-border: 240 3.7% 15.9%;
+    --border: 215 30% 18%;
+    --input: 215 30% 18%;
+    --ring: 190 48% 54%;
+    
+    --sidebar: 203 96% 15%; /* #023859 suavizado */
+    --sidebar-foreground: 185 30% 85%;
+    --sidebar-primary: 190 48% 54%;
+    --sidebar-primary-foreground: 215 45% 5%;
+    --sidebar-accent: 203 85% 22%;
+    --sidebar-accent-foreground: 190 48% 54%;
+    --sidebar-border: 203 90% 20%;
+    --sidebar-ring: 190 48% 54%;
   }
 }
 
@@ -78,13 +100,14 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-500;
-    background-image: radial-gradient(at 0% 0%, hsla(var(--primary) / 0.03) 0, transparent 50%),
-                      radial-gradient(at 100% 100%, hsla(var(--primary) / 0.03) 0, transparent 50%);
+    @apply bg-background text-foreground transition-colors duration-500 font-body antialiased;
+    /* Degradados sutiles derivados de la paleta */
+    background-image: radial-gradient(at 0% 0%, hsla(var(--primary) / 0.04) 0, transparent 40%),
+                      radial-gradient(at 100% 100%, hsla(var(--primary) / 0.04) 0, transparent 40%);
   }
 
   [data-sidebar="menu-button"][data-active="true"] {
-    @apply bg-sidebar-accent text-sidebar-accent-foreground font-bold;
+    @apply bg-sidebar-accent text-sidebar-accent-foreground font-bold shadow-sm;
   }
 
   [data-sidebar="menu-button"][data-active="true"]::before {
@@ -93,11 +116,20 @@
   }
 }
 
-/* Efectos Apple */
+/* Efectos Modernos */
 .glass-card {
-  @apply bg-card/80 backdrop-blur-md border border-white/10 shadow-sm;
+  @apply bg-card/80 backdrop-blur-md border border-white/10 shadow-sm transition-all duration-300;
 }
 
 .dark .glass-card {
   @apply bg-card/40 backdrop-blur-xl border-white/5 shadow-2xl;
+}
+
+/* Sombras suavizadas azuladas */
+.shadow-soft {
+  box-shadow: 0 4px 20px -2px hsla(var(--primary) / 0.1);
+}
+
+.dark .shadow-soft {
+  box-shadow: 0 10px 30px -5px hsla(0 0% 0% / 0.4);
 }

@@ -64,10 +64,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        'blue-500': '#3b82f6',
-        'green-500': '#22c55e',
-        'teal-500': '#14b8a6',
-        'sky-500': '#0ea5e9'
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        // Colores de la paleta institucional para uso directo
+        inst: {
+          light: "#A7EBF2",
+          medium: "#54ACBF",
+          deep: "#26658C",
+          dark: "#023859",
+          midnight: "#011C40",
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -75,23 +87,16 @@ export default {
         sm: 'calc(var(--radius) - 4px)',
         'xl': 'calc(var(--radius) + 4px)',
         '2xl': 'calc(var(--radius) + 12px)',
+        '3xl': 'calc(var(--radius) + 20px)',
       },
       keyframes: {
         'accordion-down': {
-          from: {
-            height: '0',
-          },
-          to: {
-            height: 'var(--radix-accordion-content-height)',
-          },
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
         'accordion-up': {
-          from: {
-            height: 'var(--radix-accordion-content-height)',
-          },
-          to: {
-            height: '0',
-          },
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
       },
       animation: {
@@ -99,11 +104,8 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
       boxShadow: {
-        'primary/20': '0 10px 30px -10px hsl(var(--primary) / 0.2)',
-        'blue-500/20': '0 10px 30px -10px rgba(59, 130, 246, 0.2)',
-        'green-500/20': '0 10px 30px -10px rgba(34, 197, 94, 0.2)',
-        'teal-500/20': '0 10px 30px -10px rgba(20, 184, 166, 0.2)',
-        'sky-500/20': '0 10px 30px -10px rgba(14, 165, 233, 0.2)',
+        'soft-blue': '0 10px 30px -10px hsla(185, 71%, 80%, 0.2)',
+        'deep-blue': '0 10px 30px -10px hsla(203, 96%, 18%, 0.3)',
       }
     },
   },
