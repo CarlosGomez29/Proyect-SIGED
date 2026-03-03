@@ -79,7 +79,7 @@ const initialSecciones = [
   { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", inscritos: 32, capacidad: 40, estado: "Abierta" },
   { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", inscritos: 15, capacidad: 20, estado: "Abierta" },
   { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", inscritos: 28, capacidad: 30, estado: "Abierta" },
-  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", inscritos: 25, capacidad: 25, estado: "Cerrada" },
+  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", inscritos: 25, capacidad: 25, estado: "Abierta" },
   { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", inscritos: 40, capacidad: 40, estado: "Cerrada" },
   { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", inscritos: 12, capacidad: 50, estado: "Abierta" },
   { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", inscritos: 20, capacidad: 40, estado: "Abierta" },

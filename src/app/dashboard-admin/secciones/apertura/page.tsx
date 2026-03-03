@@ -145,7 +145,7 @@ const initialSecciones = [
     dias: ["sab"],
     horaInicio: "09:00",
     horaFin: "17:00",
-    estado: "En proceso",
+    estado: "Abierta",
     inscritos: 15,
     capacidad: 20,
     periodoId: "2024-2",
@@ -173,7 +173,7 @@ const initialSecciones = [
     dias: ["lun", "mie", "vie"],
     horaInicio: "08:00",
     horaFin: "10:00",
-    estado: "En proceso",
+    estado: "Abierta",
     inscritos: 10,
     capacidad: 25,
     periodoId: "2024-2",
@@ -229,7 +229,7 @@ const initialSecciones = [
     dias: ["dom"],
     horaInicio: "08:00",
     horaFin: "12:00",
-    estado: "En proceso",
+    estado: "Abierta",
     inscritos: 8,
     capacidad: 30,
     periodoId: "2024-2",
@@ -271,7 +271,7 @@ const initialSecciones = [
     dias: ["mar", "vie"],
     horaInicio: "17:00",
     horaFin: "19:00",
-    estado: "En proceso",
+    estado: "Abierta",
     inscritos: 22,
     capacidad: 30,
     periodoId: "2024-2",
@@ -571,7 +571,6 @@ export default function AperturaSeccionesPage() {
   const getStatusBadge = (estado: string) => {
     switch (estado) {
       case "Abierta": return <Badge className="bg-success/15 text-success border-success/20 font-bold px-3">Abierta</Badge>;
-      case "En proceso": return <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20 font-bold px-3">En proceso</Badge>;
       case "Cerrada": return <Badge className="bg-destructive/15 text-destructive border-destructive/20 font-bold px-3">Cerrada</Badge>;
       default: return <Badge variant="outline">{estado}</Badge>;
     }
@@ -635,7 +634,6 @@ export default function AperturaSeccionesPage() {
                         <SelectContent>
                           <SelectItem value="Todos">Todos los estados</SelectItem>
                           <SelectItem value="Abierta">Abierta</SelectItem>
-                          <SelectItem value="En proceso">En proceso</SelectItem>
                           <SelectItem value="Cerrada">Cerrada</SelectItem>
                         </SelectContent>
                       </Select>
@@ -900,3 +898,4 @@ export default function AperturaSeccionesPage() {
     </motion.div>
   );
 }
+    
