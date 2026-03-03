@@ -16,8 +16,10 @@ import {
   FileText,
   File,
   FileSpreadsheet,
+  Check,
+  Settings2,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,10 +59,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import {
     Pagination,
@@ -306,6 +314,21 @@ export default function AperturaSeccionesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
+  // Estados para Filtros y Visibilidad
+  const [visibleColumns, setVisibleColumns] = useState({
+    curso: true,
+    programa: true,
+    docente: true,
+    horario: true,
+    estado: true,
+    ocupacion: true,
+  });
+
+  const [filterConfig, setFilterConfig] = useState({
+    estado: "Todos",
+    programa: "Todos",
+  });
+
   // Paginación dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -332,13 +355,18 @@ export default function AperturaSeccionesPage() {
   };
 
   const filteredSecciones = useMemo(() => {
-    return secciones.filter(
-        (s) =>
-          s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          s.programa.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-  }, [secciones, searchTerm]);
+    return secciones.filter((s) => {
+      const matchesSearch = 
+        s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.programa.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesEstado = filterConfig.estado === "Todos" || s.estado === filterConfig.estado;
+      const matchesPrograma = filterConfig.programa === "Todos" || s.programa === filterConfig.programa;
+
+      return matchesSearch && matchesEstado && matchesPrograma;
+    });
+  }, [secciones, searchTerm, filterConfig]);
 
   const totalPages = Math.ceil(filteredSecciones.length / itemsPerPage);
   
@@ -349,7 +377,7 @@ export default function AperturaSeccionesPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage]);
+  }, [searchTerm, itemsPerPage, filterConfig]);
 
   const calculateOcupacion = (inscritos: number, capacidad: number) => {
     return Math.round((inscritos / capacidad) * 100);
@@ -358,8 +386,6 @@ export default function AperturaSeccionesPage() {
   const handleExport = async (format: 'excel' | 'pdf' | 'word') => {
     const periodo = "2024-2";
     const now = new Date();
-    
-    // Formato de fecha y hora dinámica solicitado: DD/MM/AAAA – HH:MM AM/PM
     const dateStr = now.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit', hour12: true });
     const fullGenerationDate = `Fecha de generación: ${dateStr} – ${timeStr.toUpperCase()}`;
@@ -367,20 +393,27 @@ export default function AperturaSeccionesPage() {
     const fileName = `Secciones_${periodo}_${now.toISOString().split('T')[0]}`;
     const totalRegistros = filteredSecciones.length;
 
-    const dataToExport = filteredSecciones.map(s => ({
-      Curso: s.curso,
-      Programa: s.programa,
-      Docente: s.docente,
-      Horario: s.horario,
-      Estado: s.estado,
-      Capacidad: s.capacidad,
-      Inscritos: s.inscritos,
-      Ocupación: `${calculateOcupacion(s.inscritos, s.capacidad)}%`
-    }));
+    // Construir datos dinámicamente según columnas visibles
+    const dataToExport = filteredSecciones.map(s => {
+      const row: any = {};
+      if (visibleColumns.curso) row["Curso"] = s.curso;
+      if (visibleColumns.programa) row["Programa"] = s.programa;
+      if (visibleColumns.docente) row["Docente"] = s.docente;
+      if (visibleColumns.horario) row["Horario"] = s.horario;
+      if (visibleColumns.estado) row["Estado"] = s.estado;
+      if (visibleColumns.ocupacion) {
+        row["Capacidad"] = s.capacidad;
+        row["Inscritos"] = s.inscritos;
+        row["Ocupación"] = `${calculateOcupacion(s.inscritos, s.capacidad)}%`;
+      }
+      return row;
+    });
+
+    const exportHeaders = Object.keys(dataToExport[0] || {});
 
     toast({
       title: "Generando reporte institucional",
-      description: `Preparando exportación a ${format.toUpperCase()} con hoja timbrada...`,
+      description: `Exportando únicamente datos filtrados y columnas visibles a ${format.toUpperCase()}...`,
     });
 
     try {
@@ -425,14 +458,13 @@ export default function AperturaSeccionesPage() {
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
         doc.text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
-        
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.text(fullGenerationDate, 14, 78);
 
         autoTable(doc, {
           startY: 85,
-          head: [['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.']],
+          head: [exportHeaders],
           body: dataToExport.map(row => Object.values(row)),
           headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
           styles: { fontSize: 8 },
@@ -460,7 +492,7 @@ export default function AperturaSeccionesPage() {
                 width: { size: 100, type: WidthType.PERCENTAGE },
                 rows: [
                   new TableRow({
-                    children: ['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.'].map(h => new TableCell({
+                    children: exportHeaders.map(h => new TableCell({
                       children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, color: "FFFFFF" })], alignment: AlignmentType.CENTER })],
                       shading: { fill: "26658C" },
                     }))
@@ -477,7 +509,7 @@ export default function AperturaSeccionesPage() {
         const blob = await Packer.toBlob(docWord);
         saveAs(blob, `${fileName}.docx`);
       }
-      toast({ title: "Exportación exitosa", description: `El archivo ${fileName} ha sido generado.` });
+      toast({ title: "Exportación exitosa" });
     } catch (error) {
       toast({ variant: "destructive", title: "Error de exportación" });
     }
@@ -491,10 +523,8 @@ export default function AperturaSeccionesPage() {
     }
     const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const timeStart12 = formatTime12h(formData.horaInicio);
-    const timeEnd12 = formatTime12h(formData.horaFin);
     const newSeccion = {
-      id: newId, curso: formData.curso, programa: "DIGEP Directo", docente: formData.docente, horario: `${diasStr} ${timeStart12} - ${timeEnd12}`, dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, estado: formData.estado, inscritos: 0, capacidad: parseInt(formData.capacidad), periodoId: formData.periodoId,
+      id: newId, curso: formData.curso, programa: "DIGEP Directo", docente: formData.docente, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`, dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, estado: formData.estado, inscritos: 0, capacidad: parseInt(formData.capacidad), periodoId: formData.periodoId,
     };
     setSecciones([newSeccion, ...secciones]);
     setIsCreateDialogOpen(false);
@@ -506,12 +536,10 @@ export default function AperturaSeccionesPage() {
     e.preventDefault();
     if (!selectedSeccion) return;
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const timeStart12 = formatTime12h(formData.horaInicio);
-    const timeEnd12 = formatTime12h(formData.horaFin);
     const updatedSecciones = secciones.map(s => {
       if (s.id === selectedSeccion.id) {
         return {
-          ...s, docente: formData.docente, capacidad: parseInt(formData.capacidad), dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, horario: `${diasStr} ${timeStart12} - ${timeEnd12}`,
+          ...s, docente: formData.docente, capacidad: parseInt(formData.capacidad), dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
         };
       }
       return s;
@@ -563,6 +591,88 @@ export default function AperturaSeccionesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Botón Filtros Avanzados */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
+                <Filter className="mr-2 h-4 w-4" /> Filtros
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl border-border/50 bg-card/95 backdrop-blur-xl" align="end">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-black text-xs uppercase tracking-widest text-primary">Configuración de Vista</h4>
+                  <Settings2 className="h-4 w-4 text-muted-foreground" />
+                </div>
+                
+                <div className="space-y-3">
+                  <p className="text-[10px] font-bold uppercase opacity-60">Visibilidad de Columnas</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(visibleColumns).map(([key, isVisible]) => (
+                      <div key={key} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`col-${key}`} 
+                          checked={isVisible} 
+                          onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} 
+                        />
+                        <Label htmlFor={`col-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Separator className="opacity-50" />
+
+                <div className="space-y-4">
+                  <p className="text-[10px] font-bold uppercase opacity-60">Filtros de Datos</p>
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px]">Estado de Sección</Label>
+                      <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
+                        <SelectTrigger className="h-8 text-xs rounded-lg">
+                          <SelectValue placeholder="Todos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Todos">Todos los estados</SelectItem>
+                          <SelectItem value="Abierta">Abierta</SelectItem>
+                          <SelectItem value="En proceso">En proceso</SelectItem>
+                          <SelectItem value="Cerrada">Cerrada</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[10px]">Programa Académico</Label>
+                      <Select value={filterConfig.programa} onValueChange={(val) => setFilterConfig({...filterConfig, programa: val})}>
+                        <SelectTrigger className="h-8 text-xs rounded-lg">
+                          <SelectValue placeholder="Todos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Todos">Todos los programas</SelectItem>
+                          <SelectItem value="DIGEP Directo">DIGEP Directo</SelectItem>
+                          <SelectItem value="DIGEP-INFOTEP">DIGEP-INFOTEP</SelectItem>
+                          <SelectItem value="Dominicana Digna">Dominicana Digna</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full text-[10px] font-bold uppercase text-destructive hover:text-destructive hover:bg-destructive/5"
+                  onClick={() => {
+                    setFilterConfig({ estado: "Todos", programa: "Todos" });
+                    setVisibleColumns({ curso: true, programa: true, docente: true, horario: true, estado: true, ocupacion: true });
+                  }}
+                >
+                  Restablecer Filtros
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Botón Exportar Dinámico */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
@@ -634,12 +744,12 @@ export default function AperturaSeccionesPage() {
             <Table>
               <TableHeader className="bg-muted/30">
                 <TableRow className="hover:bg-transparent border-border/50">
-                  <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>
-                  <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>
-                  <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Docente</TableHead>
-                  <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Horario</TableHead>
-                  <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estado</TableHead>
-                  <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 w-[200px]">Ocupación</TableHead>
+                  {visibleColumns.curso && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
+                  {visibleColumns.programa && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>}
+                  {visibleColumns.docente && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Docente</TableHead>}
+                  {visibleColumns.horario && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Horario</TableHead>}
+                  {visibleColumns.estado && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estado</TableHead>}
+                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 w-[200px]">Ocupación</TableHead>}
                   <TableHead className="font-bold py-5 pr-8 text-xs uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -648,18 +758,44 @@ export default function AperturaSeccionesPage() {
                   const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
                   return (
                     <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
-                      <TableCell className="py-6 pl-8"><div className="flex flex-col"><span className="font-bold text-foreground tracking-tight">{seccion.curso}</span><span className="text-[10px] font-mono text-muted-foreground">{seccion.id}</span></div></TableCell>
-                      <TableCell className="py-6 font-medium text-sm text-muted-foreground">{seccion.programa}</TableCell>
-                      <TableCell className="py-6"><div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10"><span className="text-[10px] font-bold text-primary">{seccion.docente.charAt(0)}</span></div><span className="font-semibold text-sm">{seccion.docente}</span></div></TableCell>
-                      <TableCell className="py-6 text-xs font-medium text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>
-                      <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>
-                      <TableCell className="py-6"><div className="space-y-2"><div className="flex items-center justify-between text-[10px] font-bold"><span className={ocupacionPorcentaje > 90 ? "text-destructive" : "text-muted-foreground uppercase"}>{seccion.inscritos} de {seccion.capacidad}</span><span className="text-foreground">{ocupacionPorcentaje}%</span></div><Progress value={ocupacionPorcentaje} className={`h-1.5 ${ocupacionPorcentaje > 90 ? "bg-destructive/10" : "bg-muted"}`} indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} /></div></TableCell>
+                      {visibleColumns.curso && (
+                        <TableCell className="py-6 pl-8">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-foreground tracking-tight">{seccion.curso}</span>
+                            <span className="text-[10px] font-mono text-muted-foreground">{seccion.id}</span>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.programa && <TableCell className="py-6 font-medium text-sm text-muted-foreground">{seccion.programa}</TableCell>}
+                      {visibleColumns.docente && (
+                        <TableCell className="py-6">
+                          <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+                              <span className="text-[10px] font-bold text-primary">{seccion.docente.charAt(0)}</span>
+                            </div>
+                            <span className="font-semibold text-sm">{seccion.docente}</span>
+                          </div>
+                        </TableCell>
+                      )}
+                      {visibleColumns.horario && <TableCell className="py-6 text-xs font-medium text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>}
+                      {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
+                      {visibleColumns.ocupacion && (
+                        <TableCell className="py-6">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-[10px] font-bold">
+                              <span className={ocupacionPorcentaje > 90 ? "text-destructive" : "text-muted-foreground uppercase"}>{seccion.inscritos} de {seccion.capacidad}</span>
+                              <span className="text-foreground">{ocupacionPorcentaje}%</span>
+                            </div>
+                            <Progress value={ocupacionPorcentaje} className={`h-1.5 ${ocupacionPorcentaje > 90 ? "bg-destructive/10" : "bg-muted"}`} indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
+                          </div>
+                        </TableCell>
+                      )}
                       <TableCell className="py-6 pr-8 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openViewDetails(seccion)}><Eye className="h-4 w-4 mr-2" /> Ver detalles</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openEditSection(seccion)}><Edit className="h-4 w-4 mr-2" /> Editar sección</DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-xl">
+                            <DropdownMenuItem onClick={() => openViewDetails(seccion)} className="rounded-lg cursor-pointer"><Eye className="h-4 w-4 mr-2" /> Ver detalles</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openEditSection(seccion)} className="rounded-lg cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar sección</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -668,6 +804,18 @@ export default function AperturaSeccionesPage() {
                 })}
               </TableBody>
             </Table>
+            <AnimatePresence>
+              {filteredSecciones.length === 0 && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="py-20 text-center"
+                >
+                  <p className="text-muted-foreground font-medium italic">No se encontraron registros con los filtros actuales.</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
             <div className="flex items-center gap-4">
