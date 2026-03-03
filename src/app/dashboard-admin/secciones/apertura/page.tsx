@@ -60,7 +60,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Checkbox } from "@/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import {
     Pagination,
@@ -306,7 +306,7 @@ export default function AperturaSeccionesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
-  // Paginación
+  // Paginación dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -359,7 +359,7 @@ export default function AperturaSeccionesPage() {
     const periodo = "2024-2";
     const now = new Date();
     
-    // Formato de fecha y hora solicitado: DD/MM/AAAA – HH:MM AM/PM
+    // Formato de fecha y hora dinámica solicitado: DD/MM/AAAA – HH:MM AM/PM
     const dateStr = now.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit', hour12: true });
     const fullGenerationDate = `Fecha de generación: ${dateStr} – ${timeStr.toUpperCase()}`;
