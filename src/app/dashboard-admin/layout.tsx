@@ -51,7 +51,6 @@ const academicManagement = [
     { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
     { href: "/dashboard-admin/inscripciones-web", label: "Inscripciones Web", icon: Globe },
     { href: "/dashboard-admin/inscripciones/liberar", label: "Liberar Inscripción", icon: UserMinus },
-    { href: "/dashboard-admin/calificaciones", label: "Calificaciones", icon: GraduationCap },
 ];
 
 const reportsModule = [
@@ -95,7 +94,11 @@ export default function DashboardAdminLayout({
         <Sidebar className="border-r border-border/50 bg-background/80 backdrop-blur-xl">
           <SidebarHeader className="p-8 flex flex-col items-center justify-center text-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-primary/10 shadow-xl ring-2 ring-background">
-              <AvatarImage src="https://placehold.co/80x80.png" alt="Admin" data-ai-hint="person" />
+              <AvatarImage 
+                src="https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=35N8dRsWtTgy_9p_7yqYng&_nc_ss=8&oh=00_AfxRE-ecS-k6qO0l6hnbMY25NXpjbn4q3gKAjekZExqomQ&oe=69ACA028" 
+                alt="Admin Profile" 
+                data-ai-hint="institutional logo" 
+              />
               <AvatarFallback className="bg-primary/5 text-primary">AD</AvatarFallback>
             </Avatar>
             <div className="space-y-1">
@@ -147,7 +150,7 @@ export default function DashboardAdminLayout({
               <div className="flex -space-x-2">
                 {[1, 2, 3].map((i) => (
                   <Avatar key={i} className="h-7 w-7 border-2 border-background shadow-sm">
-                    <AvatarImage src={`https://placehold.co/32x32.png?text=${i}`} />
+                    <AvatarImage src={`https://picsum.photos/seed/stu${i}/32/32`} />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                 ))}
