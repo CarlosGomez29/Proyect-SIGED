@@ -70,7 +70,7 @@ import { useToast } from "@/hooks/use-toast";
 const PERIODOS_MAESTROS = [
   { id: "2024-2", nombre: "Período 2024-2 (Trimestral)", inicio: "2024-06-01", fin: "2024-08-31" },
   { id: "2024-S2", nombre: "Período 2024-S2 (Semestral)", inicio: "2024-07-01", fin: "2024-12-31" },
-  { id: "2025-1", nombre: "Período 2025-1 (Anual)", inicio: "2025-01-10", fin: "2025-12-15" },
+  { id: "2024-A", nombre: "Período 2024 (Anual)", inicio: "2024-01-10", fin: "2024-12-15" },
 ];
 
 const CURSOS_MAESTROS = [
@@ -189,7 +189,7 @@ export default function AperturaSeccionesPage() {
     const newSeccion = {
       id: newId,
       curso: formData.curso,
-      programa: "DIGEP Directo", // Por defecto para este flujo
+      programa: "DIGEP Directo",
       docente: formData.docente,
       horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
       estado: formData.estado,
@@ -261,26 +261,26 @@ export default function AperturaSeccionesPage() {
                 <PlusCircle className="mr-2 h-4 w-4" /> Nueva Sección
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-border/50 shadow-2xl">
+            <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-border/50 shadow-2xl">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black tracking-tight">Nueva Sección Académica</DialogTitle>
-                <DialogDescription className="font-medium">
+                <DialogTitle className="text-2xl font-black tracking-tight text-foreground">Nueva Sección Académica</DialogTitle>
+                <DialogDescription className="font-medium text-muted-foreground">
                   Configura los detalles de la nueva oferta académica para el período seleccionado.
                 </DialogDescription>
               </DialogHeader>
 
-              <form onSubmit={handleCreateSeccion} className="space-y-8 py-4">
+              <form onSubmit={handleCreateSeccion} className="space-y-8 py-6">
                 {/* BLOQUE 1 — Información Académica */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
                     <div className="h-4 w-1 bg-primary rounded-full" />
                     Bloque 1: Información Académica
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="periodo" className="text-xs font-bold uppercase opacity-60">Período Académico</Label>
                       <Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}>
-                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                        <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
                           <SelectValue placeholder="Seleccionar período..." />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -293,7 +293,7 @@ export default function AperturaSeccionesPage() {
                     <div className="space-y-2">
                       <Label htmlFor="curso" className="text-xs font-bold uppercase opacity-60">Curso</Label>
                       <Select onValueChange={(val) => setFormData({ ...formData, curso: val })}>
-                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                        <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
                           <SelectValue placeholder="Seleccionar curso..." />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -306,7 +306,7 @@ export default function AperturaSeccionesPage() {
                     <div className="space-y-2 md:col-span-2">
                       <Label htmlFor="docente" className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
                       <Select onValueChange={(val) => setFormData({ ...formData, docente: val })}>
-                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                        <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
                           <SelectValue placeholder="Buscar docente..." />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl">
@@ -320,12 +320,12 @@ export default function AperturaSeccionesPage() {
                 </div>
 
                 {/* BLOQUE 2 — Configuración de la Sección */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
                     <div className="h-4 w-1 bg-primary rounded-full" />
                     Bloque 2: Configuración de la Sección
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                       <Label htmlFor="capacidad" className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label>
                       <div className="relative">
@@ -334,7 +334,7 @@ export default function AperturaSeccionesPage() {
                           id="capacidad" 
                           type="number" 
                           min="1" 
-                          className="pl-10 h-11 rounded-xl" 
+                          className="pl-10 h-11 rounded-xl bg-background/50" 
                           value={formData.capacidad}
                           onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
                         />
@@ -343,7 +343,7 @@ export default function AperturaSeccionesPage() {
 
                     <div className="space-y-3">
                       <Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-3">
                         {DIAS_SEMANA.map((dia) => (
                           <div key={dia.id} className="flex items-center space-x-2">
                             <Checkbox 
@@ -356,51 +356,65 @@ export default function AperturaSeccionesPage() {
                                 setFormData({ ...formData, dias: newDias });
                               }}
                             />
-                            <label htmlFor={dia.id} className="text-xs font-medium cursor-pointer">{dia.label}</label>
+                            <label htmlFor={dia.id} className="text-xs font-medium cursor-pointer text-muted-foreground hover:text-foreground transition-colors">{dia.label}</label>
                           </div>
                         ))}
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase opacity-60">Horario de Inicio / Fin</Label>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                        <div className="relative flex-1">
-                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                            type="time" 
-                            min="08:00" 
-                            max="18:00" 
-                            className="pl-10 h-11 rounded-xl" 
-                            value={formData.horaInicio}
-                            onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
-                          />
+                    {/* Horario - Ahora ocupa el ancho completo para evitar solapamientos */}
+                    <div className="space-y-3 md:col-span-2">
+                      <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 - 18:00)</Label>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                        <div className="flex-1 space-y-1.5">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
+                          <div className="relative">
+                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              type="time" 
+                              min="08:00" 
+                              max="18:00" 
+                              className="pl-10 h-11 rounded-xl bg-background" 
+                              value={formData.horaInicio}
+                              onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
+                            />
+                          </div>
                         </div>
-                        <span className="hidden sm:inline text-muted-foreground opacity-50">→</span>
-                        <div className="relative flex-1">
-                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
-                            type="time" 
-                            min="08:00" 
-                            max="18:00" 
-                            className="pl-10 h-11 rounded-xl" 
-                            value={formData.horaFin}
-                            onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
-                          />
+                        <div className="hidden sm:flex items-center justify-center pt-6">
+                          <span className="text-muted-foreground opacity-50 font-bold">→</span>
+                        </div>
+                        <div className="flex-1 space-y-1.5">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase">Salida</span>
+                          <div className="relative">
+                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input 
+                              type="time" 
+                              min="08:00" 
+                              max="18:00" 
+                              className="pl-10 h-11 rounded-xl bg-background" 
+                              value={formData.horaFin}
+                              onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase opacity-60">Fechas (Auto-calculadas)</Label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-muted-foreground font-bold">INICIO</span>
-                          <Input readOnly value={formatDate(selectedPeriodo?.inicio || "")} className="h-9 text-xs bg-muted/30 border-dashed" />
+                    {/* Fechas - Ocupa el ancho completo con formato DD/MM/YYYY */}
+                    <div className="space-y-3 md:col-span-2">
+                      <Label className="text-xs font-bold uppercase opacity-60">Vigencia del Período (Fechas Automáticas)</Label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter">Inicio de Docencia</span>
+                          <div className="h-11 flex items-center px-4 rounded-xl bg-background font-mono text-sm border border-border/30 text-foreground">
+                            {formatDate(selectedPeriodo?.inicio || "") || "---"}
+                          </div>
                         </div>
-                        <div className="space-y-1">
-                          <span className="text-[10px] text-muted-foreground font-bold">FIN</span>
-                          <Input readOnly value={formatDate(selectedPeriodo?.fin || "")} className="h-9 text-xs bg-muted/30 border-dashed" />
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter">Fin de Docencia</span>
+                          <div className="h-11 flex items-center px-4 rounded-xl bg-background font-mono text-sm border border-border/30 text-foreground">
+                            {formatDate(selectedPeriodo?.fin || "") || "---"}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -414,7 +428,7 @@ export default function AperturaSeccionesPage() {
                     Bloque 3: Estado Inicial
                   </div>
                   <Select value={formData.estado} onValueChange={(val) => setFormData({ ...formData, estado: val })}>
-                    <SelectTrigger className="rounded-xl border-border/50 h-11">
+                    <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
                       <SelectValue placeholder="Estado de la sección..." />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -425,11 +439,11 @@ export default function AperturaSeccionesPage() {
                   </Select>
                 </div>
 
-                <DialogFooter className="gap-2 pt-6">
+                <DialogFooter className="gap-3 pt-8 border-t border-border/30">
                   <DialogClose asChild>
-                    <Button variant="ghost" className="rounded-xl font-bold uppercase text-[10px] tracking-widest">Cancelar</Button>
+                    <Button variant="ghost" className="rounded-xl font-bold uppercase text-[10px] tracking-widest h-11 px-6">Cancelar</Button>
                   </DialogClose>
-                  <Button type="submit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20 px-8">Crear Sección</Button>
+                  <Button type="submit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20 h-11 px-10">Crear Sección Académica</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
