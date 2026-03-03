@@ -74,11 +74,10 @@ import {
 // URL del Logo Institucional
 const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
-// Datos maestros (Simulados)
+// Datos maestros
 const PERIODOS_MAESTROS = [
   { id: "2024-2", nombre: "Período 2024-2 (Trimestral)", inicio: "2024-06-01", fin: "2024-08-31" },
   { id: "2024-S2", nombre: "Período 2024-S2 (Semestral)", inicio: "2024-07-01", fin: "2024-12-31" },
-  { id: "2024-A", nombre: "Período 2024 (Anual)", inicio: "2024-01-10", fin: "2024-12-15" },
 ];
 
 const CURSOS_MAESTROS = [
@@ -88,6 +87,12 @@ const CURSOS_MAESTROS = [
   "Manejo de Crisis",
   "Seguridad Aeroportuaria",
   "Inteligencia Emocional",
+  "Ciberseguridad en Aviación",
+  "Primeros Auxilios Aeroportuarios",
+  "Protocolo y Etiqueta",
+  "Gestión de Carga Peligrosa",
+  "Inglés Técnico Aeronáutico",
+  "Psicología del Pasajero",
 ];
 
 const DOCENTES_MAESTROS = [
@@ -193,6 +198,90 @@ const initialSecciones = [
     capacidad: 50,
     periodoId: "2024-2",
   },
+  {
+    id: "SEC-007",
+    curso: "Ciberseguridad en Aviación",
+    programa: "DIGEP Directo",
+    docente: "María García",
+    horario: "Lun-Mie 06:00 PM - 09:00 PM",
+    dias: ["lun", "mie"],
+    horaInicio: "18:00",
+    horaFin: "21:00",
+    estado: "Abierta",
+    inscritos: 20,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-008",
+    curso: "Primeros Auxilios Aeroportuarios",
+    programa: "DIGEP-INFOTEP",
+    docente: "Carlos López",
+    horario: "Dom 08:00 AM - 12:00 PM",
+    dias: ["dom"],
+    horaInicio: "08:00",
+    horaFin: "12:00",
+    estado: "En proceso",
+    inscritos: 8,
+    capacidad: 30,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-009",
+    curso: "Protocolo y Etiqueta",
+    programa: "Dominicana Digna",
+    docente: "Ana Martínez",
+    horario: "Jue 02:00 PM - 04:00 PM",
+    dias: ["jue"],
+    horaInicio: "14:00",
+    horaFin: "16:00",
+    estado: "Abierta",
+    inscritos: 25,
+    capacidad: 25,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-010",
+    curso: "Gestión de Carga Peligrosa",
+    programa: "DIGEP Directo",
+    docente: "Luis Hernández",
+    horario: "Sab 08:00 AM - 01:00 PM",
+    dias: ["sab"],
+    horaInicio: "08:00",
+    horaFin: "13:00",
+    estado: "Abierta",
+    inscritos: 18,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-011",
+    curso: "Inglés Técnico Aeronáutico",
+    programa: "DIGEP-INFOTEP",
+    docente: "Juan Pérez",
+    horario: "Mar-Vie 05:00 PM - 07:00 PM",
+    dias: ["mar", "vie"],
+    horaInicio: "17:00",
+    horaFin: "19:00",
+    estado: "En proceso",
+    inscritos: 22,
+    capacidad: 30,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-012",
+    curso: "Psicología del Pasajero",
+    programa: "Dominicana Digna",
+    docente: "María García",
+    horario: "Mie 09:00 AM - 11:00 AM",
+    dias: ["mie"],
+    horaInicio: "09:00",
+    horaFin: "11:00",
+    estado: "Abierta",
+    inscritos: 14,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
 ];
 
 const containerVariants = {
@@ -217,6 +306,7 @@ export default function AperturaSeccionesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
+  // Paginación
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -230,17 +320,6 @@ export default function AperturaSeccionesPage() {
     horaFin: "12:00",
     estado: "Abierta",
   });
-
-  const selectedPeriodo = useMemo(() => 
-    PERIODOS_MAESTROS.find(p => p.id === (isEditDialogOpen ? selectedSeccion?.periodoId : formData.periodoId)),
-    [formData.periodoId, selectedSeccion, isEditDialogOpen]
-  );
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "";
-    const [year, month, day] = dateStr.split("-");
-    return `${day}/${month}/${year}`;
-  };
 
   const formatTime12h = (timeStr: string) => {
     if (!timeStr) return "";
@@ -301,8 +380,6 @@ export default function AperturaSeccionesPage() {
     try {
       if (format === 'excel') {
         const { utils, writeFile } = await import('xlsx');
-        
-        // Crear hoja de Excel con encabezados institucionales
         const headerRows = [
           ["REPÚBLICA DOMINICANA"],
           ["Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N."],
@@ -313,60 +390,35 @@ export default function AperturaSeccionesPage() {
           [`Fecha de generación: ${new Date().toLocaleString()}`],
           [""]
         ];
-
         const worksheet = utils.aoa_to_sheet(headerRows);
         utils.sheet_add_json(worksheet, dataToExport, { origin: "A9" });
-        
-        // Agregar fila de totales al final
         const lastRowIndex = 9 + dataToExport.length;
         utils.sheet_add_aoa(worksheet, [[""], [`Total de Secciones Exportadas: ${totalRegistros}`]], { origin: `A${lastRowIndex + 1}` });
-
         const workbook = utils.book_new();
         utils.book_append_sheet(workbook, worksheet, "Secciones");
         writeFile(workbook, `${fileName}.xlsx`);
-
       } else if (format === 'pdf') {
         const { default: jsPDF } = await import('jspdf');
         const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF('landscape');
-        
-        // --- ENCABEZADO TIMBRADO PDF ---
-        const logoWidth = 25;
-        const logoHeight = 25;
         const centerX = doc.internal.pageSize.getWidth() / 2;
-        
         try {
-            // Logo Centrado
-            doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - logoWidth/2, 10, logoWidth, logoHeight);
-        } catch (e) {
-            console.warn("Logo could not be loaded for PDF");
-        }
-
+            doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - 12.5, 10, 25, 25);
+        } catch (e) {}
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
         doc.text("REPÚBLICA DOMINICANA", centerX, 42, { align: "center" });
-        
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
         doc.text("Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", centerX, 48, { align: "center" });
         doc.text("SANTO DOMINGO, ESTE.", centerX, 53, { align: "center" });
-        
         doc.setFont("helvetica", "italic");
         doc.text("“TODO POR LA PATRIA”", centerX, 58, { align: "center" });
-
-        // Línea divisoria
         doc.setDrawColor(200);
         doc.line(20, 62, doc.internal.pageSize.getWidth() - 20, 62);
-
         doc.setFont("helvetica", "bold");
         doc.setFontSize(12);
         doc.text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
-        
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(100);
-        doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 77);
-        
         autoTable(doc, {
           startY: 82,
           head: [['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.']],
@@ -374,140 +426,55 @@ export default function AperturaSeccionesPage() {
           headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
           styles: { fontSize: 8 },
         });
-
-        // Totales al final
         const finalY = (doc as any).lastAutoTable.finalY + 10;
-        doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(0);
         doc.text(`Total de Secciones Exportadas: ${totalRegistros}`, 14, finalY);
-        
         doc.save(`${fileName}.pdf`);
-
       } else if (format === 'word') {
-        const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, TextRun, AlignmentType, BorderStyle, ImageRun } = await import('docx');
+        const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, TextRun, AlignmentType, ImageRun } = await import('docx');
         const { saveAs } = await import('file-saver');
-
-        // Cargar imagen para Word
         const response = await fetch(INSTITUTIONAL_LOGO_URL);
         const buffer = await response.arrayBuffer();
-
-        const doc = new Document({
+        const docWord = new Document({
           sections: [{
             children: [
-              // Logo centrado
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new ImageRun({
-                    data: buffer,
-                    transformation: { width: 80, height: 80 },
-                  }),
-                ],
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 }),
-                ],
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 }),
-                ],
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                    new TextRun({ text: "SANTO DOMINGO, ESTE.", size: 20 }),
-                ],
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                    new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 }),
-                ],
-                spacing: { after: 200 },
-              }),
-              new Paragraph({
-                children: [ new TextRun({ text: "", border: { top: { style: BorderStyle.SINGLE, size: 1, color: "000000" } } }) ],
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({
-                    text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`,
-                    bold: true,
-                    size: 24,
-                    color: "26658C"
-                  }),
-                ],
-                spacing: { before: 200, after: 100 },
-              }),
-              new Paragraph({
-                alignment: AlignmentType.CENTER,
-                children: [
-                  new TextRun({
-                    text: `Generado el: ${new Date().toLocaleString()}`,
-                    size: 16,
-                    italics: true,
-                  }),
-                ],
-                spacing: { after: 400 },
-              }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 80, height: 80 } })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "SANTO DOMINGO, ESTE.", size: 20 })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`, bold: true, size: 24, color: "26658C" })], spacing: { before: 200, after: 400 } }),
               new Table({
                 width: { size: 100, type: WidthType.PERCENTAGE },
                 rows: [
                   new TableRow({
-                    children: [
-                      'Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.'
-                    ].map(h => new TableCell({
+                    children: ['Curso', 'Programa', 'Docente', 'Horario', 'Estado', 'Cap.', 'Ins.', 'Ocup.'].map(h => new TableCell({
                       children: [new Paragraph({ children: [new TextRun({ text: h, bold: true, color: "FFFFFF" })], alignment: AlignmentType.CENTER })],
                       shading: { fill: "26658C" },
-                      verticalAlign: "center",
                     }))
                   }),
                   ...dataToExport.map(row => new TableRow({
-                    children: Object.values(row).map(v => new TableCell({
-                      children: [new Paragraph({ text: String(v), size: 16 })],
-                      verticalAlign: "center",
-                    }))
+                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ text: String(v), size: 16 })] }))
                   }))
                 ]
               }),
-              new Paragraph({
-                spacing: { before: 400 },
-                children: [
-                    new TextRun({ text: `Total de Secciones Exportadas: ${totalRegistros}`, bold: true, size: 20 })
-                ]
-              })
+              new Paragraph({ spacing: { before: 400 }, children: [new TextRun({ text: `Total de Secciones Exportadas: ${totalRegistros}`, bold: true, size: 20 })] })
             ]
           }]
         });
-
-        const blob = await Packer.toBlob(doc);
+        const blob = await Packer.toBlob(docWord);
         saveAs(blob, `${fileName}.docx`);
       }
-      
-      toast({
-        title: "Exportación exitosa",
-        description: `El archivo ${fileName} con membrete institucional ha sido descargado.`,
-      });
+      toast({ title: "Exportación exitosa", description: `El archivo ${fileName} ha sido generado.` });
     } catch (error) {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Error de exportación",
-        description: "Hubo un problema al generar el reporte institucional.",
-      });
+      toast({ variant: "destructive", title: "Error de exportación" });
     }
   };
 
   const handleCreateSeccion = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.periodoId || !formData.curso || !formData.docente || formData.dias.length === 0) {
-      toast({ variant: "destructive", title: "Campos incompletos", description: "Por favor, completa todos los campos obligatorios." });
+      toast({ variant: "destructive", title: "Campos incompletos" });
       return;
     }
     const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
@@ -520,7 +487,7 @@ export default function AperturaSeccionesPage() {
     setSecciones([newSeccion, ...secciones]);
     setIsCreateDialogOpen(false);
     resetForm();
-    toast({ title: "Sección creada", description: `La sección ${newId} ha sido creada exitosamente.` });
+    toast({ title: "Sección creada" });
   };
 
   const handleUpdateSeccion = (e: React.FormEvent) => {
@@ -540,7 +507,7 @@ export default function AperturaSeccionesPage() {
     setSecciones(updatedSecciones);
     setIsEditDialogOpen(false);
     resetForm();
-    toast({ title: "Sección actualizada", description: `Los cambios en la sección ${selectedSeccion.id} han sido guardados.` });
+    toast({ title: "Sección actualizada" });
   };
 
   const resetForm = () => {
@@ -563,9 +530,9 @@ export default function AperturaSeccionesPage() {
 
   const getStatusBadge = (estado: string) => {
     switch (estado) {
-      case "Abierta": return <Badge className="bg-success/15 text-success border-success/20 hover:bg-success/20 font-bold px-3">Abierta</Badge>;
-      case "En proceso": return <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20 hover:bg-amber-500/20 font-bold px-3">En proceso</Badge>;
-      case "Cerrada": return <Badge className="bg-destructive/15 text-destructive border-destructive/20 hover:bg-destructive/20 font-bold px-3">Cerrada</Badge>;
+      case "Abierta": return <Badge className="bg-success/15 text-success border-success/20 font-bold px-3">Abierta</Badge>;
+      case "En proceso": return <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20 font-bold px-3">En proceso</Badge>;
+      case "Cerrada": return <Badge className="bg-destructive/15 text-destructive border-destructive/20 font-bold px-3">Cerrada</Badge>;
       default: return <Badge variant="outline">{estado}</Badge>;
     }
   };
@@ -584,10 +551,6 @@ export default function AperturaSeccionesPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="hidden sm:flex font-bold uppercase tracking-wider text-[10px] h-9">
-            <Filter className="mr-2 h-4 w-4" /> Filtros
-          </Button>
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
@@ -716,6 +679,7 @@ export default function AperturaSeccionesPage() {
         </Card>
       </motion.div>
 
+      {/* Ver Detalles Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] border-border/50 shadow-2xl">
           <DialogHeader>
@@ -748,6 +712,7 @@ export default function AperturaSeccionesPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Editar Sección Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem]">
           <DialogHeader><DialogTitle className="text-2xl font-black">Editar Sección</DialogTitle></DialogHeader>
@@ -761,12 +726,13 @@ export default function AperturaSeccionesPage() {
                 </div>
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Docente Asignado</Label>
-                  <Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select>
+                  <Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select>
                   <Label className="text-xs font-bold uppercase">Capacidad Máxima</Label>
-                  <Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} />
+                  <Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} className="rounded-xl" />
+                  <div className="space-y-3"><Label className="text-xs font-bold uppercase">Horario (Días y Horas)</Label><div className="flex flex-wrap gap-3">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-2"><Checkbox id={`edit-${dia.id}`} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={`edit-${dia.id}`} className="text-xs">{dia.label}</Label></div>))}</div><div className="flex gap-4 mt-2"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
                 </div>
               </div>
-              <DialogFooter><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar Cambios</Button></DialogFooter>
+              <DialogFooter className="gap-3 pt-8 border-t border-border/30"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar Cambios</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
