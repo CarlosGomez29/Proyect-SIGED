@@ -100,7 +100,7 @@ const initialSecciones = [
     curso: "Seguridad de la Carga Aérea",
     programa: "DIGEP Directo",
     docente: "Juan Pérez",
-    horario: "Lun-Vie 08:00 - 12:00",
+    horario: "Lun-Vie 08:00 AM - 12:00 PM",
     dias: ["lun", "mar", "mie", "jue", "vie"],
     horaInicio: "08:00",
     horaFin: "12:00",
@@ -114,7 +114,7 @@ const initialSecciones = [
     curso: "Mercancías Peligrosas",
     programa: "DIGEP-INFOTEP",
     docente: "María García",
-    horario: "Sáb 09:00 - 17:00",
+    horario: "Sáb 09:00 AM - 05:00 PM",
     dias: ["sab"],
     horaInicio: "09:00",
     horaFin: "17:00",
@@ -170,6 +170,16 @@ export default function AperturaSeccionesPage() {
     return `${day}/${month}/${year}`;
   };
 
+  const formatTime12h = (timeStr: string) => {
+    if (!timeStr) return "";
+    const [hour, minute] = timeStr.split(":");
+    const h = parseInt(hour, 10);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 || 12;
+    const formattedHour = h12 < 10 ? `0${h12}` : h12;
+    return `${formattedHour}:${minute} ${ampm}`;
+  };
+
   const filteredSecciones = secciones.filter(
     (s) =>
       s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -190,13 +200,15 @@ export default function AperturaSeccionesPage() {
 
     const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+    const timeStart12 = formatTime12h(formData.horaInicio);
+    const timeEnd12 = formatTime12h(formData.horaFin);
     
     const newSeccion = {
       id: newId,
       curso: formData.curso,
       programa: "DIGEP Directo",
       docente: formData.docente,
-      horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
+      horario: `${diasStr} ${timeStart12} - ${timeEnd12}`,
       dias: formData.dias,
       horaInicio: formData.horaInicio,
       horaFin: formData.horaFin,
@@ -221,6 +233,8 @@ export default function AperturaSeccionesPage() {
     if (!selectedSeccion) return;
 
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+    const timeStart12 = formatTime12h(formData.horaInicio);
+    const timeEnd12 = formatTime12h(formData.horaFin);
     
     const updatedSecciones = secciones.map(s => {
       if (s.id === selectedSeccion.id) {
@@ -231,7 +245,7 @@ export default function AperturaSeccionesPage() {
           dias: formData.dias,
           horaInicio: formData.horaInicio,
           horaFin: formData.horaFin,
-          horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
+          horario: `${diasStr} ${timeStart12} - ${timeEnd12}`,
         };
       }
       return s;
@@ -428,7 +442,7 @@ export default function AperturaSeccionesPage() {
                     </div>
 
                     <div className="space-y-3 md:col-span-2">
-                      <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 - 18:00)</Label>
+                      <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 AM - 06:00 PM)</Label>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
                         <div className="flex-1 space-y-1.5">
                           <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
@@ -788,7 +802,7 @@ export default function AperturaSeccionesPage() {
                   </div>
 
                   <div className="space-y-3 md:col-span-2">
-                    <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 - 18:00)</Label>
+                    <Label className="text-xs font-bold uppercase opacity-60">Horario de Clase (Rango 08:00 AM - 06:00 PM)</Label>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-muted/20 p-4 rounded-2xl border border-border/50">
                       <div className="flex-1 space-y-1.5">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
