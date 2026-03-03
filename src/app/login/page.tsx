@@ -87,13 +87,13 @@ export default function ProfileSelectionPage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
       <Image
-        src={images.hero_institutional.url}
+        src={images.login_background.url}
         alt="Background"
         layout="fill"
         objectFit="cover"
         className="z-0 filter blur-sm brightness-50"
         priority
-        data-ai-hint={images.hero_institutional.hint}
+        data-ai-hint={images.login_background.hint}
       />
 
       <div className="absolute top-4 left-4 z-20">

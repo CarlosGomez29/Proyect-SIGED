@@ -147,11 +147,11 @@ export default function DashboardAdminPage() {
           <div className="grid md:grid-cols-2">
             <div className="relative h-80 md:h-auto overflow-hidden">
               <Image 
-                src={images.hero_institutional.url} 
-                alt={images.hero_institutional.alt}
+                src={images.vision_institutional.url} 
+                alt={images.vision_institutional.alt}
                 fill
                 className="object-cover transition-transform duration-[3s] hover:scale-110"
-                data-ai-hint={images.hero_institutional.hint}
+                data-ai-hint={images.vision_institutional.hint}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent hidden md:block" />
             </div>

@@ -37,12 +37,12 @@ export default function WelcomePage() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
       <Image
-        src={images.hero_institutional.url}
+        src={images.landing_hero.url}
         alt="Background"
         fill
         priority
         className="z-0 object-cover filter brightness-50 blur-sm"
-        data-ai-hint={images.hero_institutional.hint}
+        data-ai-hint={images.landing_hero.hint}
       />
       <motion.div
         className="relative z-10 text-center"

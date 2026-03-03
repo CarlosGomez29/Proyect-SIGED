@@ -76,12 +76,12 @@ export default function RoleLoginPage() {
   return (
     <div className="relative flex items-center justify-center min-h-screen bg-background text-white p-4">
        <Image
-        src={images.hero_institutional.url}
+        src={images.login_background.url}
         alt="Background"
         fill
         priority
         className="z-0 object-cover filter brightness-50 blur-md"
-        data-ai-hint={images.hero_institutional.hint}
+        data-ai-hint={images.login_background.hint}
       />
        <Button asChild variant="ghost" className="absolute top-4 left-4 z-20 bg-transparent text-white hover:bg-white/10 hover:text-white">
             <Link href="/login">
