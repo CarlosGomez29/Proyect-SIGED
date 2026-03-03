@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   PlusCircle,
   FileDown,
@@ -297,9 +298,9 @@ export default function AperturaSeccionesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
-  // Paginación dinámica basada en entorno
+  // Paginación dinámica
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = process.env.NODE_ENV === 'development' ? 15 : 7;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -343,12 +344,18 @@ export default function AperturaSeccionesPage() {
       );
   }, [secciones, searchTerm]);
 
-  // Lógica de paginación
-  const totalPages = Math.ceil(filteredSecciones.length / ITEMS_PER_PAGE);
+  // Lógica de paginación reactiva
+  const totalPages = Math.ceil(filteredSecciones.length / itemsPerPage);
+  
   const paginatedSecciones = useMemo(() => {
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredSecciones.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredSecciones, currentPage, ITEMS_PER_PAGE]);
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredSecciones.slice(start, start + itemsPerPage);
+  }, [filteredSecciones, currentPage, itemsPerPage]);
+
+  // Resetear a la página 1 cuando cambia la búsqueda o la cantidad por página
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, itemsPerPage]);
 
   const calculateOcupacion = (inscritos: number, capacidad: number) => {
     return Math.round((inscritos / capacidad) * 100);
@@ -938,9 +945,25 @@ export default function AperturaSeccionesPage() {
             </Table>
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
-            <div className="text-xs text-muted-foreground font-medium">
-              Mostrando <span className="text-foreground font-bold">{paginatedSecciones.length}</span> de <span className="text-foreground font-bold">{filteredSecciones.length}</span> registros
+            <div className="flex items-center gap-4">
+              <div className="text-xs text-muted-foreground font-medium">
+                Mostrando <span className="text-foreground font-bold">{paginatedSecciones.length}</span> de <span className="text-foreground font-bold">{filteredSecciones.length}</span> registros
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium">Registros por página:</span>
+                <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(parseInt(val))}>
+                  <SelectTrigger className="h-8 w-20 rounded-lg text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
                     <PaginationItem>
@@ -950,17 +973,21 @@ export default function AperturaSeccionesPage() {
                             className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                         />
                     </PaginationItem>
+                    
+                    {/* Generar números de página dinámicos */}
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                         <PaginationItem key={page}>
                             <PaginationLink 
                                 href="#" 
                                 isActive={currentPage === page}
                                 onClick={(e) => { e.preventDefault(); setCurrentPage(page); }}
+                                className="h-8 w-8 text-xs"
                             >
                                 {page}
                             </PaginationLink>
                         </PaginationItem>
                     ))}
+
                     <PaginationItem>
                         <PaginationNext 
                             href="#" 
@@ -1091,7 +1118,7 @@ export default function AperturaSeccionesPage() {
                     </div>
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="docente-edit" className="text-xs font-bold uppercase opacity-60 text-foreground opacity-100">Docente Asignado (Editable)</Label>
+                    <Label htmlFor="docente-edit" className="text-xs font-bold uppercase opacity-60 text-foreground">Docente Asignado (Editable)</Label>
                     <Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}>
                       <SelectTrigger className="rounded-xl border-border/50 h-11 bg-background/50">
                         <SelectValue placeholder="Buscar docente..." />
