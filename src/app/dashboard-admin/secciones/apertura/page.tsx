@@ -159,6 +159,12 @@ export default function AperturaSeccionesPage() {
     [formData.periodoId]
   );
 
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   const filteredSecciones = secciones.filter(
     (s) =>
       s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -358,7 +364,7 @@ export default function AperturaSeccionesPage() {
 
                     <div className="space-y-2">
                       <Label className="text-xs font-bold uppercase opacity-60">Horario de Inicio / Fin</Label>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                         <div className="relative flex-1">
                           <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input 
@@ -370,7 +376,7 @@ export default function AperturaSeccionesPage() {
                             onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
                           />
                         </div>
-                        <span className="text-muted-foreground opacity-50">→</span>
+                        <span className="hidden sm:inline text-muted-foreground opacity-50">→</span>
                         <div className="relative flex-1">
                           <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input 
@@ -387,14 +393,14 @@ export default function AperturaSeccionesPage() {
 
                     <div className="space-y-2">
                       <Label className="text-xs font-bold uppercase opacity-60">Fechas (Auto-calculadas)</Label>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div className="space-y-1">
                           <span className="text-[10px] text-muted-foreground font-bold">INICIO</span>
-                          <Input readOnly value={selectedPeriodo?.inicio || ""} className="h-9 text-xs bg-muted/30 border-dashed" />
+                          <Input readOnly value={formatDate(selectedPeriodo?.inicio || "")} className="h-9 text-xs bg-muted/30 border-dashed" />
                         </div>
                         <div className="space-y-1">
                           <span className="text-[10px] text-muted-foreground font-bold">FIN</span>
-                          <Input readOnly value={selectedPeriodo?.fin || ""} className="h-9 text-xs bg-muted/30 border-dashed" />
+                          <Input readOnly value={formatDate(selectedPeriodo?.fin || "")} className="h-9 text-xs bg-muted/30 border-dashed" />
                         </div>
                       </div>
                     </div>
