@@ -37,8 +37,8 @@ import DashboardHeader from "@/components/dashboard-header";
 
 const academicOffering = [
     { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
-    { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
     { href: "/dashboard-admin/cursos", label: "Gestión de Secciones", icon: Library },
+    { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
     { href: "/dashboard-admin/secciones/limpieza", label: "Eliminar Sección Vacía", icon: Trash2 },
 ];
 
