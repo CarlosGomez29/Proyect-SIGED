@@ -61,6 +61,14 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Datos maestros (Simulados)
 const PERIODOS_MAESTROS = [
@@ -125,6 +133,146 @@ const initialSecciones = [
     capacidad: 20,
     periodoId: "2024-2",
   },
+  {
+    id: "SEC-003",
+    curso: "AVSEC para Tripulación",
+    programa: "Dominicana Digna",
+    docente: "Carlos López",
+    horario: "Mar-Jue 02:00 PM - 06:00 PM",
+    dias: ["mar", "jue"],
+    horaInicio: "14:00",
+    horaFin: "18:00",
+    estado: "Abierta",
+    inscritos: 28,
+    capacidad: 30,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-004",
+    curso: "Manejo de Crisis",
+    programa: "DIGEP Directo",
+    docente: "Ana Martínez",
+    horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM",
+    dias: ["lun", "mie", "vie"],
+    horaInicio: "08:00",
+    horaFin: "10:00",
+    estado: "En proceso",
+    inscritos: 10,
+    capacidad: 25,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-005",
+    curso: "Seguridad Aeroportuaria",
+    programa: "DIGEP-INFOTEP",
+    docente: "Luis Hernández",
+    horario: "Sáb 08:00 AM - 04:00 PM",
+    dias: ["sab"],
+    horaInicio: "08:00",
+    horaFin: "16:00",
+    estado: "Cerrada",
+    inscritos: 40,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-006",
+    curso: "Inteligencia Emocional",
+    programa: "Dominicana Digna",
+    docente: "Juan Pérez",
+    horario: "Vie 02:00 PM - 05:00 PM",
+    dias: ["vie"],
+    horaInicio: "14:00",
+    horaFin: "17:00",
+    estado: "Abierta",
+    inscritos: 12,
+    capacidad: 50,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-007",
+    curso: "Seguridad de la Carga Aérea",
+    programa: "DIGEP Directo",
+    docente: "María García",
+    horario: "Lun-Vie 06:00 PM - 09:00 PM",
+    dias: ["lun", "mar", "mie", "jue", "vie"],
+    horaInicio: "18:00",
+    horaFin: "21:00",
+    estado: "Abierta",
+    inscritos: 5,
+    capacidad: 20,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-008",
+    curso: "Mercancías Peligrosas",
+    programa: "DIGEP-INFOTEP",
+    docente: "Carlos López",
+    horario: "Dom 09:00 AM - 01:00 PM",
+    dias: ["dom"],
+    horaInicio: "09:00",
+    horaFin: "13:00",
+    estado: "Abierta",
+    inscritos: 18,
+    capacidad: 25,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-009",
+    curso: "AVSEC para Tripulación",
+    programa: "Dominicana Digna",
+    docente: "Ana Martínez",
+    horario: "Lun-Mie 10:00 AM - 12:00 PM",
+    dias: ["lun", "mie"],
+    horaInicio: "10:00",
+    horaFin: "12:00",
+    estado: "Abierta",
+    inscritos: 22,
+    capacidad: 30,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-010",
+    curso: "Manejo de Crisis",
+    programa: "DIGEP Directo",
+    docente: "Luis Hernández",
+    horario: "Jue 08:00 AM - 12:00 PM",
+    dias: ["jue"],
+    horaInicio: "08:00",
+    horaFin: "12:00",
+    estado: "Abierta",
+    inscritos: 15,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-011",
+    curso: "Seguridad Aeroportuaria",
+    programa: "DIGEP-INFOTEP",
+    docente: "Juan Pérez",
+    horario: "Lun-Vie 08:00 AM - 10:00 AM",
+    dias: ["lun", "mar", "mie", "jue", "vie"],
+    horaInicio: "08:00",
+    horaFin: "10:00",
+    estado: "Abierta",
+    inscritos: 35,
+    capacidad: 40,
+    periodoId: "2024-2",
+  },
+  {
+    id: "SEC-012",
+    curso: "Inteligencia Emocional",
+    programa: "Dominicana Digna",
+    docente: "María García",
+    horario: "Sáb 02:00 PM - 06:00 PM",
+    dias: ["sab"],
+    horaInicio: "14:00",
+    horaFin: "18:00",
+    estado: "Abierta",
+    inscritos: 45,
+    capacidad: 50,
+    periodoId: "2024-2",
+  },
 ];
 
 const containerVariants = {
@@ -148,6 +296,10 @@ export default function AperturaSeccionesPage() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
+  
+  // Paginación dinámica basada en entorno
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = process.env.NODE_ENV === 'development' ? 15 : 7;
 
   // Estados del formulario
   const [formData, setFormData] = useState({
@@ -182,12 +334,21 @@ export default function AperturaSeccionesPage() {
     return `${formattedHour}:${minute} ${ampm}`;
   };
 
-  const filteredSecciones = secciones.filter(
-    (s) =>
-      s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.programa.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSecciones = useMemo(() => {
+    return secciones.filter(
+        (s) =>
+          s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          s.programa.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [secciones, searchTerm]);
+
+  // Lógica de paginación
+  const totalPages = Math.ceil(filteredSecciones.length / ITEMS_PER_PAGE);
+  const paginatedSecciones = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredSecciones.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredSecciones, currentPage, ITEMS_PER_PAGE]);
 
   const calculateOcupacion = (inscritos: number, capacidad: number) => {
     return Math.round((inscritos / capacidad) * 100);
@@ -562,11 +723,11 @@ export default function AperturaSeccionesPage() {
                       <Label htmlFor="capacidad" className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label>
                       <div className="relative">
                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input 
+                        <input 
                           id="capacidad" 
                           type="number" 
                           min="1" 
-                          className="pl-10 h-11 rounded-xl bg-background/50" 
+                          className="flex h-11 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 backdrop-blur-sm focus:bg-background/60 pl-10" 
                           value={formData.capacidad}
                           onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
                         />
@@ -601,11 +762,11 @@ export default function AperturaSeccionesPage() {
                           <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
                           <div className="relative">
                             <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input 
+                            <input 
                               type="time" 
                               min="08:00" 
                               max="18:00" 
-                              className="pl-10 h-11 rounded-xl bg-background" 
+                              className="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 pl-10" 
                               value={formData.horaInicio}
                               onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
                             />
@@ -618,11 +779,11 @@ export default function AperturaSeccionesPage() {
                           <span className="text-[10px] font-bold text-muted-foreground uppercase">Salida</span>
                           <div className="relative">
                             <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input 
+                            <input 
                               type="time" 
                               min="08:00" 
                               max="18:00" 
-                              className="pl-10 h-11 rounded-xl bg-background" 
+                              className="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 pl-10" 
                               value={formData.horaFin}
                               onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
                             />
@@ -709,7 +870,7 @@ export default function AperturaSeccionesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredSecciones.map((seccion) => {
+                {paginatedSecciones.map((seccion) => {
                   const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
                   return (
                     <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
@@ -776,6 +937,40 @@ export default function AperturaSeccionesPage() {
               </TableBody>
             </Table>
           </CardContent>
+          <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
+            <div className="text-xs text-muted-foreground font-medium">
+              Mostrando <span className="text-foreground font-bold">{paginatedSecciones.length}</span> de <span className="text-foreground font-bold">{filteredSecciones.length}</span> registros
+            </div>
+            <Pagination className="w-auto mx-0">
+                <PaginationContent>
+                    <PaginationItem>
+                        <PaginationPrevious 
+                            href="#" 
+                            onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        />
+                    </PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <PaginationItem key={page}>
+                            <PaginationLink 
+                                href="#" 
+                                isActive={currentPage === page}
+                                onClick={(e) => { e.preventDefault(); setCurrentPage(page); }}
+                            >
+                                {page}
+                            </PaginationLink>
+                        </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                        <PaginationNext 
+                            href="#" 
+                            onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        />
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination>
+          </div>
         </Card>
       </motion.div>
 
@@ -922,11 +1117,11 @@ export default function AperturaSeccionesPage() {
                     <Label htmlFor="capacidad-edit" className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label>
                     <div className="relative">
                       <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
+                      <input 
                         id="capacidad-edit" 
                         type="number" 
                         min="1" 
-                        className="pl-10 h-11 rounded-xl bg-background/50" 
+                        className="flex h-11 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 backdrop-blur-sm focus:bg-background/60 pl-10" 
                         value={formData.capacidad}
                         onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
                       />
@@ -961,11 +1156,11 @@ export default function AperturaSeccionesPage() {
                         <span className="text-[10px] font-bold text-muted-foreground uppercase">Entrada</span>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
+                          <input 
                             type="time" 
                             min="08:00" 
                             max="18:00" 
-                            className="pl-10 h-11 rounded-xl bg-background" 
+                            className="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 pl-10" 
                             value={formData.horaInicio}
                             onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
                           />
@@ -975,11 +1170,11 @@ export default function AperturaSeccionesPage() {
                         <span className="text-[10px] font-bold text-muted-foreground uppercase">Salida</span>
                         <div className="relative">
                           <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                          <Input 
+                          <input 
                             type="time" 
                             min="08:00" 
                             max="18:00" 
-                            className="pl-10 h-11 rounded-xl bg-background" 
+                            className="flex h-11 w-full rounded-xl border border-input bg-background px-4 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-colors duration-300 pl-10" 
                             value={formData.horaFin}
                             onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
                           />
