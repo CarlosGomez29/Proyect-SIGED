@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   PlusCircle,
   FileDown,
@@ -11,8 +12,12 @@ import {
   Edit,
   XCircle,
   BookOpen,
+  Calendar as CalendarIcon,
+  Clock,
+  Users,
+  Check,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,9 +43,62 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+
+// Datos maestros (Simulados para la arquitectura)
+const PERIODOS_MAESTROS = [
+  { id: "2024-2", nombre: "Período 2024-2 (Trimestral)", inicio: "2024-06-01", fin: "2024-08-31" },
+  { id: "2024-S2", nombre: "Período 2024-S2 (Semestral)", inicio: "2024-07-01", fin: "2024-12-31" },
+  { id: "2025-1", nombre: "Período 2025-1 (Anual)", inicio: "2025-01-10", fin: "2025-12-15" },
+];
+
+const CURSOS_MAESTROS = [
+  "Seguridad de la Carga Aérea",
+  "Mercancías Peligrosas",
+  "AVSEC para Tripulación",
+  "Manejo de Crisis",
+  "Seguridad Aeroportuaria",
+  "Inteligencia Emocional",
+];
+
+const DOCENTES_MAESTROS = [
+  "Juan Pérez",
+  "María García",
+  "Carlos López",
+  "Ana Martínez",
+  "Luis Hernández",
+];
+
+const DIAS_SEMANA = [
+  { id: "lun", label: "Lunes" },
+  { id: "mar", label: "Martes" },
+  { id: "mie", label: "Miércoles" },
+  { id: "jue", label: "Jueves" },
+  { id: "vie", label: "Viernes" },
+  { id: "sab", label: "Sábado" },
+  { id: "dom", label: "Domingo" },
+];
 
 const initialSecciones = [
   {
@@ -63,36 +121,6 @@ const initialSecciones = [
     inscritos: 15,
     capacidad: 20,
   },
-  {
-    id: "SEC-003",
-    curso: "AVSEC para Tripulación",
-    programa: "DIGEP Directo",
-    docente: "Carlos López",
-    horario: "Lun-Mié 18:00 - 21:00",
-    estado: "Abierta",
-    inscritos: 38,
-    capacidad: 40,
-  },
-  {
-    id: "SEC-004",
-    curso: "Manejo de Crisis",
-    programa: "Dominicana Digna",
-    docente: "Ana Martínez",
-    horario: "Mar-Jue 14:00 - 17:00",
-    estado: "Cerrada",
-    inscritos: 40,
-    capacidad: 40,
-  },
-  {
-    id: "SEC-005",
-    curso: "Seguridad Aeroportuaria",
-    programa: "DIGEP Directo",
-    docente: "Luis Hernández",
-    horario: "Lun-Vie 13:00 - 17:00",
-    estado: "Abierta",
-    inscritos: 22,
-    capacidad: 40,
-  },
 ];
 
 const containerVariants = {
@@ -111,33 +139,85 @@ const itemVariants = {
 export default function AperturaSeccionesPage() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [secciones, setSecciones] = useState(initialSecciones);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const filteredSecciones = initialSecciones.filter(
+  // Estados del formulario
+  const [formData, setFormData] = useState({
+    periodoId: "",
+    curso: "",
+    docente: "",
+    capacidad: "40",
+    dias: [] as string[],
+    horaInicio: "08:00",
+    horaFin: "12:00",
+    estado: "Abierta",
+  });
+
+  const selectedPeriodo = useMemo(() => 
+    PERIODOS_MAESTROS.find(p => p.id === formData.periodoId),
+    [formData.periodoId]
+  );
+
+  const filteredSecciones = secciones.filter(
     (s) =>
       s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.docente.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCreateSeccion = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.periodoId || !formData.curso || !formData.docente || formData.dias.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Campos incompletos",
+        description: "Por favor, completa todos los campos obligatorios.",
+      });
+      return;
+    }
+
+    const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+    const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+    
+    const newSeccion = {
+      id: newId,
+      curso: formData.curso,
+      programa: "DIGEP Directo", // Por defecto para este flujo
+      docente: formData.docente,
+      horario: `${diasStr} ${formData.horaInicio} - ${formData.horaFin}`,
+      estado: formData.estado,
+      inscritos: 0,
+      capacidad: parseInt(formData.capacidad),
+    };
+
+    setSecciones([newSeccion, ...secciones]);
+    setIsDialogOpen(false);
+    setFormData({
+      periodoId: "",
+      curso: "",
+      docente: "",
+      capacidad: "40",
+      dias: [],
+      horaInicio: "08:00",
+      horaFin: "12:00",
+      estado: "Abierta",
+    });
+
+    toast({
+      title: "Sección creada",
+      description: `La sección ${newId} ha sido creada exitosamente.`,
+    });
+  };
+
   const getStatusBadge = (estado: string) => {
     switch (estado) {
       case "Abierta":
-        return (
-          <Badge className="bg-success/15 text-success border-success/20 hover:bg-success/20 font-bold px-3">
-            Abierta
-          </Badge>
-        );
+        return <Badge className="bg-success/15 text-success border-success/20 hover:bg-success/20 font-bold px-3">Abierta</Badge>;
       case "En proceso":
-        return (
-          <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20 hover:bg-amber-500/20 font-bold px-3">
-            En proceso
-          </Badge>
-        );
+        return <Badge className="bg-amber-500/15 text-amber-600 border-amber-500/20 hover:bg-amber-500/20 font-bold px-3">En proceso</Badge>;
       case "Cerrada":
-        return (
-          <Badge className="bg-destructive/15 text-destructive border-destructive/20 hover:bg-destructive/20 font-bold px-3">
-            Cerrada
-          </Badge>
-        );
+        return <Badge className="bg-destructive/15 text-destructive border-destructive/20 hover:bg-destructive/20 font-bold px-3">Cerrada</Badge>;
       default:
         return <Badge variant="outline">{estado}</Badge>;
     }
@@ -148,20 +228,13 @@ export default function AperturaSeccionesPage() {
   };
 
   return (
-    <motion.div
-      className="space-y-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <motion.div className="space-y-8" variants={containerVariants} initial="hidden" animate="visible">
       {/* 1. Encabezado del módulo */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <BookOpen className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-black font-headline tracking-tighter">
-              Apertura de Secciones
-            </h1>
+            <h1 className="text-3xl font-black font-headline tracking-tighter">Apertura de Secciones</h1>
           </div>
           <p className="text-muted-foreground font-medium text-sm flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -170,17 +243,191 @@ export default function AperturaSeccionesPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" className="hidden sm:flex font-bold uppercase tracking-wider text-[10px] h-9">
-            <Filter className="mr-2 h-4 w-4" />
-            Filtros
+            <Filter className="mr-2 h-4 w-4" /> Filtros
           </Button>
           <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
-            <FileDown className="mr-2 h-4 w-4" />
-            Exportar
+            <FileDown className="mr-2 h-4 w-4" /> Exportar
           </Button>
-          <Button size="sm" className="font-bold shadow-lg shadow-primary/20 uppercase tracking-wider text-[10px] h-9">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Nueva Sección
-          </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="font-bold shadow-lg shadow-primary/20 uppercase tracking-wider text-[10px] h-9">
+                <PlusCircle className="mr-2 h-4 w-4" /> Nueva Sección
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-border/50 shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black tracking-tight">Nueva Sección Académica</DialogTitle>
+                <DialogDescription className="font-medium">
+                  Configura los detalles de la nueva oferta académica para el período seleccionado.
+                </DialogDescription>
+              </DialogHeader>
+
+              <form onSubmit={handleCreateSeccion} className="space-y-8 py-4">
+                {/* BLOQUE 1 — Información Académica */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    Bloque 1: Información Académica
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="periodo" className="text-xs font-bold uppercase opacity-60">Período Académico</Label>
+                      <Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}>
+                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                          <SelectValue placeholder="Seleccionar período..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          {PERIODOS_MAESTROS.map((p) => (
+                            <SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="curso" className="text-xs font-bold uppercase opacity-60">Curso</Label>
+                      <Select onValueChange={(val) => setFormData({ ...formData, curso: val })}>
+                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                          <SelectValue placeholder="Seleccionar curso..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          {CURSOS_MAESTROS.map((c) => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label htmlFor="docente" className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
+                      <Select onValueChange={(val) => setFormData({ ...formData, docente: val })}>
+                        <SelectTrigger className="rounded-xl border-border/50 h-11">
+                          <SelectValue placeholder="Buscar docente..." />
+                        </SelectTrigger>
+                        <SelectContent className="rounded-xl">
+                          {DOCENTES_MAESTROS.map((d) => (
+                            <SelectItem key={d} value={d}>{d}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BLOQUE 2 — Configuración de la Sección */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    Bloque 2: Configuración de la Sección
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="capacidad" className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label>
+                      <div className="relative">
+                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                          id="capacidad" 
+                          type="number" 
+                          min="1" 
+                          className="pl-10 h-11 rounded-xl" 
+                          value={formData.capacidad}
+                          onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {DIAS_SEMANA.map((dia) => (
+                          <div key={dia.id} className="flex items-center space-x-2">
+                            <Checkbox 
+                              id={dia.id} 
+                              checked={formData.dias.includes(dia.id)}
+                              onCheckedChange={(checked) => {
+                                const newDias = checked 
+                                  ? [...formData.dias, dia.id]
+                                  : formData.dias.filter(d => d !== dia.id);
+                                setFormData({ ...formData, dias: newDias });
+                              }}
+                            />
+                            <label htmlFor={dia.id} className="text-xs font-medium cursor-pointer">{dia.label}</label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase opacity-60">Horario de Inicio / Fin</Label>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            type="time" 
+                            min="08:00" 
+                            max="18:00" 
+                            className="pl-10 h-11 rounded-xl" 
+                            value={formData.horaInicio}
+                            onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })}
+                          />
+                        </div>
+                        <span className="text-muted-foreground opacity-50">→</span>
+                        <div className="relative flex-1">
+                          <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input 
+                            type="time" 
+                            min="08:00" 
+                            max="18:00" 
+                            className="pl-10 h-11 rounded-xl" 
+                            value={formData.horaFin}
+                            onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase opacity-60">Fechas (Auto-calculadas)</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-muted-foreground font-bold">INICIO</span>
+                          <Input readOnly value={selectedPeriodo?.inicio || ""} className="h-9 text-xs bg-muted/30 border-dashed" />
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[10px] text-muted-foreground font-bold">FIN</span>
+                          <Input readOnly value={selectedPeriodo?.fin || ""} className="h-9 text-xs bg-muted/30 border-dashed" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BLOQUE 3 — Estado */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]">
+                    <div className="h-4 w-1 bg-primary rounded-full" />
+                    Bloque 3: Estado Inicial
+                  </div>
+                  <Select value={formData.estado} onValueChange={(val) => setFormData({ ...formData, estado: val })}>
+                    <SelectTrigger className="rounded-xl border-border/50 h-11">
+                      <SelectValue placeholder="Estado de la sección..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      <SelectItem value="Abierta">Abierta (Disponible para inscripciones)</SelectItem>
+                      <SelectItem value="En proceso">En proceso (Requiere validación)</SelectItem>
+                      <SelectItem value="Cerrada">Cerrada (No disponible)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <DialogFooter className="gap-2 pt-6">
+                  <DialogClose asChild>
+                    <Button variant="ghost" className="rounded-xl font-bold uppercase text-[10px] tracking-widest">Cancelar</Button>
+                  </DialogClose>
+                  <Button type="submit" className="rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20 px-8">Crear Sección</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </motion.div>
 
@@ -222,9 +469,7 @@ export default function AperturaSeccionesPage() {
                           <span className="text-[10px] font-mono text-muted-foreground">{seccion.id}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="py-6 font-medium text-sm text-muted-foreground">
-                        {seccion.programa}
-                      </TableCell>
+                      <TableCell className="py-6 font-medium text-sm text-muted-foreground">{seccion.programa}</TableCell>
                       <TableCell className="py-6">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
@@ -233,12 +478,8 @@ export default function AperturaSeccionesPage() {
                           <span className="font-semibold text-sm">{seccion.docente}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="py-6 text-xs font-medium text-muted-foreground leading-relaxed">
-                        {seccion.horario}
-                      </TableCell>
-                      <TableCell className="py-6 text-center">
-                        {getStatusBadge(seccion.estado)}
-                      </TableCell>
+                      <TableCell className="py-6 text-xs font-medium text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>
+                      <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>
                       <TableCell className="py-6">
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-[10px] font-bold">
