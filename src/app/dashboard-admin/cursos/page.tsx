@@ -117,7 +117,7 @@ export default function GestionSeccionesPanel() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    codigoSeccion: true,
     periodo: true,
     curso: true,
     programa: true,
@@ -141,7 +141,7 @@ export default function GestionSeccionesPanel() {
       if (filterConfig.estado !== "Finalizada" && s.estado === "Finalizada") return false;
 
       const matchesSearch = 
-        s.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.codigoSeccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.curso?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.docente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.periodo?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -205,7 +205,7 @@ export default function GestionSeccionesPanel() {
 
     const dataToExport = filteredSecciones.map(s => {
       const row: any = {};
-      if (visibleColumns.id) row["ID"] = s.id;
+      if (visibleColumns.codigoSeccion) row["Código de Sección"] = s.codigoSeccion;
       if (visibleColumns.periodo) row["Período"] = s.periodo;
       if (visibleColumns.curso) row["Curso"] = s.curso;
       if (visibleColumns.programa) row["Programa"] = s.programa;
@@ -373,7 +373,7 @@ export default function GestionSeccionesPanel() {
         <div className="relative flex-1 group w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Buscar por ID, Curso, Programa, Docente o Período..." 
+            placeholder="Buscar por Código de Sección, Curso, Programa, Docente o Período..." 
             className="pl-12 h-12 bg-card/50 border-border/50 text-sm rounded-xl" 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
@@ -397,8 +397,8 @@ export default function GestionSeccionesPanel() {
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
-                        <Checkbox id={` curs-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
-                        <Label htmlFor={` curs-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
+                        <Checkbox id={`gest-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
+                        <Label htmlFor={`gest-${key}`} className="text-[11px] font-medium capitalize">{key === 'codigoSeccion' ? 'Código de Sección' : key}</Label>
                       </div>
                     ))}
                   </div>
@@ -444,7 +444,7 @@ export default function GestionSeccionesPanel() {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow>
-                    {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">ID</TableHead>}
+                    {visibleColumns.codigoSeccion && <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60 text-primary">Código de Sección</TableHead>}
                     {visibleColumns.periodo && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Período</TableHead>}
                     {visibleColumns.curso && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Curso</TableHead>}
                     {visibleColumns.programa && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Programa</TableHead>}
@@ -460,7 +460,7 @@ export default function GestionSeccionesPanel() {
                     const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
                     return (
                       <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
-                        {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id.substring(0, 8)}</TableCell>}
+                        {visibleColumns.codigoSeccion && <TableCell className="py-6 pl-8 font-mono text-xs font-black text-primary">{seccion.codigoSeccion}</TableCell>}
                         {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
                         {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
                         {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
@@ -536,6 +536,7 @@ export default function GestionSeccionesPanel() {
                <div className="space-y-4">
                  <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información General</div>
                  <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
+                    <div><Label className="text-[10px] opacity-60">CÓDIGO DE SECCIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.codigoSeccion}</p></div>
                     <div><Label className="text-[10px] opacity-60">CURSO</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
                     <div><Label className="text-[10px] opacity-60">DOCENTE</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
                     <div><Label className="text-[10px] opacity-60">PERÍODO</Label><p className="text-sm font-bold">{selectedSeccion.periodo}</p></div>

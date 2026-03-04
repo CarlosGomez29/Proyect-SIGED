@@ -77,7 +77,7 @@ import {
 
 // Firebase imports
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { collection, updateDoc, doc, serverTimestamp, query, orderBy, runTransaction } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
@@ -148,7 +148,7 @@ export default function AperturaSeccionesPage() {
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
   const [visibleColumns, setVisibleColumns] = useState({
-    id: true,
+    codigoSeccion: true,
     periodo: true,
     curso: true,
     programa: true,
@@ -190,7 +190,7 @@ export default function AperturaSeccionesPage() {
   const filteredSecciones = useMemo(() => {
     return secciones.filter((s) => {
       const matchesSearch = 
-        s.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.codigoSeccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.curso?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.docente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.programa?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -228,7 +228,7 @@ export default function AperturaSeccionesPage() {
 
     const dataToExport = filteredSecciones.map(s => {
       const row: any = {};
-      if (visibleColumns.id) row["ID"] = s.id;
+      if (visibleColumns.codigoSeccion) row["Código de Sección"] = s.codigoSeccion;
       if (visibleColumns.periodo) row["Período"] = s.periodo;
       if (visibleColumns.curso) row["Curso"] = s.curso;
       if (visibleColumns.programa) row["Programa"] = s.programa;
@@ -334,38 +334,51 @@ export default function AperturaSeccionesPage() {
       return;
     }
 
-    const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const newSeccionData = {
-      periodo: formData.periodoId,
-      curso: formData.curso,
-      programa: "DIGEP Directo",
-      docente: formData.docente,
-      horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
-      dias: formData.dias,
-      horaInicio: formData.horaInicio,
-      horaFin: formData.horaFin,
-      estado: formData.estado,
-      inscritos: 0,
-      capacidad: parseInt(formData.capacidad),
-      fechaInicio: "2024-06-01",
-      fechaFin: "2024-08-31",
-      createdAt: serverTimestamp(),
-    };
+    try {
+      await runTransaction(db, async (transaction) => {
+        const counterRef = doc(db, "metadata", "counters");
+        const counterSnap = await transaction.get(counterRef);
+        
+        let newCount = 1;
+        if (counterSnap.exists()) {
+          newCount = (counterSnap.data().seccionesCount || 0) + 1;
+        }
+        
+        const codigoSeccion = `SEC-${newCount.toString().padStart(4, "0")}`;
+        const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+        
+        const newSeccionData = {
+          codigoSeccion,
+          periodo: formData.periodoId,
+          curso: formData.curso,
+          programa: "DIGEP Directo",
+          docente: formData.docente,
+          horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
+          dias: formData.dias,
+          horaInicio: formData.horaInicio,
+          horaFin: formData.horaFin,
+          estado: formData.estado,
+          inscritos: 0,
+          capacidad: parseInt(formData.capacidad),
+          fechaInicio: "2024-06-01",
+          fechaFin: "2024-08-31",
+          createdAt: serverTimestamp(),
+        };
 
-    addDoc(collection(db, "secciones"), newSeccionData)
-      .then(() => {
-        setIsCreateDialogOpen(false);
-        resetForm();
-        toast({ title: "Sección creada exitosamente" });
-      })
-      .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: 'secciones',
-          operation: 'create',
-          requestResourceData: newSeccionData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        const newDocRef = doc(collection(db, "secciones"));
+        transaction.set(newDocRef, newSeccionData);
+        transaction.set(counterRef, { seccionesCount: newCount }, { merge: true });
       });
+
+      setIsCreateDialogOpen(false);
+      resetForm();
+      toast({ title: "Sección creada exitosamente" });
+    } catch (err) {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: 'secciones',
+        operation: 'create',
+      }));
+    }
   };
 
   const handleUpdateSeccion = async (e: React.FormEvent) => {
@@ -456,7 +469,7 @@ export default function AperturaSeccionesPage() {
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
                         <Checkbox id={`col-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
-                        <Label htmlFor={`col-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
+                        <Label htmlFor={`col-${key}`} className="text-[11px] font-medium capitalize">{key === 'codigoSeccion' ? 'Código de Sección' : key}</Label>
                       </div>
                     ))}
                   </div>
@@ -518,7 +531,7 @@ export default function AperturaSeccionesPage() {
 
       <motion.div variants={itemVariants} className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-        <Input placeholder="Buscar por ID, Curso, Docente o Programa..." className="pl-12 h-14 bg-card/50 border-border/50 rounded-2xl" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+        <Input placeholder="Buscar por Código, Curso, Docente o Programa..." className="pl-12 h-14 bg-card/50 border-border/50 rounded-2xl" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </motion.div>
 
       <motion.div variants={itemVariants}>
@@ -530,7 +543,7 @@ export default function AperturaSeccionesPage() {
               <Table>
                 <TableHeader className="bg-muted/30">
                   <TableRow>
-                    {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">ID</TableHead>}
+                    {visibleColumns.codigoSeccion && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60 text-primary">Código de Sección</TableHead>}
                     {visibleColumns.periodo && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Período</TableHead>}
                     {visibleColumns.curso && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
                     {visibleColumns.programa && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>}
@@ -546,7 +559,7 @@ export default function AperturaSeccionesPage() {
                     const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
                     return (
                       <TableRow key={seccion.id} className="hover:bg-muted/20 border-border/50 transition-colors">
-                        {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id.substring(0, 8)}</TableCell>}
+                        {visibleColumns.codigoSeccion && <TableCell className="py-6 pl-8 font-mono text-xs font-black text-primary">{seccion.codigoSeccion}</TableCell>}
                         {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
                         {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
                         {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}

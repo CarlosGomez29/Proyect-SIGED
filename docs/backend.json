@@ -68,7 +68,7 @@
       "description": "Instancia de un curso en un periodo, sede y docente específico.",
       "type": "object",
       "properties": {
-        "codigoSeccion": { "type": "string", "description": "Código secuencial global SEC-XXXXX" },
+        "codigoSeccion": { "type": "string", "description": "Código secuencial global SEC-XXXX" },
         "cursoId": { "type": "string", "description": "Referencia al ID del Curso" },
         "periodoId": { "type": "string", "description": "Referencia al ID del Periodo" },
         "sedeId": { "type": "string", "description": "Referencia al ID de la Sede" },
