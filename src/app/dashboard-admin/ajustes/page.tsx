@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { PlusCircle, MoreHorizontal, Edit, Trash2, Search, ChevronDown } from "lucide-react";
+import { PlusCircle, MoreHorizontal, Edit, Trash2, Search, ChevronDown, RefreshCw, ShieldAlert } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -19,6 +19,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 
+// Firebase imports
+import { useFirestore } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const initialUsers = [
     { id: 'user1', nombre: 'Admin User', email: 'admin@esac.com', rol: 'Administrador', estado: 'Activo', ultimoAcceso: '2024-05-28' },
@@ -39,6 +42,7 @@ const initialInstructors = [
 
 export default function AjustesPage() {
     const { toast } = useToast();
+    const db = useFirestore();
     const [users, setUsers] = useState(initialUsers);
     const [instructors, setInstructors] = useState(initialInstructors);
     
@@ -124,6 +128,25 @@ export default function AjustesPage() {
         setIsInstructorModalOpen(true);
     };
 
+    // Nueva función para reiniciar contador solicitado
+    const handleResetCounter = async () => {
+        if (!db) return;
+        try {
+            const counterRef = doc(db, "metadata", "counters");
+            await setDoc(counterRef, { inst_secciones_count: 0 }, { merge: true });
+            toast({ 
+                title: "Secuencia Reiniciada", 
+                description: "El contador de Código de Sección ahora comenzará desde SEC-0001." 
+            });
+        } catch (error) {
+            toast({ 
+                variant: "destructive", 
+                title: "Error al reiniciar", 
+                description: "No se pudo actualizar el contador institucional." 
+            });
+        }
+    };
+
 
   return (
     <motion.div 
@@ -142,6 +165,7 @@ export default function AjustesPage() {
           <TabsTrigger value="users">Gestión de Usuarios</TabsTrigger>
           <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
           <TabsTrigger value="master-data">Datos Maestros</TabsTrigger>
+          <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-4">
@@ -385,9 +409,53 @@ export default function AjustesPage() {
                 </CardContent>
              </Card>
         </TabsContent>
+
+        <TabsContent value="maintenance" className="mt-4">
+             <Card className="border-destructive/20">
+                <CardHeader className="bg-destructive/5">
+                    <div className="flex items-center gap-2">
+                        <ShieldAlert className="h-5 w-5 text-destructive" />
+                        <CardTitle className="text-destructive">Acciones Críticas de Mantenimiento</CardTitle>
+                    </div>
+                    <CardDescription>Estas acciones afectan permanentemente la numeración institucional y la integridad de los datos.</CardDescription>
+                </CardHeader>
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
+                            <p className="text-xs text-muted-foreground max-w-md">
+                                Restaura el contador global a cero. La próxima sección que se cree tendrá el código <strong>SEC-0001</strong>. 
+                                Utilice esta opción solo si desea comenzar una nueva serie numérica.
+                            </p>
+                        </div>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">
+                                    <RefreshCw className="mr-2 h-4 w-4" />
+                                    Reiniciar Contador
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-destructive">¿Confirmar reinicio institucional?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Esta acción reiniciará la numeración de las secciones a <strong>SEC-0001</strong>. 
+                                        Esto no afectará las secciones ya creadas, pero podría causar confusión en la trazabilidad si existen códigos duplicados en el historial.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleResetCounter} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                        Confirmar Reinicio
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                </CardContent>
+             </Card>
+        </TabsContent>
       </Tabs>
     </motion.div>
   );
 }
-
-    

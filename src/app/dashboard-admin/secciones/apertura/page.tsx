@@ -341,7 +341,8 @@ export default function AperturaSeccionesPage() {
         
         let newCount = 1;
         if (counterSnap.exists()) {
-          newCount = (counterSnap.data().seccionesCount || 0) + 1;
+          // Usamos inst_secciones_count para el reinicio solicitado
+          newCount = (counterSnap.data().inst_secciones_count || 0) + 1;
         }
         
         const codigoSeccion = `SEC-${newCount.toString().padStart(4, "0")}`;
@@ -367,12 +368,12 @@ export default function AperturaSeccionesPage() {
 
         const newDocRef = doc(collection(db, "secciones"));
         transaction.set(newDocRef, newSeccionData);
-        transaction.set(counterRef, { seccionesCount: newCount }, { merge: true });
+        transaction.set(counterRef, { inst_secciones_count: newCount }, { merge: true });
       });
 
       setIsCreateDialogOpen(false);
       resetForm();
-      toast({ title: "Sección creada exitosamente" });
+      toast({ title: "Sección creada exitosamente", description: "Se ha asignado el código secuencial correctamente." });
     } catch (err) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: 'secciones',
