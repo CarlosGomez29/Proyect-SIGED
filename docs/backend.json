@@ -1,0 +1,36 @@
+
+{
+  "entities": {
+    "Seccion": {
+      "title": "Sección Académica",
+      "description": "Representa una sección de un curso con su docente, horario y capacidad.",
+      "type": "object",
+      "properties": {
+        "periodo": { "type": "string", "description": "Periodo académico (ej. 2024-2)" },
+        "curso": { "type": "string", "description": "Nombre del curso" },
+        "programa": { "type": "string", "description": "Programa asociado" },
+        "docente": { "type": "string", "description": "Nombre del docente asignado" },
+        "horario": { "type": "string", "description": "Resumen de días y horas" },
+        "dias": { "type": "array", "items": { "type": "string" }, "description": "Lista de identificadores de días" },
+        "horaInicio": { "type": "string", "description": "Hora de inicio en formato 24h" },
+        "horaFin": { "type": "string", "description": "Hora de fin en formato 24h" },
+        "estado": { "type": "string", "enum": ["Abierta", "Cerrada", "Finalizada"] },
+        "inscritos": { "type": "integer", "description": "Número de alumnos inscritos actualmente" },
+        "capacidad": { "type": "integer", "description": "Capacidad máxima de la sección" },
+        "fechaInicio": { "type": "string", "format": "date" },
+        "fechaFin": { "type": "string", "format": "date" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["periodo", "curso", "docente", "estado", "capacidad"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/secciones/{seccionId}": {
+      "schema": "Seccion",
+      "description": "Colección principal de secciones académicas."
+    }
+  }
+}

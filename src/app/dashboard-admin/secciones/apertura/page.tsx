@@ -10,15 +10,12 @@ import {
   MoreHorizontal,
   Edit,
   BookOpen,
-  Clock,
-  Users,
   FileText,
   File,
   FileSpreadsheet,
-  Check,
   Settings2,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,6 +75,12 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
+// Firebase imports
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
+
 const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
 const PERIODOS_MAESTROS = [
@@ -118,22 +121,6 @@ const DIAS_SEMANA = [
   { id: "dom", label: "Domingo" },
 ];
 
-const initialSecciones = [
-  { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", horario: "Lun-Vie 08:00 AM - 12:00 PM", dias: ["lun", "mar", "mie", "jue", "vie"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 32, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", horario: "Sáb 09:00 AM - 05:00 PM", dias: ["sab"], horaInicio: "09:00", horaFin: "17:00", estado: "Abierta", inscritos: 15, capacidad: 20, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", horario: "Mar-Jue 02:00 PM - 06:00 PM", dias: ["mar", "jue"], horaInicio: "14:00", horaFin: "18:00", estado: "Abierta", inscritos: 28, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM", dias: ["lun", "mie", "vie"], horaInicio: "08:00", horaFin: "10:00", estado: "Abierta", inscritos: 10, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", horario: "Sáb 08:00 AM - 04:00 PM", dias: ["sab"], horaInicio: "08:00", horaFin: "16:00", estado: "Cerrada", inscritos: 40, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", horario: "Vie 02:00 PM - 05:00 PM", dias: ["vie"], horaInicio: "14:00", horaFin: "17:00", estado: "Abierta", inscritos: 12, capacidad: 50, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", horario: "Lun-Mie 06:00 PM - 09:00 PM", dias: ["lun", "mie"], horaInicio: "18:00", horaFin: "21:00", estado: "Abierta", inscritos: 20, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", horario: "Dom 08:00 AM - 12:00 PM", dias: ["dom"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 8, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", dias: ["jue"], horaInicio: "14:00", horaFin: "16:00", estado: "Abierta", inscritos: 25, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", dias: ["sab"], horaInicio: "08:00", horaFin: "13:00", estado: "Abierta", inscritos: 18, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", dias: ["mar", "vie"], horaInicio: "17:00", horaFin: "19:00", estado: "Abierta", inscritos: 22, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", dias: ["mie"], horaInicio: "09:00", horaFin: "11:00", estado: "Abierta", inscritos: 14, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-013", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP-INFOTEP", docente: "Ana Martínez", horario: "Jue-Vie 08:00 AM - 12:00 PM", dias: ["jue", "vie"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 5, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-];
-
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -146,8 +133,16 @@ const itemVariants = {
 
 export default function AperturaSeccionesPage() {
   const { toast } = useToast();
+  const db = useFirestore();
+  const seccionesQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "secciones"), orderBy("createdAt", "desc"));
+  }, [db]);
+
+  const { data: seccionesRaw, loading } = useCollection(seccionesQuery);
+  const secciones = useMemo(() => seccionesRaw || [], [seccionesRaw]);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [secciones, setSecciones] = useState(initialSecciones);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
@@ -195,10 +190,10 @@ export default function AperturaSeccionesPage() {
   const filteredSecciones = useMemo(() => {
     return secciones.filter((s) => {
       const matchesSearch = 
-        s.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.programa.toLowerCase().includes(searchTerm.toLowerCase());
+        s.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.curso?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.docente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.programa?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesEstado = filterConfig.estado === "Todos" || s.estado === filterConfig.estado;
       const matchesPrograma = filterConfig.programa === "Todos" || s.programa === filterConfig.programa;
@@ -218,18 +213,17 @@ export default function AperturaSeccionesPage() {
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage, filterConfig]);
 
-  const calculateOcupacion = (inscritos: number, capacidad: number) => {
+  const calculateOcupacion = (inscritos: number = 0, capacidad: number = 40) => {
     return Math.round((inscritos / capacidad) * 100);
   };
 
   const handleExport = async (format: 'excel' | 'pdf' | 'word') => {
-    const periodo = "2024-2";
     const now = new Date();
     const dateStr = now.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit', hour12: true });
     const fullGenerationDate = `Fecha de generación: ${dateStr} – ${timeStr.toUpperCase()}`;
     
-    const fileName = `Secciones_${periodo}_${now.toISOString().split('T')[0]}`;
+    const fileName = `Secciones_${now.toISOString().split('T')[0]}`;
     const totalRegistros = filteredSecciones.length;
 
     const dataToExport = filteredSecciones.map(s => {
@@ -240,7 +234,7 @@ export default function AperturaSeccionesPage() {
       if (visibleColumns.programa) row["Programa"] = s.programa;
       if (visibleColumns.docente) row["Docente"] = s.docente;
       if (visibleColumns.horario) row["Horario"] = s.horario;
-      if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos} / ${s.capacidad} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
+      if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos || 0} / ${s.capacidad || 40} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
       if (visibleColumns.estado) row["Estado"] = s.estado;
       return row;
     });
@@ -258,7 +252,7 @@ export default function AperturaSeccionesPage() {
           ["SANTO DOMINGO, ESTE."],
           ["“TODO POR LA PATRIA”"],
           [""],
-          [`LISTADO DE SECCIONES – PERÍODO ${periodo}`],
+          [`LISTADO DE SECCIONES`],
           [fullGenerationDate],
           [""]
         ];
@@ -280,7 +274,7 @@ export default function AperturaSeccionesPage() {
         doc.text("SANTO DOMINGO, ESTE.", centerX, 53, { align: "center" });
         doc.setFont("helvetica", "italic").text("“TODO POR LA PATRIA”", centerX, 58, { align: "center" });
         doc.line(20, 62, doc.internal.pageSize.getWidth() - 20, 62);
-        doc.setFont("helvetica", "bold").setFontSize(12).text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
+        doc.setFont("helvetica", "bold").setFontSize(12).text(`LISTADO DE SECCIONES`, 14, 72);
         doc.setFont("helvetica", "normal").setFontSize(9).text(fullGenerationDate, 14, 78);
         autoTable(doc, {
           startY: 85,
@@ -332,39 +326,76 @@ export default function AperturaSeccionesPage() {
     }
   };
 
-  const handleCreateSeccion = (e: React.FormEvent) => {
+  const handleCreateSeccion = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!db) return;
     if (!formData.periodoId || !formData.curso || !formData.docente || formData.dias.length === 0) {
       toast({ variant: "destructive", title: "Campos incompletos" });
       return;
     }
-    const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const newSeccion = {
-      id: newId, curso: formData.curso, programa: "DIGEP Directo", docente: formData.docente, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`, dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, estado: formData.estado, inscritos: 0, capacidad: parseInt(formData.capacidad), periodoId: formData.periodoId, periodo: formData.periodoId, fechaInicio: "2024-06-01", fechaFin: "2024-08-31"
+    const newSeccionData = {
+      periodo: formData.periodoId,
+      curso: formData.curso,
+      programa: "DIGEP Directo",
+      docente: formData.docente,
+      horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
+      dias: formData.dias,
+      horaInicio: formData.horaInicio,
+      horaFin: formData.horaFin,
+      estado: formData.estado,
+      inscritos: 0,
+      capacidad: parseInt(formData.capacidad),
+      fechaInicio: "2024-06-01",
+      fechaFin: "2024-08-31",
+      createdAt: serverTimestamp(),
     };
-    setSecciones([newSeccion, ...secciones]);
-    setIsCreateDialogOpen(false);
-    resetForm();
-    toast({ title: "Sección creada" });
+
+    addDoc(collection(db, "secciones"), newSeccionData)
+      .then(() => {
+        setIsCreateDialogOpen(false);
+        resetForm();
+        toast({ title: "Sección creada exitosamente" });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: 'secciones',
+          operation: 'create',
+          requestResourceData: newSeccionData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
-  const handleUpdateSeccion = (e: React.FormEvent) => {
+  const handleUpdateSeccion = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedSeccion) return;
+    if (!db || !selectedSeccion) return;
+
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const updatedSecciones = secciones.map(s => {
-      if (s.id === selectedSeccion.id) {
-        return {
-          ...s, docente: formData.docente, capacidad: parseInt(formData.capacidad), dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
-        };
-      }
-      return s;
-    });
-    setSecciones(updatedSecciones);
-    setIsEditDialogOpen(false);
-    resetForm();
-    toast({ title: "Sección actualizada" });
+    const updateData = {
+      docente: formData.docente,
+      capacidad: parseInt(formData.capacidad),
+      dias: formData.dias,
+      horaInicio: formData.horaInicio,
+      horaFin: formData.horaFin,
+      horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
+    };
+
+    updateDoc(doc(db, "secciones", selectedSeccion.id), updateData)
+      .then(() => {
+        setIsEditDialogOpen(false);
+        resetForm();
+        toast({ title: "Sección actualizada exitosamente" });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: `secciones/${selectedSeccion.id}`,
+          operation: 'update',
+          requestResourceData: updateData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
   };
 
   const resetForm = () => {
@@ -375,7 +406,14 @@ export default function AperturaSeccionesPage() {
   const openEditSection = (seccion: any) => {
     setSelectedSeccion(seccion);
     setFormData({
-      periodoId: seccion.periodoId, curso: seccion.curso, docente: seccion.docente, capacidad: seccion.capacidad.toString(), dias: seccion.dias || [], horaInicio: seccion.horaInicio || "08:00", horaFin: seccion.horaFin || "12:00", estado: seccion.estado,
+      periodoId: seccion.periodo || "",
+      curso: seccion.curso || "",
+      docente: seccion.docente || "",
+      capacidad: seccion.capacidad?.toString() || "40",
+      dias: seccion.dias || [],
+      horaInicio: seccion.horaInicio || "08:00",
+      horaFin: seccion.horaFin || "12:00",
+      estado: seccion.estado || "Abierta",
     });
     setIsEditDialogOpen(true);
   };
@@ -397,7 +435,7 @@ export default function AperturaSeccionesPage() {
             <BookOpen className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-black font-headline tracking-tighter">Apertura de Secciones</h1>
           </div>
-          <p className="text-muted-foreground font-medium text-sm">Configuración y Estructura Académica</p>
+          <p className="text-muted-foreground font-medium text-sm">Configuración y Estructura Académica (Real-time Firestore)</p>
         </div>
         <div className="flex items-center gap-3">
           <Popover>
@@ -486,58 +524,62 @@ export default function AperturaSeccionesPage() {
       <motion.div variants={itemVariants}>
         <Card className="border-border/50 overflow-hidden shadow-xl bg-card/60 backdrop-blur-sm rounded-[1.5rem]">
           <CardContent className="p-0">
-            <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow>
-                  {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">ID</TableHead>}
-                  {visibleColumns.periodo && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Período</TableHead>}
-                  {visibleColumns.curso && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
-                  {visibleColumns.programa && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>}
-                  {visibleColumns.docente && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Docente</TableHead>}
-                  {visibleColumns.horario && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Horario</TableHead>}
-                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Ocupación</TableHead>}
-                  {visibleColumns.estado && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
-                  <TableHead className="font-bold py-5 pr-8 text-xs uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedSecciones.map((seccion) => {
-                  const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
-                  return (
-                    <TableRow key={seccion.id} className="hover:bg-muted/20 border-border/50 transition-colors">
-                      {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id}</TableCell>}
-                      {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
-                      {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
-                      {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
-                      {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
-                      {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>}
-                      {visibleColumns.ocupacion && (
-                        <TableCell className="py-6">
-                          <div className="space-y-1 w-[120px]">
-                            <div className="flex justify-between text-[10px] font-bold">
-                              <span>{seccion.inscritos} / {seccion.capacidad}</span>
-                              <span>{ocupacionPorcentaje}%</span>
+            {loading ? (
+              <div className="p-12 text-center text-muted-foreground font-bold animate-pulse">Cargando secciones desde Firestore...</div>
+            ) : (
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">ID</TableHead>}
+                    {visibleColumns.periodo && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Período</TableHead>}
+                    {visibleColumns.curso && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
+                    {visibleColumns.programa && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>}
+                    {visibleColumns.docente && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Docente</TableHead>}
+                    {visibleColumns.horario && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Horario</TableHead>}
+                    {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Ocupación</TableHead>}
+                    {visibleColumns.estado && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
+                    <TableHead className="font-bold py-5 pr-8 text-xs uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedSecciones.map((seccion) => {
+                    const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
+                    return (
+                      <TableRow key={seccion.id} className="hover:bg-muted/20 border-border/50 transition-colors">
+                        {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id.substring(0, 8)}</TableCell>}
+                        {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
+                        {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
+                        {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
+                        {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
+                        {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>}
+                        {visibleColumns.ocupacion && (
+                          <TableCell className="py-6">
+                            <div className="space-y-1 w-[120px]">
+                              <div className="flex justify-between text-[10px] font-bold">
+                                <span>{seccion.inscritos || 0} / {seccion.capacidad || 40}</span>
+                                <span>{ocupacionPorcentaje}%</span>
+                              </div>
+                              <Progress value={ocupacionPorcentaje} className="h-1" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
                             </div>
-                            <Progress value={ocupacionPorcentaje} className="h-1" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
-                          </div>
+                          </TableCell>
+                        )}
+                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
+                        <TableCell className="py-6 pr-8 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-xl">
+                              {seccion.estado !== "Finalizada" && (
+                                <DropdownMenuItem onClick={() => openEditSection(seccion)} className="cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar estructura</DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
-                      )}
-                      {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
-                      <TableCell className="py-6 pr-8 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-xl">
-                            {seccion.estado !== "Finalizada" && (
-                              <DropdownMenuItem onClick={() => openEditSection(seccion)} className="cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar estructura</DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
             <div className="flex items-center gap-6">

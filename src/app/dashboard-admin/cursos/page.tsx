@@ -10,7 +10,6 @@ import {
   GraduationCap,
   ClipboardCheck,
   Users,
-  BookOpen,
   FileText,
   File,
   FileSpreadsheet,
@@ -23,7 +22,7 @@ import {
   Lock,
   Unlock
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,23 +83,13 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
+// Firebase imports
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, updateDoc, doc, query, orderBy } from "firebase/firestore";
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
-const initialSecciones = [
-  { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", horario: "Lun-Vie 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 32, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", horario: "Sáb 09:00 AM - 05:00 PM", estado: "Abierta", inscritos: 15, capacidad: 20, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", horario: "Mar-Jue 02:00 PM - 06:00 PM", estado: "Abierta", inscritos: 28, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM", estado: "Abierta", inscritos: 10, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", horario: "Sáb 08:00 AM - 04:00 PM", estado: "Cerrada", inscritos: 40, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", horario: "Vie 02:00 PM - 05:00 PM", estado: "Abierta", inscritos: 12, capacidad: 50, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", horario: "Lun-Mie 06:00 PM - 09:00 PM", estado: "Abierta", inscritos: 20, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", horario: "Dom 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 8, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", estado: "Abierta", inscritos: 25, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", estado: "Abierta", inscritos: 18, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", estado: "Abierta", inscritos: 22, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", estado: "Abierta", inscritos: 14, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-013", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP-INFOTEP", docente: "Ana Martínez", horario: "Jue-Vie 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 5, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-];
+const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -114,8 +103,16 @@ const itemVariants = {
 
 export default function GestionSeccionesPanel() {
   const { toast } = useToast();
+  const db = useFirestore();
+  const seccionesQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "secciones"), orderBy("createdAt", "desc"));
+  }, [db]);
+
+  const { data: seccionesRaw, loading } = useCollection(seccionesQuery);
+  const secciones = useMemo(() => seccionesRaw || [], [seccionesRaw]);
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [secciones, setSecciones] = useState(initialSecciones);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   
@@ -140,14 +137,14 @@ export default function GestionSeccionesPanel() {
 
   const filteredSecciones = useMemo(() => {
     return secciones.filter((s) => {
-      // Regla: No mostrar Finalizadas en el panel operativo principal
-      if (s.estado === "Finalizada") return false;
+      // Regla: No mostrar Finalizadas por defecto en el panel operativo principal
+      if (filterConfig.estado !== "Finalizada" && s.estado === "Finalizada") return false;
 
       const matchesSearch = 
-        s.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.periodo.toLowerCase().includes(searchTerm.toLowerCase());
+        s.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.curso?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.docente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.periodo?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesEstado = filterConfig.estado === "Todos" || s.estado === filterConfig.estado;
       const matchesPrograma = filterConfig.programa === "Todos" || s.programa === filterConfig.programa;
@@ -160,8 +157,8 @@ export default function GestionSeccionesPanel() {
     const total = filteredSecciones.length;
     const abiertas = filteredSecciones.filter(s => s.estado === "Abierta").length;
     const cerradas = filteredSecciones.filter(s => s.estado === "Cerrada").length;
-    const totalEstudiantes = filteredSecciones.reduce((acc, s) => acc + s.inscritos, 0);
-    const ocupacionTotal = filteredSecciones.reduce((acc, s) => acc + (s.inscritos / s.capacidad), 0);
+    const totalEstudiantes = filteredSecciones.reduce((acc, s) => acc + (s.inscritos || 0), 0);
+    const ocupacionTotal = filteredSecciones.reduce((acc, s) => acc + ((s.inscritos || 0) / (s.capacidad || 40)), 0);
     const promedioOcupacion = total > 0 ? Math.round((ocupacionTotal / total) * 100) : 0;
 
     return { total, abiertas, cerradas, totalEstudiantes, promedioOcupacion };
@@ -174,23 +171,25 @@ export default function GestionSeccionesPanel() {
     return filteredSecciones.slice(start, start + itemsPerPage);
   }, [filteredSecciones, currentPage, itemsPerPage]);
 
-  const calculateOcupacion = (inscritos: number, capacidad: number) => {
+  const calculateOcupacion = (inscritos: number = 0, capacidad: number = 40) => {
     return Math.round((inscritos / capacidad) * 100);
   };
 
-  const handleAction = (id: string, action: string) => {
+  const handleAction = async (id: string, action: string) => {
+    if (!db) return;
+    const seccionRef = doc(db, "secciones", id);
+
     if (action === "toggle") {
-      setSecciones(prev => prev.map(s => {
-        if (s.id === id) {
-          const nuevoEstado = s.estado === "Abierta" ? "Cerrada" : "Abierta";
-          toast({ title: nuevoEstado === "Cerrada" ? "Sección Cerrada" : "Sección Reabierta", description: nuevoEstado === "Cerrada" ? "Inscripciones bloqueadas." : "Inscripciones habilitadas." });
-          return { ...s, estado: nuevoEstado };
-        }
-        return s;
-      }));
+      const currentSeccion = secciones.find(s => s.id === id);
+      if (!currentSeccion) return;
+      const nuevoEstado = currentSeccion.estado === "Abierta" ? "Cerrada" : "Abierta";
+      updateDoc(seccionRef, { estado: nuevoEstado })
+        .then(() => toast({ title: nuevoEstado === "Cerrada" ? "Sección Cerrada" : "Sección Reabierta" }))
+        .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: seccionRef.path, operation: 'update', requestResourceData: { estado: nuevoEstado } })));
     } else if (action === "finalizar") {
-      setSecciones(prev => prev.map(s => s.id === id ? { ...s, estado: "Finalizada" } : s));
-      toast({ title: "Sección Finalizada", description: "Sección concluida e inhabilitada para cambios futuros." });
+      updateDoc(seccionRef, { estado: "Finalizada" })
+        .then(() => toast({ title: "Sección Finalizada" }))
+        .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: seccionRef.path, operation: 'update', requestResourceData: { estado: 'Finalizada' } })));
     } else {
       toast({ title: "Módulo Operativo", description: `Iniciando: ${action}` });
     }
@@ -212,7 +211,7 @@ export default function GestionSeccionesPanel() {
       if (visibleColumns.programa) row["Programa"] = s.programa;
       if (visibleColumns.docente) row["Docente"] = s.docente;
       if (visibleColumns.horario) row["Horario"] = s.horario;
-      if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos} / ${s.capacidad} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
+      if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos || 0} / ${s.capacidad || 40} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
       if (visibleColumns.estado) row["Estado"] = s.estado;
       return row;
     });
@@ -322,7 +321,7 @@ export default function GestionSeccionesPanel() {
             <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-3">
               Total Operativo: {stats.total}
             </Badge>
-            <span className="text-muted-foreground text-xs font-medium">• Panel de Control Académico</span>
+            <span className="text-muted-foreground text-xs font-medium">• Panel de Control Académico (Real-time)</span>
           </div>
         </div>
       </motion.div>
@@ -413,6 +412,7 @@ export default function GestionSeccionesPanel() {
                             <SelectItem value="Todos">Todos</SelectItem>
                             <SelectItem value="Abierta">Abierta</SelectItem>
                             <SelectItem value="Cerrada">Cerrada</SelectItem>
+                            <SelectItem value="Finalizada">Finalizada</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -438,66 +438,70 @@ export default function GestionSeccionesPanel() {
       <motion.div variants={itemVariants}>
         <Card className="border-border/50 overflow-hidden shadow-xl bg-card/60 backdrop-blur-sm rounded-[1.5rem]">
           <CardContent className="p-0">
-            <Table>
-              <TableHeader className="bg-muted/30">
-                <TableRow>
-                  {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">ID</TableHead>}
-                  {visibleColumns.periodo && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Período</TableHead>}
-                  {visibleColumns.curso && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Curso</TableHead>}
-                  {visibleColumns.programa && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Programa</TableHead>}
-                  {visibleColumns.docente && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>}
-                  {visibleColumns.horario && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Horario</TableHead>}
-                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Ocupación</TableHead>}
-                  {visibleColumns.estado && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
-                  <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedSecciones.map((seccion) => {
-                  const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
-                  return (
-                    <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
-                      {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id}</TableCell>}
-                      {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
-                      {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
-                      {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
-                      {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
-                      {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground">{seccion.horario}</TableCell>}
-                      {visibleColumns.ocupacion && (
-                        <TableCell className="py-6">
-                          <div className="space-y-1.5 w-[140px]">
-                            <div className="flex justify-between text-[10px] font-bold">
-                              <span>{seccion.inscritos} / {seccion.capacidad}</span>
-                              <span className={ocupacionPorcentaje > 90 ? "text-destructive" : ""}>{ocupacionPorcentaje}%</span>
+            {loading ? (
+              <div className="p-12 text-center text-muted-foreground font-bold animate-pulse">Consultando Firestore...</div>
+            ) : (
+              <Table>
+                <TableHeader className="bg-muted/30">
+                  <TableRow>
+                    {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">ID</TableHead>}
+                    {visibleColumns.periodo && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Período</TableHead>}
+                    {visibleColumns.curso && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Curso</TableHead>}
+                    {visibleColumns.programa && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Programa</TableHead>}
+                    {visibleColumns.docente && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>}
+                    {visibleColumns.horario && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Horario</TableHead>}
+                    {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Ocupación</TableHead>}
+                    {visibleColumns.estado && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
+                    <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedSecciones.map((seccion) => {
+                    const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
+                    return (
+                      <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
+                        {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id.substring(0, 8)}</TableCell>}
+                        {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
+                        {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
+                        {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
+                        {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
+                        {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground">{seccion.horario}</TableCell>}
+                        {visibleColumns.ocupacion && (
+                          <TableCell className="py-6">
+                            <div className="space-y-1.5 w-[140px]">
+                              <div className="flex justify-between text-[10px] font-bold">
+                                <span>{seccion.inscritos || 0} / {seccion.capacidad || 40}</span>
+                                <span className={ocupacionPorcentaje > 90 ? "text-destructive" : ""}>{ocupacionPorcentaje}%</span>
+                              </div>
+                              <Progress value={ocupacionPorcentaje} className="h-1.5" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
                             </div>
-                            <Progress value={ocupacionPorcentaje} className="h-1.5" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
-                          </div>
+                          </TableCell>
+                        )}
+                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
+                        <TableCell className="py-6 pr-8 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
+                               <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
+                               <DropdownMenuItem onClick={() => setSelectedSeccion(seccion) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
+                               <DropdownMenuSeparator className="opacity-50" />
+                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "toggle")} className="cursor-pointer text-xs">
+                                  {seccion.estado === "Abierta" ? <><Lock className="h-4 w-4 mr-2 text-destructive" /> Cerrar Sección</> : <><Unlock className="h-4 w-4 mr-2 text-success" /> Reabrir Sección</>}
+                               </DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "finalizar")} className="cursor-pointer text-xs text-destructive">
+                                  <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Sección Académica
+                               </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
-                      )}
-                      {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
-                      <TableCell className="py-6 pr-8 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
-                             <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
-                             <DropdownMenuItem onClick={() => setSelectedSeccion(seccion) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
-                             <DropdownMenuSeparator className="opacity-50" />
-                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "toggle")} className="cursor-pointer text-xs">
-                                {seccion.estado === "Abierta" ? <><Lock className="h-4 w-4 mr-2 text-destructive" /> Cerrar Sección</> : <><Unlock className="h-4 w-4 mr-2 text-success" /> Reabrir Sección</>}
-                             </DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "finalizar")} className="cursor-pointer text-xs text-destructive">
-                                <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Sección Académica
-                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
             <div className="flex items-center gap-6">
@@ -545,7 +549,7 @@ export default function GestionSeccionesPanel() {
                         <div className="flex-1"><Label className="text-[10px] opacity-60">FIN</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaFin}</p></div>
                     </div>
                     <div><Label className="text-[10px] opacity-60">HORARIO</Label><p className="text-xs font-bold">{selectedSeccion.horario}</p></div>
-                    <div><Label className="text-[10px] opacity-60">MÉTRICA DE OCUPACIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.inscritos} / {selectedSeccion.capacidad} ({calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%)</p></div>
+                    <div><Label className="text-[10px] opacity-60">MÉTRICA DE OCUPACIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.inscritos || 0} / {selectedSeccion.capacidad || 40} ({calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%)</p></div>
                  </div>
                </div>
              </div>
