@@ -79,13 +79,11 @@ import {
     PaginationPrevious,
 } from "@/components/ui/pagination";
 
-// URL del Logo Institucional
 const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
-// Datos maestros
 const PERIODOS_MAESTROS = [
-  { id: "2024-2", nombre: "Período 2024-2 (Trimestral)", inicio: "2024-06-01", fin: "2024-08-31" },
-  { id: "2024-S2", nombre: "Período 2024-S2 (Semestral)", inicio: "2024-07-01", fin: "2024-12-31" },
+  { id: "2024-2", nombre: "2024-2", inicio: "2024-06-01", fin: "2024-08-31" },
+  { id: "2024-S2", nombre: "2024-S2", inicio: "2024-07-01", fin: "2024-12-31" },
 ];
 
 const CURSOS_MAESTROS = [
@@ -122,182 +120,23 @@ const DIAS_SEMANA = [
 ];
 
 const initialSecciones = [
-  {
-    id: "SEC-001",
-    curso: "Seguridad de la Carga Aérea",
-    programa: "DIGEP Directo",
-    docente: "Juan Pérez",
-    horario: "Lun-Vie 08:00 AM - 12:00 PM",
-    dias: ["lun", "mar", "mie", "jue", "vie"],
-    horaInicio: "08:00",
-    horaFin: "12:00",
-    estado: "Abierta",
-    inscritos: 32,
-    capacidad: 40,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-002",
-    curso: "Mercancías Peligrosas",
-    programa: "DIGEP-INFOTEP",
-    docente: "María García",
-    horario: "Sáb 09:00 AM - 05:00 PM",
-    dias: ["sab"],
-    horaInicio: "09:00",
-    horaFin: "17:00",
-    estado: "Abierta",
-    inscritos: 15,
-    capacidad: 20,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-003",
-    curso: "AVSEC para Tripulación",
-    programa: "Dominicana Digna",
-    docente: "Carlos López",
-    horario: "Mar-Jue 02:00 PM - 06:00 PM",
-    dias: ["mar", "jue"],
-    horaInicio: "14:00",
-    horaFin: "18:00",
-    estado: "Abierta",
-    inscritos: 28,
-    capacidad: 30,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-004",
-    curso: "Manejo de Crisis",
-    programa: "DIGEP Directo",
-    docente: "Ana Martínez",
-    horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM",
-    dias: ["lun", "mie", "vie"],
-    horaInicio: "08:00",
-    horaFin: "10:00",
-    estado: "Abierta",
-    inscritos: 10,
-    capacidad: 25,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-005",
-    curso: "Seguridad Aeroportuaria",
-    programa: "DIGEP-INFOTEP",
-    docente: "Luis Hernández",
-    horario: "Sáb 08:00 AM - 04:00 PM",
-    dias: ["sab"],
-    horaInicio: "08:00",
-    horaFin: "16:00",
-    estado: "Cerrada",
-    inscritos: 40,
-    capacidad: 40,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-006",
-    curso: "Inteligencia Emocional",
-    programa: "Dominicana Digna",
-    docente: "Juan Pérez",
-    horario: "Vie 02:00 PM - 05:00 PM",
-    dias: ["vie"],
-    horaInicio: "14:00",
-    horaFin: "17:00",
-    estado: "Abierta",
-    inscritos: 12,
-    capacidad: 50,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-007",
-    curso: "Ciberseguridad en Aviación",
-    programa: "DIGEP Directo",
-    docente: "María García",
-    horario: "Lun-Mie 06:00 PM - 09:00 PM",
-    dias: ["lun", "mie"],
-    horaInicio: "18:00",
-    horaFin: "21:00",
-    estado: "Abierta",
-    inscritos: 20,
-    capacidad: 40,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-008",
-    curso: "Primeros Auxilios Aeroportuarios",
-    programa: "DIGEP-INFOTEP",
-    docente: "Carlos López",
-    horario: "Dom 08:00 AM - 12:00 PM",
-    dias: ["dom"],
-    horaInicio: "08:00",
-    horaFin: "12:00",
-    estado: "Abierta",
-    inscritos: 8,
-    capacidad: 30,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-009",
-    curso: "Protocolo y Etiqueta",
-    programa: "Dominicana Digna",
-    docente: "Ana Martínez",
-    horario: "Jue 02:00 PM - 04:00 PM",
-    dias: ["jue"],
-    horaInicio: "14:00",
-    horaFin: "16:00",
-    estado: "Abierta",
-    inscritos: 25,
-    capacidad: 25,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-010",
-    curso: "Gestión de Carga Peligrosa",
-    programa: "DIGEP Directo",
-    docente: "Luis Hernández",
-    horario: "Sab 08:00 AM - 01:00 PM",
-    dias: ["sab"],
-    horaInicio: "08:00",
-    horaFin: "13:00",
-    estado: "Abierta",
-    inscritos: 18,
-    capacidad: 40,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-011",
-    curso: "Inglés Técnico Aeronáutico",
-    programa: "DIGEP-INFOTEP",
-    docente: "Juan Pérez",
-    horario: "Mar-Vie 05:00 PM - 07:00 PM",
-    dias: ["mar", "vie"],
-    horaInicio: "17:00",
-    horaFin: "19:00",
-    estado: "Abierta",
-    inscritos: 22,
-    capacidad: 30,
-    periodoId: "2024-2",
-  },
-  {
-    id: "SEC-012",
-    curso: "Psicología del Pasajero",
-    programa: "Dominicana Digna",
-    docente: "María García",
-    horario: "Mie 09:00 AM - 11:00 AM",
-    dias: ["mie"],
-    horaInicio: "09:00",
-    horaFin: "11:00",
-    estado: "Abierta",
-    inscritos: 14,
-    capacidad: 40,
-    periodoId: "2024-2",
-  },
+  { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", horario: "Lun-Vie 08:00 AM - 12:00 PM", dias: ["lun", "mar", "mie", "jue", "vie"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 32, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", horario: "Sáb 09:00 AM - 05:00 PM", dias: ["sab"], horaInicio: "09:00", horaFin: "17:00", estado: "Abierta", inscritos: 15, capacidad: 20, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", horario: "Mar-Jue 02:00 PM - 06:00 PM", dias: ["mar", "jue"], horaInicio: "14:00", horaFin: "18:00", estado: "Abierta", inscritos: 28, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM", dias: ["lun", "mie", "vie"], horaInicio: "08:00", horaFin: "10:00", estado: "Abierta", inscritos: 10, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", horario: "Sáb 08:00 AM - 04:00 PM", dias: ["sab"], horaInicio: "08:00", horaFin: "16:00", estado: "Cerrada", inscritos: 40, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", horario: "Vie 02:00 PM - 05:00 PM", dias: ["vie"], horaInicio: "14:00", horaFin: "17:00", estado: "Abierta", inscritos: 12, capacidad: 50, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", horario: "Lun-Mie 06:00 PM - 09:00 PM", dias: ["lun", "mie"], horaInicio: "18:00", horaFin: "21:00", estado: "Abierta", inscritos: 20, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", horario: "Dom 08:00 AM - 12:00 PM", dias: ["dom"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 8, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", dias: ["jue"], horaInicio: "14:00", horaFin: "16:00", estado: "Abierta", inscritos: 25, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", dias: ["sab"], horaInicio: "08:00", horaFin: "13:00", estado: "Abierta", inscritos: 18, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", dias: ["mar", "vie"], horaInicio: "17:00", horaFin: "19:00", estado: "Abierta", inscritos: 22, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", dias: ["mie"], horaInicio: "09:00", horaFin: "11:00", estado: "Abierta", inscritos: 14, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const itemVariants = {
@@ -314,14 +153,15 @@ export default function AperturaSeccionesPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
-  // Estados para Filtros y Visibilidad
   const [visibleColumns, setVisibleColumns] = useState({
+    id: true,
+    periodo: true,
     curso: true,
     programa: true,
     docente: true,
     horario: true,
-    estado: true,
     ocupacion: true,
+    estado: true,
   });
 
   const [filterConfig, setFilterConfig] = useState({
@@ -329,7 +169,6 @@ export default function AperturaSeccionesPage() {
     programa: "Todos",
   });
 
-  // Paginación dinámica
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -357,6 +196,7 @@ export default function AperturaSeccionesPage() {
   const filteredSecciones = useMemo(() => {
     return secciones.filter((s) => {
       const matchesSearch = 
+        s.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.curso.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.docente.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.programa.toLowerCase().includes(searchTerm.toLowerCase());
@@ -393,28 +233,22 @@ export default function AperturaSeccionesPage() {
     const fileName = `Secciones_${periodo}_${now.toISOString().split('T')[0]}`;
     const totalRegistros = filteredSecciones.length;
 
-    // Construir datos dinámicamente según columnas visibles
     const dataToExport = filteredSecciones.map(s => {
       const row: any = {};
+      if (visibleColumns.id) row["ID"] = s.id;
+      if (visibleColumns.periodo) row["Período"] = s.periodo;
       if (visibleColumns.curso) row["Curso"] = s.curso;
       if (visibleColumns.programa) row["Programa"] = s.programa;
       if (visibleColumns.docente) row["Docente"] = s.docente;
       if (visibleColumns.horario) row["Horario"] = s.horario;
+      if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos} / ${s.capacidad} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
       if (visibleColumns.estado) row["Estado"] = s.estado;
-      if (visibleColumns.ocupacion) {
-        row["Capacidad"] = s.capacidad;
-        row["Inscritos"] = s.inscritos;
-        row["Ocupación"] = `${calculateOcupacion(s.inscritos, s.capacidad)}%`;
-      }
       return row;
     });
 
     const exportHeaders = Object.keys(dataToExport[0] || {});
 
-    toast({
-      title: "Generando reporte institucional",
-      description: `Exportando únicamente datos filtrados y columnas visibles a ${format.toUpperCase()}...`,
-    });
+    toast({ title: "Generando reporte institucional", description: `Exportando ${totalRegistros} registros a ${format.toUpperCase()}...` });
 
     try {
       if (format === 'excel') {
@@ -441,37 +275,23 @@ export default function AperturaSeccionesPage() {
         const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF('landscape');
         const centerX = doc.internal.pageSize.getWidth() / 2;
-        try {
-            doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - 12.5, 10, 25, 25);
-        } catch (e) {}
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.text("REPÚBLICA DOMINICANA", centerX, 42, { align: "center" });
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text("Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", centerX, 48, { align: "center" });
+        try { doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - 12.5, 10, 25, 25); } catch (e) {}
+        doc.setFont("helvetica", "bold").setFontSize(14).text("REPÚBLICA DOMINICANA", centerX, 42, { align: "center" });
+        doc.setFontSize(10).setFont("helvetica", "normal").text("Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", centerX, 48, { align: "center" });
         doc.text("SANTO DOMINGO, ESTE.", centerX, 53, { align: "center" });
-        doc.setFont("helvetica", "italic");
-        doc.text("“TODO POR LA PATRIA”", centerX, 58, { align: "center" });
-        doc.setDrawColor(200);
+        doc.setFont("helvetica", "italic").text("“TODO POR LA PATRIA”", centerX, 58, { align: "center" });
         doc.line(20, 62, doc.internal.pageSize.getWidth() - 20, 62);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(12);
-        doc.text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.text(fullGenerationDate, 14, 78);
-
+        doc.setFont("helvetica", "bold").setFontSize(12).text(`LISTADO DE SECCIONES – PERÍODO ${periodo}`, 14, 72);
+        doc.setFont("helvetica", "normal").setFontSize(9).text(fullGenerationDate, 14, 78);
         autoTable(doc, {
           startY: 85,
           head: [exportHeaders],
           body: dataToExport.map(row => Object.values(row)),
-          headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
+          headStyles: { fillColor: [38, 101, 140], textColor: [255, 255, 255] },
           styles: { fontSize: 8 },
         });
         const finalY = (doc as any).lastAutoTable.finalY + 10;
-        doc.setFont("helvetica", "bold");
-        doc.text(`Total de Secciones Exportadas: ${totalRegistros}`, 14, finalY);
+        doc.setFont("helvetica", "bold").text(`Total de Secciones Exportadas: ${totalRegistros}`, 14, finalY);
         doc.save(`${fileName}.pdf`);
       } else if (format === 'word') {
         const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, TextRun, AlignmentType, ImageRun } = await import('docx');
@@ -481,13 +301,11 @@ export default function AperturaSeccionesPage() {
         const docWord = new Document({
           sections: [{
             children: [
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 80, height: 80 } })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 } })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "SANTO DOMINGO, ESTE.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: `LISTADO DE SECCIONES – PERÍODO ${periodo}`, bold: true, size: 24, color: "26658C" })], spacing: { before: 200, after: 100 } }),
-              new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fullGenerationDate, size: 18, color: "666666" })], spacing: { after: 300 } }),
+              new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fullGenerationDate, size: 18 })], spacing: { after: 300 } }),
               new Table({
                 width: { size: 100, type: WidthType.PERCENTAGE },
                 rows: [
@@ -524,7 +342,7 @@ export default function AperturaSeccionesPage() {
     const newId = `SEC-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
     const newSeccion = {
-      id: newId, curso: formData.curso, programa: "DIGEP Directo", docente: formData.docente, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`, dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, estado: formData.estado, inscritos: 0, capacidad: parseInt(formData.capacidad), periodoId: formData.periodoId,
+      id: newId, curso: formData.curso, programa: "DIGEP Directo", docente: formData.docente, horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`, dias: formData.dias, horaInicio: formData.horaInicio, horaFin: formData.horaFin, estado: formData.estado, inscritos: 0, capacidad: parseInt(formData.capacidad), periodoId: formData.periodoId, periodo: formData.periodoId, fechaInicio: "2024-06-01", fechaFin: "2024-08-31"
     };
     setSecciones([newSeccion, ...secciones]);
     setIsCreateDialogOpen(false);
@@ -572,6 +390,7 @@ export default function AperturaSeccionesPage() {
     switch (estado) {
       case "Abierta": return <Badge className="bg-success/15 text-success border-success/20 font-bold px-3">Abierta</Badge>;
       case "Cerrada": return <Badge className="bg-destructive/15 text-destructive border-destructive/20 font-bold px-3">Cerrada</Badge>;
+      case "Finalizada": return <Badge className="bg-muted text-muted-foreground border-muted-foreground/20 font-bold px-3">Finalizada</Badge>;
       default: return <Badge variant="outline">{estado}</Badge>;
     }
   };
@@ -584,13 +403,9 @@ export default function AperturaSeccionesPage() {
             <BookOpen className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-black font-headline tracking-tighter">Apertura de Secciones</h1>
           </div>
-          <p className="text-muted-foreground font-medium text-sm flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse" />
-            Período Académico Activo: <span className="text-foreground font-bold">2024-2</span>
-          </p>
+          <p className="text-muted-foreground font-medium text-sm">Configuración y Estructura Académica</p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Botón Filtros Avanzados */}
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
@@ -603,74 +418,32 @@ export default function AperturaSeccionesPage() {
                   <h4 className="font-black text-xs uppercase tracking-widest text-primary">Configuración de Vista</h4>
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
                 </div>
-                
                 <div className="space-y-3">
                   <p className="text-[10px] font-bold uppercase opacity-60">Visibilidad de Columnas</p>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`col-${key}`} 
-                          checked={isVisible} 
-                          onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} 
-                        />
+                        <Checkbox id={`col-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
                         <Label htmlFor={`col-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
                       </div>
                     ))}
                   </div>
                 </div>
-
                 <Separator className="opacity-50" />
-
                 <div className="space-y-4">
                   <p className="text-[10px] font-bold uppercase opacity-60">Filtros de Datos</p>
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px]">Estado de Sección</Label>
-                      <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
-                        <SelectTrigger className="h-8 text-xs rounded-lg">
-                          <SelectValue placeholder="Todos" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Todos">Todos los estados</SelectItem>
-                          <SelectItem value="Abierta">Abierta</SelectItem>
-                          <SelectItem value="Cerrada">Cerrada</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px]">Programa Académico</Label>
-                      <Select value={filterConfig.programa} onValueChange={(val) => setFilterConfig({...filterConfig, programa: val})}>
-                        <SelectTrigger className="h-8 text-xs rounded-lg">
-                          <SelectValue placeholder="Todos" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Todos">Todos los programas</SelectItem>
-                          <SelectItem value="DIGEP Directo">DIGEP Directo</SelectItem>
-                          <SelectItem value="DIGEP-INFOTEP">DIGEP-INFOTEP</SelectItem>
-                          <SelectItem value="Dominicana Digna">Dominicana Digna</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px]">Estado</Label>
+                    <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
+                      <SelectTrigger className="h-8 text-xs rounded-lg"><SelectValue placeholder="Todos" /></SelectTrigger>
+                      <SelectContent><SelectItem value="Todos">Todos</SelectItem><SelectItem value="Abierta">Abierta</SelectItem><SelectItem value="Cerrada">Cerrada</SelectItem><SelectItem value="Finalizada">Finalizada</SelectItem></SelectContent>
+                    </Select>
                   </div>
                 </div>
-
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full text-[10px] font-bold uppercase text-destructive hover:text-destructive hover:bg-destructive/5"
-                  onClick={() => {
-                    setFilterConfig({ estado: "Todos", programa: "Todos" });
-                    setVisibleColumns({ curso: true, programa: true, docente: true, horario: true, estado: true, ocupacion: true });
-                  }}
-                >
-                  Restablecer Filtros
-                </Button>
               </div>
             </PopoverContent>
           </Popover>
 
-          {/* Botón Exportar Dinámico */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
@@ -678,18 +451,9 @@ export default function AperturaSeccionesPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 rounded-xl border-border/50 p-2 shadow-xl">
-              <DropdownMenuItem onClick={() => handleExport('word')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
-                <FileText className="h-4 w-4 opacity-70" />
-                <span className="font-medium text-sm">Exportar a Word</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('pdf')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
-                <File className="h-4 w-4 opacity-70" />
-                <span className="font-medium text-sm">Exportar a PDF</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('excel')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer">
-                <FileSpreadsheet className="h-4 w-4 opacity-70" />
-                <span className="font-medium text-sm">Exportar a Excel</span>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('word')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer"><FileText className="h-4 w-4 opacity-70" /><span className="font-medium text-sm">Word (.docx)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('pdf')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer"><File className="h-4 w-4 opacity-70" /><span className="font-medium text-sm">PDF (.pdf)</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')} className="rounded-lg flex items-center gap-2 py-2 cursor-pointer"><FileSpreadsheet className="h-4 w-4 opacity-70" /><span className="font-medium text-sm">Excel (.xlsx)</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -699,55 +463,46 @@ export default function AperturaSeccionesPage() {
                 <PlusCircle className="mr-2 h-4 w-4" /> Nueva Sección
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-border/50 shadow-2xl">
+            <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem]">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-black tracking-tight">Nueva Sección Académica</DialogTitle>
-                <DialogDescription className="font-medium text-muted-foreground">Configura los detalles de la nueva oferta académica.</DialogDescription>
+                <DialogTitle className="text-2xl font-black tracking-tight">Apertura de Sección</DialogTitle>
+                <DialogDescription>Define la estructura de la nueva oferta académica.</DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleCreateSeccion} className="space-y-8 py-6">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]"><div className="h-4 w-1 bg-primary rounded-full" />Bloque 1: Información Académica</div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Período Académico</Label><Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar período..." /></SelectTrigger><SelectContent>{PERIODOS_MAESTROS.map((p) => (<SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>))}</SelectContent></Select></div>
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Curso</Label><Select onValueChange={(val) => setFormData({ ...formData, curso: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar curso..." /></SelectTrigger><SelectContent>{CURSOS_MAESTROS.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}</SelectContent></Select></div>
-                    <div className="space-y-2 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label><Select onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente..." /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select></div>
-                  </div>
+              <form onSubmit={handleCreateSeccion} className="space-y-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Período Académico</Label><Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar período..." /></SelectTrigger><SelectContent>{PERIODOS_MAESTROS.map((p) => (<SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>))}</SelectContent></Select></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Curso</Label><Select onValueChange={(val) => setFormData({ ...formData, curso: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar curso..." /></SelectTrigger><SelectContent>{CURSOS_MAESTROS.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}</SelectContent></Select></div>
+                  <div className="space-y-2 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label><Select onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente..." /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label><Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} /></div>
+                  <div className="space-y-3"><Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label><div className="flex flex-wrap gap-2">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-1"><Checkbox id={dia.id} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={dia.id} className="text-[10px]">{dia.label}</Label></div>))}</div></div>
+                  <div className="space-y-2 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Horario</Label><div className="flex gap-4"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
                 </div>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]"><div className="h-4 w-1 bg-primary rounded-full" />Bloque 2: Configuración</div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label><Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} /></div>
-                    <div className="space-y-3"><Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label><div className="flex flex-wrap gap-3">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-2"><Checkbox id={dia.id} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={dia.id} className="text-xs">{dia.label}</Label></div>))}</div></div>
-                    <div className="space-y-3 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Horario de Clase</Label><div className="flex gap-4"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
-                  </div>
-                </div>
-                <DialogFooter className="gap-3 pt-8 border-t border-border/30">
-                  <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
-                  <Button type="submit">Crear Sección</Button>
-                </DialogFooter>
+                <DialogFooter className="pt-4"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Abrir Sección</Button></DialogFooter>
               </form>
             </DialogContent>
           </Dialog>
         </div>
       </motion.div>
 
-      <motion.div variants={itemVariants} className="relative group">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
-        <Input placeholder="Buscar por curso, docente o programa..." className="pl-12 h-14 bg-card/50 border-border/50 focus:bg-card transition-all text-lg rounded-2xl" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      <motion.div variants={itemVariants} className="relative">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input placeholder="Buscar por ID, Curso, Docente o Programa..." className="pl-12 h-14 bg-card/50 border-border/50 rounded-2xl" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <Card className="border-border/50 overflow-hidden shadow-xl shadow-black/5 bg-card/60 backdrop-blur-sm rounded-[1.5rem]">
+        <Card className="border-border/50 overflow-hidden shadow-xl bg-card/60 backdrop-blur-sm rounded-[1.5rem]">
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-muted/30">
-                <TableRow className="hover:bg-transparent border-border/50">
-                  {visibleColumns.curso && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
+                <TableRow>
+                  {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-xs uppercase tracking-widest opacity-60">ID</TableHead>}
+                  {visibleColumns.periodo && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Período</TableHead>}
+                  {visibleColumns.curso && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Curso</TableHead>}
                   {visibleColumns.programa && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Programa</TableHead>}
                   {visibleColumns.docente && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Docente</TableHead>}
                   {visibleColumns.horario && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Horario</TableHead>}
-                  {visibleColumns.estado && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estado</TableHead>}
-                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 w-[200px]">Ocupación</TableHead>}
+                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60">Ocupación</TableHead>}
+                  {visibleColumns.estado && <TableHead className="font-bold py-5 text-xs uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
                   <TableHead className="font-bold py-5 pr-8 text-xs uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -755,45 +510,33 @@ export default function AperturaSeccionesPage() {
                 {paginatedSecciones.map((seccion) => {
                   const ocupacionPorcentaje = calculateOcupacion(seccion.inscritos, seccion.capacidad);
                   return (
-                    <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
-                      {visibleColumns.curso && (
-                        <TableCell className="py-6 pl-8">
-                          <div className="flex flex-col">
-                            <span className="font-bold text-foreground tracking-tight">{seccion.curso}</span>
-                            <span className="text-[10px] font-mono text-muted-foreground">{seccion.id}</span>
-                          </div>
-                        </TableCell>
-                      )}
-                      {visibleColumns.programa && <TableCell className="py-6 font-medium text-sm text-muted-foreground">{seccion.programa}</TableCell>}
-                      {visibleColumns.docente && (
-                        <TableCell className="py-6">
-                          <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
-                              <span className="text-[10px] font-bold text-primary">{seccion.docente.charAt(0)}</span>
-                            </div>
-                            <span className="font-semibold text-sm">{seccion.docente}</span>
-                          </div>
-                        </TableCell>
-                      )}
-                      {visibleColumns.horario && <TableCell className="py-6 text-xs font-medium text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>}
-                      {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
+                    <TableRow key={seccion.id} className="hover:bg-muted/20 border-border/50 transition-colors">
+                      {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id}</TableCell>}
+                      {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
+                      {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
+                      {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
+                      {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
+                      {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground leading-relaxed">{seccion.horario}</TableCell>}
                       {visibleColumns.ocupacion && (
                         <TableCell className="py-6">
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between text-[10px] font-bold">
-                              <span className={ocupacionPorcentaje > 90 ? "text-destructive" : "text-muted-foreground uppercase"}>{seccion.inscritos} de {seccion.capacidad}</span>
-                              <span className="text-foreground">{ocupacionPorcentaje}%</span>
+                          <div className="space-y-1 w-[120px]">
+                            <div className="flex justify-between text-[10px] font-bold">
+                              <span>{seccion.inscritos} / {seccion.capacidad}</span>
+                              <span>{ocupacionPorcentaje}%</span>
                             </div>
-                            <Progress value={ocupacionPorcentaje} className={`h-1.5 ${ocupacionPorcentaje > 90 ? "bg-destructive/10" : "bg-muted"}`} indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
+                            <Progress value={ocupacionPorcentaje} className="h-1" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
                           </div>
                         </TableCell>
                       )}
+                      {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
                       <TableCell className="py-6 pr-8 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-xl">
-                            <DropdownMenuItem onClick={() => openViewDetails(seccion)} className="rounded-lg cursor-pointer"><Eye className="h-4 w-4 mr-2" /> Ver detalles</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => openEditSection(seccion)} className="rounded-lg cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar sección</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => openViewDetails(seccion)} className="cursor-pointer"><Eye className="h-4 w-4 mr-2" /> Ver detalles</DropdownMenuItem>
+                            {seccion.estado !== "Finalizada" && (
+                              <DropdownMenuItem onClick={() => openEditSection(seccion)} className="cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar estructura</DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -802,26 +545,16 @@ export default function AperturaSeccionesPage() {
                 })}
               </TableBody>
             </Table>
-            <AnimatePresence>
-              {filteredSecciones.length === 0 && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="py-20 text-center"
-                >
-                  <p className="text-muted-foreground font-medium italic">No se encontraron registros con los filtros actuales.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-xs text-muted-foreground font-medium">Mostrando <span className="text-foreground font-bold">{paginatedSecciones.length}</span> de <span className="text-foreground font-bold">{filteredSecciones.length}</span> registros</div>
+            <div className="flex items-center gap-6">
+              <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                Mostrando {paginatedSecciones.length} de {filteredSecciones.length}
+              </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground font-medium">Registros por página:</span>
+                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Ver:</span>
                 <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(parseInt(val))}>
-                  <SelectTrigger className="h-8 w-20 rounded-lg text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-7 w-16 rounded-lg text-[10px] font-bold"><SelectValue /></SelectTrigger>
                   <SelectContent><SelectItem value="10">10</SelectItem><SelectItem value="50">50</SelectItem><SelectItem value="100">100</SelectItem></SelectContent>
                 </Select>
               </div>
@@ -829,7 +562,7 @@ export default function AperturaSeccionesPage() {
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
                     <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} /></PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (<PaginationItem key={page}><PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }}>{page}</PaginationLink></PaginationItem>))}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (<PaginationItem key={page} className="hidden sm:block"><PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }} className="text-xs h-8 w-8">{page}</PaginationLink></PaginationItem>))}
                     <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} /></PaginationItem>
                 </PaginationContent>
             </Pagination>
@@ -837,31 +570,27 @@ export default function AperturaSeccionesPage() {
         </Card>
       </motion.div>
 
-      {/* Ver Detalles Dialog */}
+      {/* Ver Detalles */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] border-border/50 shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black tracking-tight">Detalles de la Sección</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="sm:max-w-[600px] rounded-[1.5rem]">
+          <DialogHeader><DialogTitle className="text-2xl font-black">Expediente de Sección</DialogTitle></DialogHeader>
           {selectedSeccion && (
-            <div className="space-y-8 py-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]"><div className="h-4 w-1 bg-primary rounded-full" />Información Académica</div>
-                  <div className="space-y-3 bg-muted/20 p-4 rounded-2xl border border-border/50">
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Período</Label><p className="text-sm font-semibold">{PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.nombre}</p></div>
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Curso</Label><p className="text-sm font-semibold">{selectedSeccion.curso}</p></div>
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Programa</Label><p className="text-sm font-semibold">{selectedSeccion.programa}</p></div>
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Docente</Label><p className="text-sm font-semibold">{selectedSeccion.docente}</p></div>
-                  </div>
+            <div className="grid grid-cols-2 gap-8 py-6">
+              <div className="space-y-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información Académica</div>
+                <div className="space-y-2 bg-muted/20 p-4 rounded-xl border border-border/50">
+                  <div><Label className="text-[10px] opacity-60 uppercase">ID</Label><p className="text-sm font-bold">{selectedSeccion.id}</p></div>
+                  <div><Label className="text-[10px] opacity-60 uppercase">Curso</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
+                  <div><Label className="text-[10px] opacity-60 uppercase">Programa</Label><p className="text-sm font-bold">{selectedSeccion.programa}</p></div>
+                  <div><Label className="text-[10px] opacity-60 uppercase">Docente</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px]"><div className="h-4 w-1 bg-primary rounded-full" />Configuración</div>
-                  <div className="space-y-3 bg-muted/20 p-4 rounded-2xl border border-border/50">
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Ocupación</Label><div className="flex justify-between text-xs font-bold mb-1"><span>{selectedSeccion.inscritos}/{selectedSeccion.capacidad}</span><span>{calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%</span></div><Progress value={calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)} className="h-1.5" /></div>
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Horario</Label><p className="text-sm font-semibold">{selectedSeccion.horario}</p></div>
-                    <div><Label className="text-[10px] font-bold uppercase opacity-50">Estado</Label><div className="mt-1">{getStatusBadge(selectedSeccion.estado)}</div></div>
-                  </div>
+              </div>
+              <div className="space-y-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Configuración Estructural</div>
+                <div className="space-y-2 bg-muted/20 p-4 rounded-xl border border-border/50">
+                  <div><Label className="text-[10px] opacity-60 uppercase">Horario</Label><p className="text-sm font-bold">{selectedSeccion.horario}</p></div>
+                  <div><Label className="text-[10px] opacity-60 uppercase">Ocupación</Label><p className="text-sm font-bold">{selectedSeccion.inscritos} / {selectedSeccion.capacidad}</p></div>
+                  <div><Label className="text-[10px] opacity-60 uppercase">Estado</Label><div className="mt-1">{getStatusBadge(selectedSeccion.estado)}</div></div>
                 </div>
               </div>
             </div>
@@ -870,32 +599,20 @@ export default function AperturaSeccionesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Editar Sección Dialog */}
+      {/* Editar Estructura */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto rounded-[1.5rem]">
-          <DialogHeader><DialogTitle className="text-2xl font-black">Editar Sección</DialogTitle></DialogHeader>
-          {selectedSeccion && (
-            <form onSubmit={handleUpdateSeccion} className="space-y-8 py-6">
-              <div className="space-y-6">
-                <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-[10px] opacity-60">Información General (Solo Lectura)</div>
-                <div className="grid grid-cols-2 gap-4 opacity-70">
-                   <div className="space-y-1"><Label className="text-[10px]">Período</Label><div className="p-3 bg-muted rounded-xl text-sm">{PERIODOS_MAESTROS.find(p => p.id === selectedSeccion.periodoId)?.nombre}</div></div>
-                   <div className="space-y-1"><Label className="text-[10px]">Curso</Label><div className="p-3 bg-muted rounded-xl text-sm">{selectedSeccion.curso}</div></div>
-                </div>
-                <div className="space-y-4">
-                  <Label className="text-xs font-bold uppercase">Docente Asignado</Label>
-                  <Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select>
-                  <Label className="text-xs font-bold uppercase">Capacidad Máxima</Label>
-                  <Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} className="rounded-xl" />
-                  <div className="space-y-3"><Label className="text-xs font-bold uppercase">Horario (Días y Horas)</Label><div className="flex flex-wrap gap-3">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-2"><Checkbox id={`edit-${dia.id}`} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={`edit-${dia.id}`} className="text-xs">{dia.label}</Label></div>))}</div><div className="flex gap-4 mt-2"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
-                </div>
-              </div>
-              <DialogFooter className="gap-3 pt-8 border-t border-border/30"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar Cambios</Button></DialogFooter>
-            </form>
-          )}
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem]">
+          <DialogHeader><DialogTitle className="text-2xl font-black">Editar Estructura Académica</DialogTitle></DialogHeader>
+          <form onSubmit={handleUpdateSeccion} className="space-y-8 py-6">
+             <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label><Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label><Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} /></div>
+                <div className="space-y-4 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Horario (Días y Horas)</Label><div className="flex flex-wrap gap-4">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-2"><Checkbox id={`edit-${dia.id}`} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={`edit-${dia.id}`} className="text-xs">{dia.label}</Label></div>))}</div><div className="flex gap-4 mt-4"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
+             </div>
+             <DialogFooter><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar Cambios</Button></DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </motion.div>
   );
 }
-    

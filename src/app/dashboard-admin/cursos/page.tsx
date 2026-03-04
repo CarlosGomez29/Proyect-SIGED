@@ -17,8 +17,11 @@ import {
   CheckCircle2,
   XCircle,
   Settings2,
-  TrendingUp,
-  Target
+  Target,
+  Eye,
+  Calendar,
+  Lock,
+  Unlock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -58,6 +61,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -76,18 +87,18 @@ import {
 const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
 const initialSecciones = [
-  { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", inscritos: 32, capacidad: 40, estado: "Abierta" },
-  { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", inscritos: 15, capacidad: 20, estado: "Abierta" },
-  { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", inscritos: 28, capacidad: 30, estado: "Abierta" },
-  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", inscritos: 25, capacidad: 25, estado: "Abierta" },
-  { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", inscritos: 40, capacidad: 40, estado: "Cerrada" },
-  { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", inscritos: 12, capacidad: 50, estado: "Abierta" },
-  { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", inscritos: 20, capacidad: 40, estado: "Abierta" },
-  { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", inscritos: 8, capacidad: 30, estado: "Abierta" },
-  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", inscritos: 25, capacidad: 25, estado: "Cerrada" },
-  { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", inscritos: 18, capacidad: 40, estado: "Abierta" },
-  { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", inscritos: 22, capacidad: 30, estado: "Abierta" },
-  { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", inscritos: 14, capacidad: 40, estado: "Abierta" },
+  { id: "SEC-001", periodo: "2024-2", curso: "Seguridad de la Carga Aérea", programa: "DIGEP Directo", docente: "Juan Pérez", horario: "Lun-Vie 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 32, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-002", periodo: "2024-2", curso: "Mercancías Peligrosas", programa: "DIGEP-INFOTEP", docente: "María García", horario: "Sáb 09:00 AM - 05:00 PM", estado: "Abierta", inscritos: 15, capacidad: 20, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-003", periodo: "2024-2", curso: "AVSEC para Tripulación", programa: "Dominicana Digna", docente: "Carlos López", horario: "Mar-Jue 02:00 PM - 06:00 PM", estado: "Abierta", inscritos: 28, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-004", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP Directo", docente: "Ana Martínez", horario: "Lun-Mie-Vie 08:00 AM - 10:00 AM", estado: "Abierta", inscritos: 10, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-005", periodo: "2024-2", curso: "Seguridad Aeroportuaria", programa: "DIGEP-INFOTEP", docente: "Luis Hernández", horario: "Sáb 08:00 AM - 04:00 PM", estado: "Cerrada", inscritos: 40, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", horario: "Vie 02:00 PM - 05:00 PM", estado: "Abierta", inscritos: 12, capacidad: 50, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", horario: "Lun-Mie 06:00 PM - 09:00 PM", estado: "Abierta", inscritos: 20, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", horario: "Dom 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 8, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", estado: "Cerrada", inscritos: 25, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", estado: "Abierta", inscritos: 18, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", estado: "Abierta", inscritos: 22, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", estado: "Abierta", inscritos: 14, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
 ];
 
 const containerVariants = {
@@ -104,6 +115,8 @@ export default function GestionSeccionesPanel() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [secciones, setSecciones] = useState(initialSecciones);
+  const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   
   const [visibleColumns, setVisibleColumns] = useState({
     id: true,
@@ -111,6 +124,7 @@ export default function GestionSeccionesPanel() {
     curso: true,
     programa: true,
     docente: true,
+    horario: true,
     ocupacion: true,
     estado: true,
   });
@@ -118,15 +132,14 @@ export default function GestionSeccionesPanel() {
   const [filterConfig, setFilterConfig] = useState({
     estado: "Todos",
     programa: "Todos",
-    periodo: "Todos",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Lógica de filtrado: Excluimos 'Finalizada' y aplicamos filtros de usuario
   const filteredSecciones = useMemo(() => {
     return secciones.filter((s) => {
+      // Regla: No mostrar Finalizadas en el panel operativo principal
       if (s.estado === "Finalizada") return false;
 
       const matchesSearch = 
@@ -137,13 +150,11 @@ export default function GestionSeccionesPanel() {
       
       const matchesEstado = filterConfig.estado === "Todos" || s.estado === filterConfig.estado;
       const matchesPrograma = filterConfig.programa === "Todos" || s.programa === filterConfig.programa;
-      const matchesPeriodo = filterConfig.periodo === "Todos" || s.periodo === filterConfig.periodo;
 
-      return matchesSearch && matchesEstado && matchesPrograma && matchesPeriodo;
+      return matchesSearch && matchesEstado && matchesPrograma;
     });
   }, [secciones, searchTerm, filterConfig]);
 
-  // Estadísticas del Panel con datos reales
   const stats = useMemo(() => {
     const total = filteredSecciones.length;
     const abiertas = filteredSecciones.filter(s => s.estado === "Abierta").length;
@@ -162,23 +173,25 @@ export default function GestionSeccionesPanel() {
     return filteredSecciones.slice(start, start + itemsPerPage);
   }, [filteredSecciones, currentPage, itemsPerPage]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, itemsPerPage, filterConfig]);
-
   const calculateOcupacion = (inscritos: number, capacidad: number) => {
     return Math.round((inscritos / capacidad) * 100);
   };
 
   const handleAction = (id: string, action: string) => {
-    if (action === "cerrar") {
-      setSecciones(prev => prev.map(s => s.id === id ? { ...s, estado: "Cerrada" } : s));
-      toast({ title: "Sección Cerrada", description: "Inscripciones bloqueadas para esta sección." });
+    if (action === "toggle") {
+      setSecciones(prev => prev.map(s => {
+        if (s.id === id) {
+          const nuevoEstado = s.estado === "Abierta" ? "Cerrada" : "Abierta";
+          toast({ title: nuevoEstado === "Cerrada" ? "Sección Cerrada" : "Sección Reabierta", description: nuevoEstado === "Cerrada" ? "Inscripciones bloqueadas." : "Inscripciones habilitadas." });
+          return { ...s, estado: nuevoEstado };
+        }
+        return s;
+      }));
     } else if (action === "finalizar") {
       setSecciones(prev => prev.map(s => s.id === id ? { ...s, estado: "Finalizada" } : s));
-      toast({ title: "Sección Finalizada", description: "La sección ha sido archivada y removida del panel operativo." });
+      toast({ title: "Sección Finalizada", description: "Sección concluida e inhabilitada para cambios futuros." });
     } else {
-      toast({ title: "Módulo en desarrollo", description: `Iniciando: ${action}` });
+      toast({ title: "Módulo Operativo", description: `Iniciando: ${action}` });
     }
   };
 
@@ -197,6 +210,7 @@ export default function GestionSeccionesPanel() {
       if (visibleColumns.curso) row["Curso"] = s.curso;
       if (visibleColumns.programa) row["Programa"] = s.programa;
       if (visibleColumns.docente) row["Docente"] = s.docente;
+      if (visibleColumns.horario) row["Horario"] = s.horario;
       if (visibleColumns.ocupacion) row["Ocupación"] = `${s.inscritos} / ${s.capacidad} (${calculateOcupacion(s.inscritos, s.capacidad)}%)`;
       if (visibleColumns.estado) row["Estado"] = s.estado;
       return row;
@@ -259,7 +273,7 @@ export default function GestionSeccionesPanel() {
             children: [
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 } })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 })] }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales FF.AA. y P.N.", size: 20 })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
               new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: fullGenerationDate, size: 18 })], spacing: { after: 300 } }),
               new Table({
@@ -293,142 +307,114 @@ export default function GestionSeccionesPanel() {
     switch (estado) {
       case "Abierta": return <Badge className="bg-success/15 text-success border-success/20 font-bold px-3">Abierta</Badge>;
       case "Cerrada": return <Badge className="bg-destructive/15 text-destructive border-destructive/20 font-bold px-3">Cerrada</Badge>;
+      case "Finalizada": return <Badge className="bg-muted text-muted-foreground border-muted-foreground/20 font-bold px-3">Finalizada</Badge>;
       default: return <Badge variant="outline">{estado}</Badge>;
     }
   };
 
   return (
     <motion.div className="space-y-8 pb-10" variants={containerVariants} initial="hidden" animate="visible">
-      {/* 1. Encabezado Superior */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-black font-headline tracking-tighter">Gestión de Secciones</h1>
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest px-3">
-              Total de Secciones: {stats.total}
+              Total Operativo: {stats.total}
             </Badge>
-            <span className="text-muted-foreground text-xs font-medium">• Panel Operativo Académico</span>
+            <span className="text-muted-foreground text-xs font-medium">• Panel de Control Académico</span>
           </div>
         </div>
       </motion.div>
 
-      {/* 2. Tarjetas Resumen (Indicadores) */}
       <motion.section variants={containerVariants} className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="glass-card hover:bg-card/90 transition-all border-l-4 border-success">
+        <Card className="glass-card border-l-4 border-success">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Abiertas</CardTitle>
             <CheckCircle2 className="h-4 w-4 text-success" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black tracking-tighter">{stats.abiertas}</div>
-            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Disponibles para inscripción</p>
+            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Operación activa</p>
           </CardContent>
         </Card>
-        <Card className="glass-card hover:bg-card/90 transition-all border-l-4 border-destructive">
+        <Card className="glass-card border-l-4 border-destructive">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Cerradas</CardTitle>
             <XCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black tracking-tighter">{stats.cerradas}</div>
-            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Cupos bloqueados</p>
+            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Bloqueadas</p>
           </CardContent>
         </Card>
-        <Card className="glass-card hover:bg-card/90 transition-all border-l-4 border-primary">
+        <Card className="glass-card border-l-4 border-primary">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Inscritos</CardTitle>
             <Users className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black tracking-tighter">{stats.totalEstudiantes}</div>
-            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Estudiantes activos</p>
+            <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">Estudiantes reales</p>
           </CardContent>
         </Card>
-        <Card className="glass-card hover:bg-card/90 transition-all border-l-4 border-accent">
+        <Card className="glass-card border-l-4 border-accent">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Eficiencia</CardTitle>
+            <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ocupación</CardTitle>
             <Target className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-black tracking-tighter">{stats.promedioOcupacion}%</div>
-            <Progress value={stats.promedioOcupacion} className="h-1.5 mt-3" indicatorClassName="bg-accent" />
+            <Progress value={stats.promedioOcupacion} className="h-1.5 mt-3" />
           </CardContent>
         </Card>
       </motion.section>
 
-      {/* 3. Barra de Control */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 group w-full">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground transition-colors group-focus-within:text-primary" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
             placeholder="Buscar por ID, Curso, Programa, Docente o Período..." 
-            className="pl-12 h-12 bg-card/50 border-border/50 focus:bg-card transition-all text-sm rounded-xl" 
+            className="pl-12 h-12 bg-card/50 border-border/50 text-sm rounded-xl" 
             value={searchTerm} 
             onChange={(e) => setSearchTerm(e.target.value)} 
           />
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex items-center gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-12 px-6">
                 <Filter className="mr-2 h-4 w-4" /> Filtros
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl border-border/50 bg-card/95 backdrop-blur-xl" align="end">
-              <div className="space-y-6">
+            <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl bg-card" align="end">
+               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-black text-xs uppercase tracking-widest text-primary">Filtros de Panel</h4>
+                  <h4 className="font-black text-xs uppercase tracking-widest text-primary">Configuración</h4>
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
                 </div>
-                
                 <div className="space-y-3">
                   <p className="text-[10px] font-bold uppercase opacity-60">Visualización de Columnas</p>
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`col-${key}`} 
-                          checked={isVisible} 
-                          onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} 
-                        />
-                        <Label htmlFor={`col-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
+                        <Checkbox id={` кур-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
+                        <Label htmlFor={` кур-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
                       </div>
                     ))}
                   </div>
                 </div>
-
                 <Separator className="opacity-50" />
-
-                <div className="space-y-4">
-                  <p className="text-[10px] font-bold uppercase opacity-60">Segmentación</p>
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px]">Estatus</Label>
-                      <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Todos" /></SelectTrigger>
+                <div className="space-y-3">
+                    <Label className="text-[10px] uppercase font-bold opacity-60">Estado de Sección</Label>
+                    <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
+                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Todos" /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Todos">Todos los activos</SelectItem>
-                          <SelectItem value="Abierta">Abierta</SelectItem>
-                          <SelectItem value="Cerrada">Cerrada</SelectItem>
+                            <SelectItem value="Todos">Todos</SelectItem>
+                            <SelectItem value="Abierta">Abierta</SelectItem>
+                            <SelectItem value="Cerrada">Cerrada</SelectItem>
                         </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-[10px]">Programa</Label>
-                      <Select value={filterConfig.programa} onValueChange={(val) => setFilterConfig({...filterConfig, programa: val})}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Todos" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Todos">Todos los programas</SelectItem>
-                          <SelectItem value="DIGEP Directo">DIGEP Directo</SelectItem>
-                          <SelectItem value="DIGEP-INFOTEP">DIGEP-INFOTEP</SelectItem>
-                          <SelectItem value="Dominicana Digna">Dominicana Digna</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                    </Select>
                 </div>
-
-                <Button variant="ghost" size="sm" className="w-full text-[10px] font-bold uppercase text-destructive" onClick={() => setFilterConfig({ estado: "Todos", programa: "Todos", periodo: "Todos" })}>Limpiar Filtros</Button>
               </div>
             </PopoverContent>
           </Popover>
@@ -439,35 +425,28 @@ export default function GestionSeccionesPanel() {
                 <FileDown className="mr-2 h-4 w-4" /> Exportar
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl border-border/50">
-              <DropdownMenuLabel className="text-[10px] font-bold uppercase opacity-60">Formatos Disponibles</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleExport('word')} className="cursor-pointer rounded-lg">
-                <FileText className="h-4 w-4 mr-2" /> Microsoft Word (.docx)
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('pdf')} className="cursor-pointer rounded-lg">
-                <File className="h-4 w-4 mr-2" /> Documento PDF (.pdf)
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer rounded-lg">
-                <FileSpreadsheet className="h-4 w-4 mr-2" /> Microsoft Excel (.xlsx)
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
+              <DropdownMenuItem onClick={() => handleExport('word')} className="cursor-pointer"><FileText className="h-4 w-4 mr-2" /> Word (.docx)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('pdf')} className="cursor-pointer"><File className="h-4 w-4 mr-2" /> PDF (.pdf)</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer"><FileSpreadsheet className="h-4 w-4 mr-2" /> Excel (.xlsx)</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </motion.div>
 
-      {/* 4. Listado Principal (Panel Operativo) */}
       <motion.div variants={itemVariants}>
         <Card className="border-border/50 overflow-hidden shadow-xl bg-card/60 backdrop-blur-sm rounded-[1.5rem]">
           <CardContent className="p-0">
             <Table>
               <TableHeader className="bg-muted/30">
-                <TableRow className="hover:bg-transparent border-border/50">
+                <TableRow>
                   {visibleColumns.id && <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">ID</TableHead>}
                   {visibleColumns.periodo && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Período</TableHead>}
-                  {visibleColumns.curso && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Curso Académico</TableHead>}
+                  {visibleColumns.curso && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Curso</TableHead>}
                   {visibleColumns.programa && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Programa</TableHead>}
                   {visibleColumns.docente && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>}
-                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Ocupación (Métricas)</TableHead>}
+                  {visibleColumns.horario && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Horario</TableHead>}
+                  {visibleColumns.ocupacion && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Ocupación</TableHead>}
                   {visibleColumns.estado && <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estatus</TableHead>}
                   <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
                 </TableRow>
@@ -479,32 +458,18 @@ export default function GestionSeccionesPanel() {
                     <TableRow key={seccion.id} className="group hover:bg-muted/20 border-border/50 transition-colors">
                       {visibleColumns.id && <TableCell className="py-6 pl-8 font-mono text-xs font-bold text-primary">{seccion.id}</TableCell>}
                       {visibleColumns.periodo && <TableCell className="py-6 font-semibold text-xs tracking-tight">{seccion.periodo}</TableCell>}
-                      {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed max-w-[200px]">{seccion.curso}</TableCell>}
+                      {visibleColumns.curso && <TableCell className="py-6 font-bold text-foreground text-xs leading-relaxed">{seccion.curso}</TableCell>}
                       {visibleColumns.programa && <TableCell className="py-6 text-xs text-muted-foreground font-medium">{seccion.programa}</TableCell>}
-                      {visibleColumns.docente && (
-                        <TableCell className="py-6">
-                          <div className="flex items-center gap-2">
-                            <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
-                              <span className="text-[10px] font-bold text-primary">{seccion.docente.charAt(0)}</span>
-                            </div>
-                            <span className="font-bold text-xs">{seccion.docente}</span>
-                          </div>
-                        </TableCell>
-                      )}
+                      {visibleColumns.docente && <TableCell className="py-6 font-bold text-xs">{seccion.docente}</TableCell>}
+                      {visibleColumns.horario && <TableCell className="py-6 text-[10px] text-muted-foreground">{seccion.horario}</TableCell>}
                       {visibleColumns.ocupacion && (
                         <TableCell className="py-6">
-                          <div className="space-y-2 w-[180px]">
-                            <div className="flex items-center justify-between text-[10px] font-bold">
-                              <span className={ocupacionPorcentaje > 90 ? "text-destructive" : "text-muted-foreground"}>
-                                {seccion.inscritos} / {seccion.capacidad}
-                              </span>
-                              <span className="text-foreground tracking-tighter">{ocupacionPorcentaje}%</span>
+                          <div className="space-y-1.5 w-[140px]">
+                            <div className="flex justify-between text-[10px] font-bold">
+                              <span>{seccion.inscritos} / {seccion.capacidad}</span>
+                              <span className={ocupacionPorcentaje > 90 ? "text-destructive" : ""}>{ocupacionPorcentaje}%</span>
                             </div>
-                            <Progress 
-                              value={ocupacionPorcentaje} 
-                              className="h-1.5" 
-                              indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} 
-                            />
+                            <Progress value={ocupacionPorcentaje} className="h-1.5" indicatorClassName={ocupacionPorcentaje > 90 ? "bg-destructive" : "bg-primary"} />
                           </div>
                         </TableCell>
                       )}
@@ -512,31 +477,18 @@ export default function GestionSeccionesPanel() {
                       <TableCell className="py-6 pr-8 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56 rounded-xl shadow-2xl border-border/50 p-2">
-                            <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Operaciones Académicas</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer rounded-lg text-xs py-2">
-                              <GraduationCap className="h-4 w-4 mr-3 opacity-70" /> Registrar Calificaciones
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleAction(seccion.id, "estudiantes")} className="cursor-pointer rounded-lg text-xs py-2">
-                              <Users className="h-4 w-4 mr-3 opacity-70" /> Ver Listado de Estudiantes
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer rounded-lg text-xs py-2">
-                              <ClipboardCheck className="h-4 w-4 mr-3 opacity-70" /> Pasar Asistencia Diaria
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="opacity-50" />
-                            <DropdownMenuItem 
-                              onClick={() => handleAction(seccion.id, "cerrar")} 
-                              disabled={seccion.estado === "Cerrada"}
-                              className="cursor-pointer rounded-lg text-xs py-2 text-amber-600 focus:text-amber-700"
-                            >
-                              <XCircle className="h-4 w-4 mr-3" /> Cerrar Inscripciones
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleAction(seccion.id, "finalizar")} 
-                              className="cursor-pointer rounded-lg text-xs py-2 text-destructive focus:text-destructive"
-                            >
-                              <CheckCircle2 className="h-4 w-4 mr-3" /> Finalizar Sección Académica
-                            </DropdownMenuItem>
+                          <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
+                             <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
+                             <DropdownMenuItem onClick={() => setSelectedSeccion(seccion) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
+                             <DropdownMenuSeparator className="opacity-50" />
+                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "toggle")} className="cursor-pointer text-xs">
+                                {seccion.estado === "Abierta" ? <><Lock className="h-4 w-4 mr-2 text-destructive" /> Cerrar Sección</> : <><Unlock className="h-4 w-4 mr-2 text-success" /> Reabrir Sección</>}
+                             </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleAction(seccion.id, "finalizar")} className="cursor-pointer text-xs text-destructive">
+                                <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Sección Académica
+                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -545,65 +497,61 @@ export default function GestionSeccionesPanel() {
                 })}
               </TableBody>
             </Table>
-            <AnimatePresence>
-              {filteredSecciones.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-24 text-center">
-                  <BookOpen className="h-12 w-12 text-muted-foreground/20 mx-auto mb-4" />
-                  <p className="text-muted-foreground font-medium italic text-sm">No se encontraron secciones activas bajo estos criterios.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                Mostrando <span className="text-foreground">{paginatedSecciones.length}</span> de <span className="text-foreground">{filteredSecciones.length}</span>
+                Mostrando {paginatedSecciones.length} de {filteredSecciones.length}
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Ver:</span>
                 <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(parseInt(val))}>
                   <SelectTrigger className="h-8 w-20 rounded-lg text-[10px] font-bold"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
+                  <SelectContent><SelectItem value="10">10</SelectItem><SelectItem value="50">50</SelectItem><SelectItem value="100">100</SelectItem></SelectContent>
                 </Select>
               </div>
             </div>
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        href="#" 
-                        onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} 
-                        className={currentPage === 1 ? "opacity-30 pointer-events-none" : ""}
-                      />
-                    </PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <PaginationItem key={page} className="hidden sm:block">
-                        <PaginationLink 
-                          href="#" 
-                          isActive={currentPage === page} 
-                          onClick={(e) => { e.preventDefault(); setCurrentPage(page); }}
-                          className="text-xs h-8 w-8"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext 
-                        href="#" 
-                        onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} 
-                        className={currentPage === totalPages ? "opacity-30 pointer-events-none" : ""}
-                      />
-                    </PaginationItem>
+                    <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} /></PaginationItem>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (<PaginationItem key={page} className="hidden sm:block"><PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }} className="text-xs h-8 w-8">{page}</PaginationLink></PaginationItem>))}
+                    <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} /></PaginationItem>
                 </PaginationContent>
             </Pagination>
           </div>
         </Card>
       </motion.div>
+
+      {/* Ver Detalles Expandido */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem]">
+           <DialogHeader><DialogTitle className="text-2xl font-black">Panel Operativo de Sección</DialogTitle></DialogHeader>
+           {selectedSeccion && (
+             <div className="grid grid-cols-2 gap-8 py-6">
+               <div className="space-y-4">
+                 <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información General</div>
+                 <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
+                    <div><Label className="text-[10px] opacity-60">CURSO</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
+                    <div><Label className="text-[10px] opacity-60">DOCENTE</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
+                    <div><Label className="text-[10px] opacity-60">PERÍODO</Label><p className="text-sm font-bold">{selectedSeccion.periodo}</p></div>
+                 </div>
+               </div>
+               <div className="space-y-4">
+                 <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Control de Tiempos y Cupos</div>
+                 <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
+                    <div className="flex gap-4">
+                        <div className="flex-1"><Label className="text-[10px] opacity-60">INICIO</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaInicio}</p></div>
+                        <div className="flex-1"><Label className="text-[10px] opacity-60">FIN</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaFin}</p></div>
+                    </div>
+                    <div><Label className="text-[10px] opacity-60">HORARIO</Label><p className="text-xs font-bold">{selectedSeccion.horario}</p></div>
+                    <div><Label className="text-[10px] opacity-60">MÉTRICA DE OCUPACIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.inscritos} / {selectedSeccion.capacidad} ({calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%)</p></div>
+                 </div>
+               </div>
+             </div>
+           )}
+           <DialogFooter><DialogClose asChild><Button variant="outline">Cerrar Panel</Button></DialogClose></DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
