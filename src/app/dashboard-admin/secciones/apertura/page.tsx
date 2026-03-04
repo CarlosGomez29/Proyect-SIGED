@@ -131,6 +131,7 @@ const initialSecciones = [
   { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", dias: ["sab"], horaInicio: "08:00", horaFin: "13:00", estado: "Abierta", inscritos: 18, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", dias: ["mar", "vie"], horaInicio: "17:00", horaFin: "19:00", estado: "Abierta", inscritos: 22, capacidad: 30, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", dias: ["mie"], horaInicio: "09:00", horaFin: "11:00", estado: "Abierta", inscritos: 14, capacidad: 40, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-013", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP-INFOTEP", docente: "Ana Martínez", horario: "Jue-Vie 08:00 AM - 12:00 PM", dias: ["jue", "vie"], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta", inscritos: 5, capacidad: 25, periodoId: "2024-2", fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
 ];
 
 const containerVariants = {

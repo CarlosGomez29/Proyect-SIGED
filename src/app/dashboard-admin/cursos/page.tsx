@@ -95,10 +95,11 @@ const initialSecciones = [
   { id: "SEC-006", periodo: "2024-2", curso: "Inteligencia Emocional", programa: "Dominicana Digna", docente: "Juan Pérez", horario: "Vie 02:00 PM - 05:00 PM", estado: "Abierta", inscritos: 12, capacidad: 50, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-007", periodo: "2024-2", curso: "Ciberseguridad en Aviación", programa: "DIGEP Directo", docente: "María García", horario: "Lun-Mie 06:00 PM - 09:00 PM", estado: "Abierta", inscritos: 20, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-008", periodo: "2024-2", curso: "Primeros Auxilios Aeroportuarios", programa: "DIGEP-INFOTEP", docente: "Carlos López", horario: "Dom 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 8, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
-  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", estado: "Cerrada", inscritos: 25, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-009", periodo: "2024-2", curso: "Protocolo y Etiqueta", programa: "Dominicana Digna", docente: "Ana Martínez", horario: "Jue 02:00 PM - 04:00 PM", estado: "Abierta", inscritos: 25, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-010", periodo: "2024-2", curso: "Gestión de Carga Peligrosa", programa: "DIGEP Directo", docente: "Luis Hernández", horario: "Sab 08:00 AM - 01:00 PM", estado: "Abierta", inscritos: 18, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-011", periodo: "2024-2", curso: "Inglés Técnico Aeronáutico", programa: "DIGEP-INFOTEP", docente: "Juan Pérez", horario: "Mar-Vie 05:00 PM - 07:00 PM", estado: "Abierta", inscritos: 22, capacidad: 30, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
   { id: "SEC-012", periodo: "2024-2", curso: "Psicología del Pasajero", programa: "Dominicana Digna", docente: "María García", horario: "Mie 09:00 AM - 11:00 AM", estado: "Abierta", inscritos: 14, capacidad: 40, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
+  { id: "SEC-013", periodo: "2024-2", curso: "Manejo de Crisis", programa: "DIGEP-INFOTEP", docente: "Ana Martínez", horario: "Jue-Vie 08:00 AM - 12:00 PM", estado: "Abierta", inscritos: 5, capacidad: 25, fechaInicio: "2024-06-01", fechaFin: "2024-08-31" },
 ];
 
 const containerVariants = {
@@ -397,8 +398,8 @@ export default function GestionSeccionesPanel() {
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
-                        <Checkbox id={` кур-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
-                        <Label htmlFor={` кур-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
+                        <Checkbox id={` curs-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
+                        <Label htmlFor={` curs-${key}`} className="text-[11px] font-medium capitalize">{key}</Label>
                       </div>
                     ))}
                   </div>
