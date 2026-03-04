@@ -15,78 +15,55 @@ service cloud.firestore {
 
     // USERS collection
     match /users/{userId} {
-      // Any authenticated user can create their own user document (for signup)
       allow create: if request.auth != null;
-      
-      // A user can read their own document
-      // Admins/Super-Admins can read any user document
       allow read: if request.auth.uid == userId
                    || getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
-                   
-      // A user can update their own document
-      // Admins/Super-Admins can update any user document
       allow update: if request.auth.uid == userId
                      || getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
-      
-      // Only Admins/Super-Admins can delete user documents
       allow delete: if getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
+    }
+
+    // SECCIONES collection
+    match /secciones/{seccionId} {
+        // Admins and Super-Admins have full access
+        allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
+        
+        // Instructors and Admissions can read sections
+        allow read: if getUserRole(request.auth.uid) in ['instructor', 'admision'];
     }
 
     // ALUMNOS collection
     match /alumnos/{alumnoId} {
-        // Admins, Super-Admins and Admissions can create, read, update, delete students
         allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin', 'admision'];
-        
-        // Students can read their own data
         allow read: if request.auth.uid == alumnoId;
-
-        // Instructors can read student data (needs refinement based on course enrollment)
-        // This is a placeholder, a more complex rule would check if the student is in one of the instructor's courses
         allow read: if getUserRole(request.auth.uid) == 'instructor';
     }
 
     // CURSOS collection
     match /cursos/{cursoId} {
-        // Admins and Super-Admins have full access
         allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
-        
-        // Instructors and Admissions can read courses
         allow read: if getUserRole(request.auth.uid) in ['instructor', 'admision'];
-
-        // Students can read course list
         allow read: if getUserRole(request.auth.uid) == 'alumno';
     }
 
     // INSCRIPCIONES collection
     match /inscripciones/{inscripcionId} {
-        // Admins, Super-Admins, and Admissions have full access
         allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin', 'admision'];
-
-        // Students can read their own inscriptions
         allow read: if request.auth.uid == resource.data.alumnoId;
     }
 
     // PAGOS collection
     match /pagos/{pagoId} {
-        // Admins, Super-Admins, and Admissions have full access
         allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin', 'admision'];
-
-        // Students can read their own payments
         allow read: if request.auth.uid == resource.data.alumnoId;
     }
 
     // CALIFICACIONES collection
     match /calificaciones/{calificacionId} {
-        // Admins and Super-Admins have full access
         allow read, write: if getUserRole(request.auth.uid) in ['administrador', 'super-admin'];
-
-        // Instructors can create and update grades
         allow write: if getUserRole(request.auth.uid) == 'instructor';
-
-        // Instructors, Admissions and Students can read grades
         allow read: if getUserRole(request.auth.uid) in ['instructor', 'admision'] 
                     || request.auth.uid == resource.data.alumnoId;
-
     }
   }
 }
