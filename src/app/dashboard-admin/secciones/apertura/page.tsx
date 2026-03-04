@@ -8,7 +8,6 @@ import {
   Filter,
   Search,
   MoreHorizontal,
-  Eye,
   Edit,
   BookOpen,
   Clock,
@@ -149,7 +148,6 @@ export default function AperturaSeccionesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [secciones, setSecciones] = useState(initialSecciones);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   
@@ -373,11 +371,6 @@ export default function AperturaSeccionesPage() {
     setSelectedSeccion(null);
   };
 
-  const openViewDetails = (seccion: any) => {
-    setSelectedSeccion(seccion);
-    setIsViewDialogOpen(true);
-  };
-
   const openEditSection = (seccion: any) => {
     setSelectedSeccion(seccion);
     setFormData({
@@ -533,7 +526,6 @@ export default function AperturaSeccionesPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-xl">
-                            <DropdownMenuItem onClick={() => openViewDetails(seccion)} className="cursor-pointer"><Eye className="h-4 w-4 mr-2" /> Ver detalles</DropdownMenuItem>
                             {seccion.estado !== "Finalizada" && (
                               <DropdownMenuItem onClick={() => openEditSection(seccion)} className="cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar estructura</DropdownMenuItem>
                             )}
@@ -569,35 +561,6 @@ export default function AperturaSeccionesPage() {
           </div>
         </Card>
       </motion.div>
-
-      {/* Ver Detalles */}
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] rounded-[1.5rem]">
-          <DialogHeader><DialogTitle className="text-2xl font-black">Expediente de Sección</DialogTitle></DialogHeader>
-          {selectedSeccion && (
-            <div className="grid grid-cols-2 gap-8 py-6">
-              <div className="space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información Académica</div>
-                <div className="space-y-2 bg-muted/20 p-4 rounded-xl border border-border/50">
-                  <div><Label className="text-[10px] opacity-60 uppercase">ID</Label><p className="text-sm font-bold">{selectedSeccion.id}</p></div>
-                  <div><Label className="text-[10px] opacity-60 uppercase">Curso</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
-                  <div><Label className="text-[10px] opacity-60 uppercase">Programa</Label><p className="text-sm font-bold">{selectedSeccion.programa}</p></div>
-                  <div><Label className="text-[10px] opacity-60 uppercase">Docente</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Configuración Estructural</div>
-                <div className="space-y-2 bg-muted/20 p-4 rounded-xl border border-border/50">
-                  <div><Label className="text-[10px] opacity-60 uppercase">Horario</Label><p className="text-sm font-bold">{selectedSeccion.horario}</p></div>
-                  <div><Label className="text-[10px] opacity-60 uppercase">Ocupación</Label><p className="text-sm font-bold">{selectedSeccion.inscritos} / {selectedSeccion.capacidad}</p></div>
-                  <div><Label className="text-[10px] opacity-60 uppercase">Estado</Label><div className="mt-1">{getStatusBadge(selectedSeccion.estado)}</div></div>
-                </div>
-              </div>
-            </div>
-          )}
-          <DialogFooter><DialogClose asChild><Button variant="outline">Cerrar</Button></DialogClose></DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Editar Estructura */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
