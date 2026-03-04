@@ -1,36 +1,111 @@
 
 {
   "entities": {
-    "Seccion": {
-      "title": "Sección Académica",
-      "description": "Representa una sección de un curso con su docente, horario y capacidad.",
+    "Sede": {
+      "title": "Sede / Recinto",
+      "description": "Recinto físico donde se imparten los programas académicos.",
       "type": "object",
       "properties": {
-        "periodo": { "type": "string", "description": "Periodo académico (ej. 2024-2)" },
-        "curso": { "type": "string", "description": "Nombre del curso" },
-        "programa": { "type": "string", "description": "Programa asociado" },
-        "docente": { "type": "string", "description": "Nombre del docente asignado" },
-        "horario": { "type": "string", "description": "Resumen de días y horas" },
-        "dias": { "type": "array", "items": { "type": "string" }, "description": "Lista de identificadores de días" },
-        "horaInicio": { "type": "string", "description": "Hora de inicio en formato 24h" },
-        "horaFin": { "type": "string", "description": "Hora de fin en formato 24h" },
-        "estado": { "type": "string", "enum": ["Abierta", "Cerrada", "Finalizada"] },
-        "inscritos": { "type": "integer", "description": "Número de alumnos inscritos actualmente" },
-        "capacidad": { "type": "integer", "description": "Capacidad máxima de la sección" },
+        "nombre": { "type": "string", "description": "Nombre oficial del recinto" },
+        "ubicacion": { "type": "string", "description": "Provincia o municipio" },
+        "codigo": { "type": "string", "description": "Código interno de la sede" }
+      },
+      "required": ["nombre", "codigo"]
+    },
+    "Curso": {
+      "title": "Curso Académico",
+      "description": "Definición del programa técnico (Curricula).",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre del programa técnico" },
+        "codigo": { "type": "string", "description": "Código del plan de estudios" },
+        "descripcion": { "type": "string" },
+        "duracionHoras": { "type": "integer" }
+      },
+      "required": ["nombre", "codigo"]
+    },
+    "Periodo": {
+      "title": "Periodo Académico",
+      "description": "Ciclo lectivo (Trimestral, Semestral o Anual).",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Ej. 2024-T2, 2024-S1" },
+        "tipo": { "type": "string", "enum": ["Trimestral", "Semestral", "Anual"] },
+        "anio": { "type": "integer" },
         "fechaInicio": { "type": "string", "format": "date" },
-        "fechaFin": { "type": "string", "format": "date" },
+        "fechaFin": { "type": "string", "format": "date" }
+      },
+      "required": ["nombre", "tipo", "anio"]
+    },
+    "Docente": {
+      "title": "Docente / Instructor",
+      "description": "Personal encargado de impartir docencia.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "cedula": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "especialidad": { "type": "string" }
+      },
+      "required": ["nombre", "cedula"]
+    },
+    "Estudiante": {
+      "title": "Estudiante / Alumno",
+      "description": "Persona inscrita en los programas.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "cedula": { "type": "string" },
+        "matricula": { "type": "string" },
+        "email": { "type": "string", "format": "email" }
+      },
+      "required": ["nombre", "matricula"]
+    },
+    "Seccion": {
+      "title": "Sección Académica",
+      "description": "Instancia de un curso en un periodo, sede y docente específico.",
+      "type": "object",
+      "properties": {
+        "codigoSeccion": { "type": "string", "description": "Código secuencial global SEC-XXXXX" },
+        "cursoId": { "type": "string", "description": "Referencia al ID del Curso" },
+        "periodoId": { "type": "string", "description": "Referencia al ID del Periodo" },
+        "sedeId": { "type": "string", "description": "Referencia al ID de la Sede" },
+        "docenteId": { "type": "string", "description": "Referencia al ID del Docente" },
+        "horario": { "type": "string" },
+        "capacidad": { "type": "integer" },
+        "inscritos": { "type": "integer", "default": 0 },
+        "estado": { "type": "string", "enum": ["Abierta", "Cerrada", "Finalizada"] },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["periodo", "curso", "docente", "estado", "capacidad"]
+      "required": ["codigoSeccion", "cursoId", "periodoId", "sedeId", "estado"]
+    },
+    "Inscripcion": {
+      "title": "Inscripción y Calificación",
+      "description": "Registro de un estudiante en una sección con su nota.",
+      "type": "object",
+      "properties": {
+        "seccionId": { "type": "string" },
+        "estudianteId": { "type": "string" },
+        "calificacionFinal": { "type": "number", "minimum": 0, "maximum": 100 },
+        "estado": { "type": "string", "enum": ["Inscrito", "Retirado", "Aprobado", "Reprobado"] },
+        "fechaInscripcion": { "type": "string", "format": "date-time" }
+      },
+      "required": ["seccionId", "estudianteId", "estado"]
     }
   },
   "auth": {
     "providers": ["password"]
   },
   "firestore": {
-    "/secciones/{seccionId}": {
-      "schema": "Seccion",
-      "description": "Colección principal de secciones académicas."
-    }
+    "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos." },
+    "/cursos/{cursoId}": { "schema": "Curso", "description": "Maestro de programas." },
+    "/periodos/{periodoId}": { "schema": "Periodo", "description": "Ciclos lectivos." },
+    "/docentes/{docenteId}": { "schema": "Docente", "description": "Instructores." },
+    "/estudiantes/{estudianteId}": { "schema": "Estudiante", "description": "Alumnos." },
+    "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },
+    "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
+    "/metadata/counters": { "schema": "object", "description": "Contadores para IDs secuenciales." }
   }
 }

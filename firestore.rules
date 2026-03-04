@@ -1,12 +1,39 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Reglas permisivas para la fase de prototipado y desarrollo
-    // Permiten el acceso a las colecciones principales sin requerir Auth de Firebase 
-    // mientras se utiliza el simulador de roles del sistema.
+    // Reglas para la fase de prototipado y arquitectura inicial
+    
+    match /sedes/{sedeId} {
+      allow read, write: if true;
+    }
+    
+    match /cursos/{cursoId} {
+      allow read, write: if true;
+    }
+    
+    match /periodos/{periodoId} {
+      allow read, write: if true;
+    }
+    
+    match /docentes/{docenteId} {
+      allow read, write: if true;
+    }
+    
+    match /estudiantes/{estudianteId} {
+      allow read, write: if true;
+    }
     
     match /secciones/{seccionId} {
+      allow read, write: if true;
+    }
+    
+    match /inscripciones/{inscripcionId} {
+      allow read, write: if true;
+    }
+    
+    match /metadata/counters {
       allow read, write: if true;
     }
 
@@ -14,7 +41,6 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
-    // Regla por defecto para el resto de la base de datos
     match /{document=**} {
       allow read, write: if true;
     }
