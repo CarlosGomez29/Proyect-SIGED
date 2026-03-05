@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -15,10 +16,12 @@ import {
   ShieldCheck
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import images from "@/app/lib/placeholder-images";
+import { useFirestore, useCollection } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -34,15 +37,27 @@ const itemVariants = {
 };
 
 export default function DashboardAdminPage() {
-  // En el futuro, este valor vendrá del contexto del usuario o de la configuración del recinto
+  const db = useFirestore();
+  
+  // Queries para métricas reales
+  const estudiantesQuery = useMemo(() => db ? collection(db, "estudiantes") : null, [db]);
+  const docentesQuery = useMemo(() => db ? collection(db, "docentes") : null, [db]);
+  const inscripcionesQuery = useMemo(() => db ? collection(db, "inscripciones") : null, [db]);
+  const seccionesAbiertasQuery = useMemo(() => db ? query(collection(db, "secciones"), where("estado", "==", "Abierta")) : null, [db]);
+
+  const { data: estudiantes } = useCollection(estudiantesQuery);
+  const { data: docentes } = useCollection(docentesQuery);
+  const { data: inscripciones } = useCollection(inscripcionesQuery);
+  const { data: seccionesAbiertas } = useCollection(seccionesAbiertasQuery);
+
   const activeRecinto = "Escuela Vocacional Santo Domingo Este";
-  const academicPeriod = "Período Académico 2024-2";
+  const academicPeriod = "Gestión Institucional Real-time";
 
   const metrics = [
-    { title: "Estudiantes Activos", value: "1,254", icon: Users, color: "text-blue-500", trend: "+2.5%" },
-    { title: "Secciones Abiertas", value: "82", icon: BookOpen, color: "text-emerald-500", trend: "+4" },
-    { title: "Docentes Activos", value: "45", icon: ShieldCheck, color: "text-purple-500", trend: "Estable" },
-    { title: "Inscripciones Período", value: "350", icon: ClipboardCheck, color: "text-amber-500", trend: "+12%" },
+    { title: "Estudiantes Activos", value: estudiantes?.length.toString() || "0", icon: Users, color: "text-blue-500" },
+    { title: "Secciones Abiertas", value: seccionesAbiertas?.length.toString() || "0", icon: BookOpen, color: "text-emerald-500" },
+    { title: "Docentes Registrados", value: docentes?.length.toString() || "0", icon: ShieldCheck, color: "text-purple-500" },
+    { title: "Inscripciones Totales", value: inscripciones?.length.toString() || "0", icon: ClipboardCheck, color: "text-amber-500" },
   ];
 
   const quickActions = [
@@ -59,7 +74,6 @@ export default function DashboardAdminPage() {
       initial="hidden"
       animate="visible"
     >
-      {/* 1. Hero Institucional Estilo Apple */}
       <motion.section variants={itemVariants} className="relative h-[400px] w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
         <Image 
           src={images.workshop_secondary.url} 
@@ -88,7 +102,6 @@ export default function DashboardAdminPage() {
         </div>
       </motion.section>
 
-      {/* 2. Métricas Estilo Widget */}
       <motion.section variants={containerVariants} className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {metrics.map((metric) => (
           <motion.div key={metric.title} variants={itemVariants} whileHover={{ y: -5 }}>
@@ -102,10 +115,7 @@ export default function DashboardAdminPage() {
               <CardContent>
                 <div className="text-3xl font-black tracking-tighter">{metric.value}</div>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-success/10 text-success">
-                    {metric.trend}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground font-medium italic">este mes</span>
+                  <span className="text-[10px] text-muted-foreground font-medium italic">registros en tiempo real</span>
                 </div>
               </CardContent>
             </Card>
@@ -113,7 +123,6 @@ export default function DashboardAdminPage() {
         ))}
       </motion.section>
 
-      {/* 3. Procesos Estilo App Store */}
       <motion.section variants={itemVariants} className="space-y-6">
         <div className="flex items-center justify-between px-2">
           <h2 className="text-2xl font-black font-headline tracking-tighter">Procesos Clave</h2>
@@ -139,45 +148,6 @@ export default function DashboardAdminPage() {
             </Link>
           ))}
         </div>
-      </motion.section>
-
-      {/* 4. Sección Visión Modernizada */}
-      <motion.section variants={itemVariants}>
-        <Card className="overflow-hidden glass-card rounded-[2.5rem]">
-          <div className="grid md:grid-cols-2">
-            <div className="relative h-80 md:h-auto overflow-hidden">
-              <Image 
-                src={images.vision_institutional.url} 
-                alt={images.vision_institutional.alt}
-                fill
-                className="object-cover transition-transform duration-[3s] hover:scale-110"
-                data-ai-hint={images.vision_institutional.hint}
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-card/80 via-transparent to-transparent hidden md:block" />
-            </div>
-            <div className="p-12 flex flex-col justify-center space-y-6">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-[10px] font-black text-primary uppercase tracking-widest w-fit">
-                Nuestra Identidad
-              </div>
-              <h2 className="text-3xl font-black font-headline text-primary tracking-tighter">Visión Institucional</h2>
-              <p className="text-muted-foreground leading-relaxed text-lg font-medium italic border-l-4 border-primary/20 pl-6">
-                "Una Organización reconocida por la calidad de sus programas dirigidos al desarrollo Humano de los dominicanos, preparando mano de obra calificada y fomentando el emprendedurismo."
-              </p>
-              <div className="flex items-center gap-6 pt-4">
-                <div className="flex -space-x-3">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-12 w-12 rounded-full border-4 border-background bg-muted flex items-center justify-center overflow-hidden shadow-lg transition-transform hover:scale-110 hover:z-10 cursor-pointer">
-                      <Image src={`https://picsum.photos/seed/stu${i}/40/40`} alt="User" width={48} height={48} />
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs font-bold text-muted-foreground tracking-tight">
-                  +100k graduados transformando el país.
-                </p>
-              </div>
-            </div>
-          </div>
-        </Card>
       </motion.section>
     </motion.div>
   );

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { File, PlusCircle, Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -13,13 +13,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
-const initialCalificacionesData = [
-  { id: 1, alumno: "Juan Pérez", curso: "Seguridad de la Carga Aérea", calificacion: 95, fecha: "2024-05-10" },
-  { id: 2, alumno: "María García", curso: "Mercancías Peligrosas", calificacion: 88, fecha: "2024-05-12" },
-  { id: 3, alumno: "Carlos López", curso: "AVSEC para Tripulación", calificacion: 72, fecha: "2024-05-15" },
-  { id: 4, alumno: "Ana Martínez", curso: "Manejo de Crisis", calificacion: 91, fecha: "2024-05-18" },
-  { id: 5, alumno: "Luis Hernández", curso: "Seguridad Aeroportuaria", calificacion: 85, fecha: "2024-05-20" },
-];
+// Firebase imports
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,28 +34,40 @@ const itemVariants = {
 
 export default function CalificacionesPage() {
     const { toast } = useToast();
-    const [calificacionesData, setCalificacionesData] = useState(initialCalificacionesData);
+    const db = useFirestore();
+    
+    // Consultamos inscripciones para gestionar sus notas
+    const inscripcionesQuery = useMemo(() => db ? collection(db, "inscripciones") : null, [db]);
+    const { data: calificacionesData, loading } = useCollection(inscripcionesQuery);
+
     const [searchTerm, setSearchTerm] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     const handleSaveCalificacion = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!db) return;
+
         const formData = new FormData(e.currentTarget);
-        const newCalificacion = {
-            id: Date.now(),
+        const payload = {
             alumno: formData.get('alumno') as string,
             curso: formData.get('curso') as string,
             calificacion: parseInt(formData.get('calificacion') as string, 10),
-            fecha: new Date().toISOString().split('T')[0],
+            estado: "Aprobada",
+            createdAt: serverTimestamp(),
         };
-        setCalificacionesData([...calificacionesData, newCalificacion]);
-        toast({ title: "Calificación Registrada", description: `Se ha añadido la calificación para ${newCalificacion.alumno}.` });
+
+        const collectionRef = collection(db, "inscripciones");
+        addDoc(collectionRef, payload)
+          .then(() => toast({ title: "Calificación Registrada", description: `Se ha añadido la nota para ${payload.alumno} en Firestore.` }))
+          .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collectionRef.path, operation: 'create', requestResourceData: payload })));
+        
         setIsModalOpen(false);
     };
 
     const filteredCalificaciones = calificacionesData.filter(c =>
-        c.alumno.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        c.curso.toLowerCase().includes(searchTerm.toLowerCase())
+        (c.alumno?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        c.curso?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        c.calificacion !== undefined
     );
 
   return (
@@ -70,7 +80,7 @@ export default function CalificacionesPage() {
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold font-headline tracking-tight">Gestión de Calificaciones</h1>
-          <p className="text-muted-foreground">Visualiza y gestiona las calificaciones de los cursos.</p>
+          <p className="text-muted-foreground">Listado institucional persistente en la nube.</p>
         </div>
         <div className="flex items-center gap-2">
            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -87,11 +97,11 @@ export default function CalificacionesPage() {
                     <form onSubmit={handleSaveCalificacion} className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="alumno" className="text-right">Alumno</Label>
-                            <Input id="alumno" name="alumno" placeholder="Nombre del alumno" className="col-span-3" required />
+                            <Input id="alumno" name="alumno" placeholder="Nombre completo" className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="curso" className="text-right">Curso</Label>
-                            <Input id="curso" name="curso" placeholder="Nombre del curso" className="col-span-3" required />
+                            <Input id="curso" name="curso" placeholder="Nombre del programa" className="col-span-3" required />
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="calificacion" className="text-right">Calificación</Label>
@@ -131,29 +141,36 @@ export default function CalificacionesPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Alumno</TableHead>
-                  <TableHead>Curso</TableHead>
-                  <TableHead className="text-center">Calificación</TableHead>
-                  <TableHead className="text-right">Fecha de Registro</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCalificaciones.map((calif) => (
-                  <TableRow key={calif.id}>
-                    <TableCell className="font-medium">{calif.alumno}</TableCell>
-                    <TableCell>{calif.curso}</TableCell>
-                    <TableCell className={`text-center font-semibold ${calif.calificacion < 80 ? 'text-red-600' : 'text-green-600'}`}>{calif.calificacion}</TableCell>
-                    <TableCell className="text-right">{calif.fecha}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {loading ? (
+                <div className="p-12 text-center text-muted-foreground">Consultando registros...</div>
+            ) : (
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead>Alumno</TableHead>
+                    <TableHead>Curso</TableHead>
+                    <TableHead className="text-center">Calificación</TableHead>
+                    <TableHead className="text-right">Fecha de Registro</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {filteredCalificaciones.map((calif) => (
+                    <TableRow key={calif.id}>
+                        <TableCell className="font-medium">{calif.alumno || "Sin nombre"}</TableCell>
+                        <TableCell>{calif.curso || "Sin curso"}</TableCell>
+                        <TableCell className={`text-center font-semibold ${calif.calificacion < 80 ? 'text-red-600' : 'text-green-600'}`}>{calif.calificacion}</TableCell>
+                        <TableCell className="text-right">{calif.createdAt?.toDate ? calif.createdAt.toDate().toLocaleDateString() : "Reciente"}</TableCell>
+                    </TableRow>
+                    ))}
+                    {filteredCalificaciones.length === 0 && (
+                         <TableRow><TableCell colSpan={4} className="text-center py-10 text-muted-foreground font-bold italic">No hay calificaciones registradas aún.</TableCell></TableRow>
+                    )}
+                </TableBody>
+                </Table>
+            )}
           </CardContent>
            <div className="p-4 border-t flex items-center justify-between text-sm text-muted-foreground">
-             <div>Mostrando {filteredCalificaciones.length} de {calificacionesData.length} registros</div>
+             <div>Registros encontrados: {filteredCalificaciones.length}</div>
              <Pagination>
                 <PaginationContent>
                     <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
@@ -167,5 +184,3 @@ export default function CalificacionesPage() {
     </motion.div>
   );
 }
-
-    

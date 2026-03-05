@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   File,
   PlusCircle,
@@ -48,16 +48,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Label } from '@/components/ui/label';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-
-const initialAlumnosData = [
-  { id: 1, nombre: "Juan", apellido: "Pérez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
-  { id: 2, nombre: "María", apellido: "García", curso: "Mercancías Peligrosas", estado: "Activo" },
-  { id: 3, nombre: "Carlos", apellido: "López", curso: "AVSEC para Tripulación", estado: "Inactivo" },
-  { id: 4, nombre: "Ana", apellido: "Martínez", curso: "Manejo de Crisis", estado: "Activo" },
-  { id: 5, nombre: "Luis", apellido: "Hernández", curso: "Seguridad Aeroportuaria", estado: "Suspendido" },
-  { id: 6, nombre: "Laura", apellido: "Gómez", curso: "Seguridad de la Carga Aérea", estado: "Activo" },
-  { id: 7, nombre: "José", apellido: "Díaz", curso: "Mercancías Peligrosas", estado: "Activo" },
-];
+// Firebase imports
+import { useFirestore, useCollection } from '@/firebase';
+import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -72,15 +67,18 @@ const itemVariants = {
   visible: { y: 0, opacity: 1 },
 };
 
-
 export default function AlumnosPage() {
     const { toast } = useToast();
-    const [alumnosData, setAlumnosData] = useState(initialAlumnosData);
+    const db = useFirestore();
+    
+    // Conexión real a Firestore
+    const alumnosQuery = useMemo(() => db ? collection(db, "estudiantes") : null, [db]);
+    const { data: alumnosData, loading } = useCollection(alumnosQuery);
+
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string[]>(["Activo", "Inactivo", "Suspendido"]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAlumno, setEditingAlumno] = useState<any>(null);
-
 
     const handleFilterChange = (status: string) => {
         setStatusFilter(prev => 
@@ -90,21 +88,27 @@ export default function AlumnosPage() {
     
     const handleSaveAlumno = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!db) return;
+
         const formData = new FormData(e.currentTarget);
-        const newAlumno = {
-            id: editingAlumno ? editingAlumno.id : Date.now(),
+        const alumnoPayload = {
             nombre: formData.get('nombre') as string,
             apellido: formData.get('apellido') as string,
             curso: formData.get('curso') as string,
             estado: formData.get('estado') as string,
+            updatedAt: serverTimestamp(),
         };
 
         if (editingAlumno) {
-            setAlumnosData(alumnosData.map(a => a.id === newAlumno.id ? newAlumno : a));
-            toast({ title: "Alumno Actualizado", description: `${newAlumno.nombre} ha sido actualizado.` });
+            const alumnoRef = doc(db, "estudiantes", editingAlumno.id);
+            updateDoc(alumnoRef, alumnoPayload)
+              .then(() => toast({ title: "Alumno Actualizado", description: `${alumnoPayload.nombre} ha sido actualizado.` }))
+              .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: alumnoRef.path, operation: 'update', requestResourceData: alumnoPayload })));
         } else {
-            setAlumnosData([...alumnosData, newAlumno]);
-            toast({ title: "Alumno Registrado", description: `${newAlumno.nombre} ha sido añadido.` });
+            const collectionRef = collection(db, "estudiantes");
+            addDoc(collectionRef, { ...alumnoPayload, createdAt: serverTimestamp() })
+              .then(() => toast({ title: "Alumno Registrado", description: `${alumnoPayload.nombre} ha sido añadido.` }))
+              .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collectionRef.path, operation: 'create', requestResourceData: alumnoPayload })));
         }
         setIsModalOpen(false);
         setEditingAlumno(null);
@@ -115,18 +119,17 @@ export default function AlumnosPage() {
         setIsModalOpen(true);
     };
 
-    const handleDelete = (id: number) => {
-        setAlumnosData(alumnosData.filter(a => a.id !== id));
-        toast({
-            variant: "destructive",
-            title: "Alumno Eliminado",
-            description: "El registro del alumno ha sido eliminado.",
-        });
+    const handleDelete = (id: string) => {
+        if (!db) return;
+        const alumnoRef = doc(db, "estudiantes", id);
+        deleteDoc(alumnoRef)
+          .then(() => toast({ variant: "destructive", title: "Alumno Eliminado", description: "El registro ha sido eliminado de Firestore." }))
+          .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: alumnoRef.path, operation: 'delete' })));
     };
 
     const filteredAlumnos = alumnosData.filter(alumno => 
-        (alumno.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || alumno.apellido.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        statusFilter.includes(alumno.estado)
+        (alumno.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || alumno.apellido?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        statusFilter.includes(alumno.estado || "Activo")
     );
 
   return (
@@ -139,7 +142,7 @@ export default function AlumnosPage() {
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold font-headline tracking-tight">Gestión de Alumnos</h1>
-          <p className="text-muted-foreground">Busca, filtra y gestiona los perfiles de los alumnos.</p>
+          <p className="text-muted-foreground">Busca, filtra y gestiona los perfiles reales en Firestore.</p>
         </div>
         <div className="flex items-center gap-2">
             <Dialog open={isModalOpen} onOpenChange={(open) => {
@@ -171,7 +174,16 @@ export default function AlumnosPage() {
                         </div>
                          <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="estado" className="text-right">Estado</Label>
-                            <Input id="estado" name="estado" defaultValue={editingAlumno?.estado || 'Activo'} className="col-span-3" required />
+                            <Select name="estado" defaultValue={editingAlumno?.estado || 'Activo'}>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="col-span-3 text-left justify-start">Seleccionar Estado</Button>
+                                </DropdownMenuTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Activo">Activo</SelectItem>
+                                    <SelectItem value="Inactivo">Inactivo</SelectItem>
+                                    <SelectItem value="Suspendido">Suspendido</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                         <DialogFooter>
                             <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
@@ -223,74 +235,77 @@ export default function AlumnosPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre Completo</TableHead>
-                  <TableHead className="hidden md:table-cell">Curso</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredAlumnos.map((alumno) => (
-                  <TableRow key={alumno.id}>
-                    <TableCell className="font-medium">{`${alumno.nombre} ${alumno.apellido}`}</TableCell>
-                    <TableCell className="hidden md:table-cell">{alumno.curso}</TableCell>
-                    <TableCell>
-                      <Badge 
-                        variant={alumno.estado === 'Activo' ? 'default' : 'secondary'}
-                        className={
-                            alumno.estado === 'Activo' ? 'bg-green-100 text-green-800' :
-                            alumno.estado === 'Inactivo' ? 'bg-gray-100 text-gray-800' :
-                            'bg-red-100 text-red-800'
-                        }
-                      >
-                        {alumno.estado}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => toast({ title: `Perfil de ${alumno.nombre}`})}>Ver Perfil</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEdit(alumno)}>Editar</DropdownMenuItem>
-                           <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">Eliminar</DropdownMenuItem>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                    <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Esta acción no se puede deshacer. Esto eliminará permanentemente el registro del alumno.
-                                    </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(alumno.id)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {loading ? (
+                <div className="p-12 text-center text-muted-foreground">Consultando base de datos...</div>
+            ) : (
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead>Nombre Completo</TableHead>
+                    <TableHead className="hidden md:table-cell">Curso</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {filteredAlumnos.map((alumno) => (
+                    <TableRow key={alumno.id}>
+                        <TableCell className="font-medium">{`${alumno.nombre} ${alumno.apellido}`}</TableCell>
+                        <TableCell className="hidden md:table-cell">{alumno.curso}</TableCell>
+                        <TableCell>
+                        <Badge 
+                            variant={alumno.estado === 'Activo' ? 'default' : 'secondary'}
+                            className={
+                                alumno.estado === 'Activo' ? 'bg-green-100 text-green-800' :
+                                alumno.estado === 'Inactivo' ? 'bg-gray-100 text-gray-800' :
+                                'bg-red-100 text-red-800'
+                            }
+                        >
+                            {alumno.estado}
+                        </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => toast({ title: `Perfil de ${alumno.nombre}`})}>Ver Perfil</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(alumno)}>Editar</DropdownMenuItem>
+                            <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-red-600">Eliminar</DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                        <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Esta acción no se puede deshacer. Esto eliminará permanentemente el registro del alumno de Firestore.
+                                        </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDelete(alumno.id)} className="bg-destructive hover:bg-destructive/90">Eliminar</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        </TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody>
+                </Table>
+            )}
           </CardContent>
           <div className="p-4 border-t flex items-center justify-between text-sm text-muted-foreground">
-             <div>Mostrando {filteredAlumnos.length} de {alumnosData.length} alumnos</div>
+             <div>Registros encontrados: {filteredAlumnos.length}</div>
              <Pagination>
                 <PaginationContent>
                     <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
                     <PaginationItem><PaginationLink href="#" isActive>1</PaginationLink></PaginationItem>
-                    <PaginationItem><PaginationLink href="#">2</PaginationLink></PaginationItem>
                     <PaginationItem><PaginationNext href="#" /></PaginationItem>
                 </PaginationContent>
              </Pagination>
