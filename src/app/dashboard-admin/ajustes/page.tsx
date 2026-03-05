@@ -31,26 +31,14 @@ const initialUsers = [
     { id: 'user5', nombre: 'Ana Fernandez', email: 'ana.fernandez@esac.com', rol: 'Admision', estado: 'Activo', ultimoAcceso: '2024-05-26' },
 ];
 
-const initialInstructors = [
-    { id: 'inst1', nombre: 'Juan Pérez' },
-    { id: 'inst2', nombre: 'María García' },
-    { id: 'inst3', nombre: 'Carlos López' },
-    { id: 'inst4', nombre: 'Ana Martínez' },
-    { id: 'inst5', nombre: 'Luis Hernández' },
-];
-
 export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
     const [users, setUsers] = useState(initialUsers);
-    const [instructors, setInstructors] = useState(initialInstructors);
     
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<any>(null);
 
-    const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
-    const [editingInstructor, setEditingInstructor] = useState<any>(null);
-    
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
         courseReminders: false,
@@ -106,27 +94,6 @@ export default function AjustesPage() {
         toast({ variant: 'destructive', title: "Usuario Eliminado", description: "El usuario ha sido eliminado del sistema." });
     };
 
-     const handleSaveInstructor = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const instructorData = {
-            id: editingInstructor ? editingInstructor.id : `inst${Date.now()}`,
-            nombre: formData.get('nombre') as string,
-        };
-
-        if (editingInstructor) {
-            setInstructors(instructors.map(i => i.id === instructorData.id ? instructorData : i));
-            toast({ title: "Instructor Actualizado" });
-        }
-        setIsInstructorModalOpen(false);
-        setEditingInstructor(null);
-    };
-
-     const handleEditInstructor = (instructor: any) => {
-        setEditingInstructor(instructor);
-        setIsInstructorModalOpen(true);
-    };
-
     // Función para reiniciar el contador secuencial global
     const handleResetCounter = async () => {
         if (!db) return;
@@ -163,7 +130,6 @@ export default function AjustesPage() {
         <TabsList>
           <TabsTrigger value="users">Gestión de Usuarios</TabsTrigger>
           <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
-          <TabsTrigger value="master-data">Datos Maestros</TabsTrigger>
           <TabsTrigger value="maintenance">Mantenimiento</TabsTrigger>
         </TabsList>
 
@@ -349,64 +315,6 @@ export default function AjustesPage() {
                     </div>
                 </CardContent>
             </Card>
-        </TabsContent>
-
-        <TabsContent value="master-data" className="mt-4">
-             <Card>
-                <CardHeader>
-                    <CardTitle>Datos Maestros</CardTitle>
-                    <CardDescription>Gestiona listas globales como instructores y categorías de cursos.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <h3 className="font-medium mb-2">Lista de Instructores</h3>
-                    <div className="rounded-md border">
-                       <TooltipProvider>
-                        <Table>
-                            <TableBody>
-                                {instructors.map(instructor => (
-                                    <TableRow key={instructor.id}>
-                                        <TableCell>{instructor.nombre}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button variant="outline" size="sm" onClick={() => handleEditInstructor(instructor)}>
-                                                        <Edit className="h-3 w-3" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Editar nombre del instructor</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                       </TooltipProvider>
-                    </div>
-
-                     <Dialog open={isInstructorModalOpen} onOpenChange={(open) => {
-                        setIsInstructorModalOpen(open);
-                        if (!open) setEditingInstructor(null);
-                    }}>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Editar Instructor</DialogTitle>
-                            </DialogHeader>
-                            <form onSubmit={handleSaveInstructor} className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="nombre-instructor" className="text-right">Nombre</Label>
-                                    <Input id="nombre-instructor" name="nombre" defaultValue={editingInstructor?.nombre} className="col-span-3" required />
-                                </div>
-                                <DialogFooter>
-                                    <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
-                                    <Button type="submit">Guardar Cambios</Button>
-                                </DialogFooter>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                </CardContent>
-             </Card>
         </TabsContent>
 
         <TabsContent value="maintenance" className="mt-4">
