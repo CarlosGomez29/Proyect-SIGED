@@ -578,7 +578,7 @@ export default function AperturaSeccionesPage() {
                             </div>
                           </TableCell>
                         )}
-                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(estado)}</TableCell>}
+                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
                         <TableCell className="py-6 pr-8 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
