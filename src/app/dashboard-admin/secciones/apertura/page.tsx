@@ -341,7 +341,7 @@ export default function AperturaSeccionesPage() {
         
         let newCount = 1;
         if (counterSnap.exists()) {
-          // Usamos inst_secciones_count para el reinicio solicitado
+          // Usamos inst_secciones_count para el contador global institucional
           newCount = (counterSnap.data().inst_secciones_count || 0) + 1;
         }
         
@@ -368,6 +368,7 @@ export default function AperturaSeccionesPage() {
 
         const newDocRef = doc(collection(db, "secciones"));
         transaction.set(newDocRef, newSeccionData);
+        // Actualizamos el contador institucional en Firestore
         transaction.set(counterRef, { inst_secciones_count: newCount }, { merge: true });
       });
 
@@ -577,7 +578,7 @@ export default function AperturaSeccionesPage() {
                             </div>
                           </TableCell>
                         )}
-                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(seccion.estado)}</TableCell>}
+                        {visibleColumns.estado && <TableCell className="py-6 text-center">{getStatusBadge(estado)}</TableCell>}
                         <TableCell className="py-6 pr-8 text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>

@@ -39,7 +39,6 @@ const initialInstructors = [
     { id: 'inst5', nombre: 'Luis Hernández' },
 ];
 
-
 export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
@@ -128,11 +127,12 @@ export default function AjustesPage() {
         setIsInstructorModalOpen(true);
     };
 
-    // Nueva función para reiniciar contador solicitado
+    // Función para reiniciar el contador secuencial global
     const handleResetCounter = async () => {
         if (!db) return;
         try {
             const counterRef = doc(db, "metadata", "counters");
+            // Ponemos el contador en 0 para que la próxima sección sea (0 + 1) = SEC-0001
             await setDoc(counterRef, { inst_secciones_count: 0 }, { merge: true });
             toast({ 
                 title: "Secuencia Reiniciada", 
@@ -142,11 +142,10 @@ export default function AjustesPage() {
             toast({ 
                 variant: "destructive", 
                 title: "Error al reiniciar", 
-                description: "No se pudo actualizar el contador institucional." 
+                description: "No se pudo actualizar el contador institucional en Firestore." 
             });
         }
     };
-
 
   return (
     <motion.div 
@@ -415,17 +414,18 @@ export default function AjustesPage() {
                 <CardHeader className="bg-destructive/5">
                     <div className="flex items-center gap-2">
                         <ShieldAlert className="h-5 w-5 text-destructive" />
-                        <CardTitle className="text-destructive">Acciones Críticas de Mantenimiento</CardTitle>
+                        <CardTitle className="text-destructive">Mantenimiento de Secuencias</CardTitle>
                     </div>
-                    <CardDescription>Estas acciones afectan permanentemente la numeración institucional y la integridad de los datos.</CardDescription>
+                    <CardDescription>Acciones de bajo nivel para corregir o reiniciar identificadores institucionales.</CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
                     <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
                         <div className="space-y-1">
                             <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
                             <p className="text-xs text-muted-foreground max-w-md">
-                                Restaura el contador global a cero. La próxima sección que se cree tendrá el código <strong>SEC-0001</strong>. 
-                                Utilice esta opción solo si desea comenzar una nueva serie numérica.
+                                Restaura el contador a cero. Al confirmar, la próxima sección que se cree en el módulo de Apertura tendrá el código <strong>SEC-0001</strong>. 
+                                <br/><br/>
+                                <strong>Nota:</strong> Esta acción no borra secciones existentes, solo reinicia la numeración futura.
                             </p>
                         </div>
                         <AlertDialog>
@@ -437,10 +437,10 @@ export default function AjustesPage() {
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-destructive">¿Confirmar reinicio institucional?</AlertDialogTitle>
+                                    <AlertDialogTitle className="text-destructive">¿Confirmar reinicio de secuencia?</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        Esta acción reiniciará la numeración de las secciones a <strong>SEC-0001</strong>. 
-                                        Esto no afectará las secciones ya creadas, pero podría causar confusión en la trazabilidad si existen códigos duplicados en el historial.
+                                        Esta acción establecerá el contador en 0. La siguiente sección creada será la <strong>SEC-0001</strong>. 
+                                        Asegúrese de que esta acción es necesaria para la integridad administrativa del recinto.
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
