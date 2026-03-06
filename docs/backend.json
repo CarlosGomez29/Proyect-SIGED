@@ -54,7 +54,6 @@
         "escuelaId": { "type": "string", "description": "Referencia a escuelas" },
         "rango_militar": { "type": "string" },
         "profesion": { "type": "string", "description": "Formación profesional: Carrera que estudió el docente." },
-        "oficio": { "type": "string" },
         "institucion": { "type": "string" },
         "sexo": { "type": "string", "enum": ["Masculino", "Femenino", "Otro"] },
         "estado_civil": { "type": "string", "enum": ["Soltero", "Casado", "Divorciado", "Viudo"] },
