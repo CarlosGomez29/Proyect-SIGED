@@ -59,7 +59,6 @@
         "sexo": { "type": "string", "enum": ["Masculino", "Femenino", "Otro"] },
         "estado_civil": { "type": "string", "enum": ["Soltero", "Casado", "Divorciado", "Viudo"] },
         "cantidad_hijos": { "type": "integer" },
-        "especialidad": { "type": "string" },
         "modulos_asignaturas_imparte": { "type": "string" },
         "educacion_academica": { "type": "string" },
         "clave_acceso": { "type": "string" },
@@ -67,7 +66,7 @@
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["nombre", "apellido", "cedula", "correo", "especialidad", "estado"]
+      "required": ["nombre", "apellido", "cedula", "correo", "estado"]
     },
     "Estudiante": {
       "title": "Estudiante / Alumno",

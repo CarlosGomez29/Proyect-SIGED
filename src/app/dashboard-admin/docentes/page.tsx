@@ -139,7 +139,6 @@ export default function DocentesPage() {
     sexo: "Masculino",
     estado_civil: "Soltero",
     cantidad_hijos: "0",
-    especialidad: "",
     modulos_asignaturas_imparte: "",
     educacion_academica: "",
     clave_acceso: "",
@@ -152,7 +151,6 @@ export default function DocentesPage() {
         d.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.cedula?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.especialidad?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.correo?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesEstado = statusFilter === "Todos" || d.estado === statusFilter;
@@ -259,7 +257,7 @@ export default function DocentesPage() {
       fecha_nacimiento: "", foto_perfil: "", fecha_ingreso: "", escuelaId: "", 
       rango_militar: "", profesion: "", oficio: "", institucion: "", 
       sexo: "Masculino", estado_civil: "Soltero", cantidad_hijos: "0", 
-      especialidad: "", modulos_asignaturas_imparte: "", educacion_academica: "", 
+      modulos_asignaturas_imparte: "", educacion_academica: "", 
       clave_acceso: "", estado: "Activo" 
     });
     setSelectedDocente(null);
@@ -285,7 +283,6 @@ export default function DocentesPage() {
       sexo: docente.sexo || "Masculino",
       estado_civil: docente.estado_civil || "Soltero",
       cantidad_hijos: docente.cantidad_hijos?.toString() || "0",
-      especialidad: docente.especialidad || "",
       modulos_asignaturas_imparte: docente.modulos_asignaturas_imparte || "",
       educacion_academica: docente.educacion_academica || "",
       clave_acceso: docente.clave_acceso || "",
@@ -374,7 +371,6 @@ export default function DocentesPage() {
 
                     <TabsContent value="laboral" className="mt-0 space-y-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2"><Label>Especialidad *</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Profesión</Label><Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Oficio</Label><Input value={formData.oficio} onChange={e => setFormData({...formData, oficio: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
@@ -408,7 +404,7 @@ export default function DocentesPage() {
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Buscar por nombre, cédula o especialidad..." 
+            placeholder="Buscar por nombre o cédula..." 
             className="pl-12 h-12 bg-card/50 border-border/50 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -439,7 +435,6 @@ export default function DocentesPage() {
                     <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">No.</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Cédula</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Especialidad</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estado</TableHead>
                     <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
                   </TableRow>
@@ -458,7 +453,6 @@ export default function DocentesPage() {
                         </div>
                       </TableCell>
                       <TableCell className="py-6 font-mono text-xs opacity-80">{d.cedula}</TableCell>
-                      <TableCell className="py-6 font-medium text-xs tracking-tight">{d.especialidad}</TableCell>
                       <TableCell className="py-6 text-center">
                         <Badge className={`font-bold px-3 ${d.estado === 'Activo' ? 'bg-success/15 text-success border-success/20' : 'bg-destructive/15 text-destructive border-destructive/20'}`}>
                           {d.estado}
@@ -523,7 +517,6 @@ export default function DocentesPage() {
                </div>
                <div>
                   <DialogTitle className="text-2xl font-black">{selectedDocente?.nombre} {selectedDocente?.apellido}</DialogTitle>
-                  <p className="text-xs text-primary font-bold uppercase tracking-widest">{selectedDocente?.especialidad}</p>
                   <Badge variant="outline" className="mt-2">{selectedDocente?.estado}</Badge>
                </div>
             </div>
@@ -628,8 +621,8 @@ export default function DocentesPage() {
 
                 <TabsContent value="laboral" className="mt-0 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Especialidad</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Profesión</Label><Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Oficio</Label><Input value={formData.oficio} onChange={e => setFormData({...formData, oficio: e.target.value})} /></div>
                     <div className="space-y-2 col-span-2"><Label>Educación Académica</Label><Textarea value={formData.educacion_academica} onChange={e => setFormData({...formData, educacion_academica: e.target.value})} /></div>
                   </div>
                 </TabsContent>
