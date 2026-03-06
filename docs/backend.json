@@ -110,6 +110,16 @@
       },
       "required": ["seccionId", "estudianteId", "estado"]
     },
+    "RangoMilitar": {
+      "title": "Rango Militar",
+      "description": "Catálogo institucional de rangos militares.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre del rango" },
+        "orden": { "type": "integer", "description": "Orden jerárquico" }
+      },
+      "required": ["nombre", "orden"]
+    },
     "MetadataCounters": {
       "title": "Contadores de Systema",
       "description": "Estado de los contadores secuenciales para IDs institucionales.",
@@ -131,6 +141,7 @@
     "/estudiantes/{estudianteId}": { "schema": "Estudiante", "description": "Alumnos." },
     "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
+    "/rangos_militares/{rangoId}": { "schema": "RangoMilitar", "description": "Catálogo de rangos militares." },
     "/metadata/counters": { 
       "schema": { "$ref": "#/backend/entities/MetadataCounters" }, 
       "description": "Contadores atómicos para la generación de identificadores secuenciales únicos." 

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -7,13 +8,31 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase imports
 import { useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, writeBatch } from 'firebase/firestore';
+
+const RANGOS_MILITARES_DEFAULT = [
+    { nombre: "Civil", orden: 1 },
+    { nombre: "Asimilado", orden: 2 },
+    { nombre: "Raso", orden: 3 },
+    { nombre: "Cabo", orden: 4 },
+    { nombre: "Sargento", orden: 5 },
+    { nombre: "Sargento Mayor", orden: 6 },
+    { nombre: "Segundo Teniente", orden: 7 },
+    { nombre: "Primer Teniente", orden: 8 },
+    { nombre: "Capitán", orden: 9 },
+    { nombre: "Mayor", orden: 10 },
+    { nombre: "Teniente Coronel", orden: 11 },
+    { nombre: "Coronel", orden: 12 },
+    { nombre: "General de Brigada", orden: 13 },
+    { nombre: "Mayor General", orden: 14 },
+    { nombre: "Teniente General", orden: 15 },
+];
 
 export default function AjustesPage() {
     const { toast } = useToast();
@@ -29,7 +48,6 @@ export default function AjustesPage() {
         if (!db) return;
         try {
             const counterRef = doc(db, "metadata", "counters");
-            // Ponemos el contador en 0 para que la próxima sección sea (0 + 1) = SEC-0001
             await setDoc(counterRef, { inst_secciones_count: 0 }, { merge: true });
             toast({ 
                 title: "Secuencia Reiniciada", 
@@ -40,6 +58,29 @@ export default function AjustesPage() {
                 variant: "destructive", 
                 title: "Error al reiniciar", 
                 description: "No se pudo actualizar el contador institucional en Firestore." 
+            });
+        }
+    };
+
+    // Función para inicializar el catálogo de rangos militares
+    const handleSeedRangos = async () => {
+        if (!db) return;
+        try {
+            const batch = writeBatch(db);
+            RANGOS_MILITARES_DEFAULT.forEach((rango) => {
+                const docRef = doc(collection(db, "rangos_militares"));
+                batch.set(docRef, rango);
+            });
+            await batch.commit();
+            toast({ 
+                title: "Catálogo Inicializado", 
+                description: "Se han cargado los rangos militares correctamente." 
+            });
+        } catch (error) {
+            toast({ 
+                variant: "destructive", 
+                title: "Error de inicialización", 
+                description: "No se pudo cargar el catálogo de rangos." 
             });
         }
     };
@@ -88,50 +129,73 @@ export default function AjustesPage() {
         </TabsContent>
 
         <TabsContent value="maintenance" className="mt-4">
-             <Card className="border-destructive/20">
-                <CardHeader className="bg-destructive/5">
-                    <div className="flex items-center gap-2">
-                        <ShieldAlert className="h-5 w-5 text-destructive" />
-                        <CardTitle className="text-destructive">Mantenimiento de Secuencias</CardTitle>
-                    </div>
-                    <CardDescription>Acciones de bajo nivel para corregir o reiniciar identificadores institucionales.</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6">
-                    <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
-                        <div className="space-y-1">
-                            <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
-                            <p className="text-xs text-muted-foreground max-w-md">
-                                Restaura el contador a cero. Al confirmar, la próxima sección que se cree en el módulo de Apertura tendrá el código <strong>SEC-0001</strong>. 
-                                <br/><br/>
-                                <strong>Nota:</strong> Esta acción no borra secciones existentes, solo reinicia la numeración futura.
-                            </p>
+             <div className="grid gap-6">
+                <Card className="border-destructive/20">
+                    <CardHeader className="bg-destructive/5">
+                        <div className="flex items-center gap-2">
+                            <ShieldAlert className="h-5 w-5 text-destructive" />
+                            <CardTitle className="text-destructive">Mantenimiento de Secuencias</CardTitle>
                         </div>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive" size="sm" className="bg-destructive text-destructive-foreground hover:bg-destructive/90 px-4 py-2 rounded-md font-medium text-sm flex items-center">
-                                    <RefreshCw className="mr-2 h-4 w-4" />
-                                    Reiniciar Contador
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-destructive">¿Confirmar reinicio de secuencia?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Esta acción establecerá el contador en 0. La siguiente sección creada será la <strong>SEC-0001</strong>. 
-                                        Asegúrese de que esta acción es necesaria para la integridad administrativa del recinto.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleResetCounter} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                        Confirmar Reinicio
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
-                </CardContent>
-             </Card>
+                        <CardDescription>Acciones de bajo nivel para corregir o reiniciar identificadores institucionales.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
+                                <p className="text-xs text-muted-foreground max-w-md">
+                                    Restaura el contador a cero. Al confirmar, la próxima sección que se cree en el módulo de Apertura tendrá el código <strong>SEC-0001</strong>. 
+                                </p>
+                            </div>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <RefreshCw className="mr-2 h-4 w-4" />
+                                        Reiniciar Contador
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle className="text-destructive">¿Confirmar reinicio de secuencia?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            Esta acción establecerá el contador en 0. La siguiente sección creada será la <strong>SEC-0001</strong>. 
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction onClick={handleResetCounter} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                            Confirmar Reinicio
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Database className="h-5 w-5 text-primary" />
+                            <CardTitle>Inicialización de Catálogos</CardTitle>
+                        </div>
+                        <CardDescription>Poblar la base de datos con valores predeterminados del sistema.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between p-4 rounded-xl border">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Poblar Rangos Militares</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    Crea el catálogo oficial de rangos militares en Firestore para su uso en formularios.
+                                </p>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handleSeedRangos}>
+                                <Database className="mr-2 h-4 w-4" />
+                                Inicializar Rangos
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+             </div>
         </TabsContent>
       </Tabs>
     </motion.div>

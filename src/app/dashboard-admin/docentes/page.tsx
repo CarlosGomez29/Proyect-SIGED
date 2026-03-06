@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
@@ -146,13 +147,24 @@ function DocenteSeccionesList({ docenteId }: { docenteId: string }) {
 export default function DocentesPage() {
   const { toast } = useToast();
   const db = useFirestore();
+
+  // Queries para colecciones principales
   const docentesQuery = useMemo(() => {
     if (!db) return null;
     return query(collection(db, "docentes"), orderBy("createdAt", "desc"));
   }, [db]);
 
+  // Catálogo de Rangos Militares dinámico
+  const rangosQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "rangos_militares"), orderBy("orden", "asc"));
+  }, [db]);
+
   const { data: docentesRaw, loading } = useCollection(docentesQuery);
+  const { data: rangosData } = useCollection(rangosQuery);
+  
   const docentes = useMemo(() => docentesRaw || [], [docentesRaw]);
+  const rangos = useMemo(() => rangosData || [], [rangosData]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -454,7 +466,20 @@ export default function DocentesPage() {
                     <TabsContent value="institucional" className="mt-0 space-y-4 text-left">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>Rango Militar (Opcional)</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
+                        <div className="space-y-2">
+                          <Label>Rango Militar *</Label>
+                          <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})}>
+                            <SelectTrigger className="h-12 rounded-xl">
+                              <SelectValue placeholder="Seleccionar rango..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {rangos.map((r: any) => (
+                                <SelectItem key={r.id} value={r.nombre}>{r.nombre}</SelectItem>
+                              ))}
+                              {rangos.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay rangos configurados.</p>}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="space-y-2"><Label>Escuela (Referencia ID)</Label><Input placeholder="ID de la escuela" value={formData.escuelaId} onChange={e => setFormData({...formData, escuelaId: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Clave de Acceso Temporal</Label><Input type="password" value={formData.clave_acceso} onChange={e => setFormData({...formData, clave_acceso: e.target.value})} /></div>
                       </div>
@@ -821,7 +846,20 @@ export default function DocentesPage() {
 
                 <TabsContent value="institucional" className="mt-0 space-y-6">
                   <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-2"><Label>Rango Militar</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
+                    <div className="space-y-2">
+                      <Label>Rango Militar</Label>
+                      <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})}>
+                        <SelectTrigger className="h-12 rounded-xl">
+                          <SelectValue placeholder="Seleccionar rango..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {rangos.map((r: any) => (
+                            <SelectItem key={r.id} value={r.nombre}>{r.nombre}</SelectItem>
+                          ))}
+                          {rangos.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay rangos configurados.</p>}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
                   </div>
                 </TabsContent>

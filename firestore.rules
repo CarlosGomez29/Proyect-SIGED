@@ -33,6 +33,10 @@ service cloud.firestore {
       allow read, write: if true;
     }
     
+    match /rangos_militares/{rangoId} {
+      allow read, write: if true;
+    }
+    
     match /metadata/counters {
       allow read, write: if true;
     }
