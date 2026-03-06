@@ -163,7 +163,7 @@ export default function DocentesPage() {
   const [selectedDocente, setSelectedDocente] = useState<any>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(itemsPerPage || 10);
   
   const [isSaving, setIsSaving] = useState(false);
 
@@ -623,19 +623,19 @@ export default function DocentesPage() {
                   <UserCircle className="h-4 w-4"/> Datos Personales
               </h4>
               <div className="space-y-4">
-                <div className="flex flex-col gap-1">
-                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Cédula de Identidad</Label>
-                  <p className="font-bold text-foreground text-base tracking-tight">{selectedDocente?.cedula}</p>
-                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">F. de Nacimiento</Label>
-                    <p className="font-bold text-foreground">{selectedDocente?.fecha_nacimiento || "N/A"}</p>
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Cédula de Identidad</Label>
+                    <p className="font-bold text-foreground text-base tracking-tight">{selectedDocente?.cedula}</p>
                   </div>
                   <div className="flex flex-col gap-1">
                     <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Edad</Label>
-                    <p className="font-bold text-foreground">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p>
+                    <p className="font-bold text-foreground text-base tracking-tight">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p>
                   </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">F. de Nacimiento</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.fecha_nacimiento || "N/A"}</p>
                 </div>
                 <div className="flex flex-col gap-1">
                   <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Sexo y Estado Civil</Label>
