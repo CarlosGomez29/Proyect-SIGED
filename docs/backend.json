@@ -53,7 +53,7 @@
         "fecha_ingreso": { "type": "string", "format": "date" },
         "escuelaId": { "type": "string", "description": "Referencia a escuelas" },
         "rango_militar": { "type": "string" },
-        "profesion": { "type": "string" },
+        "profesion": { "type": "string", "description": "Formación profesional: Carrera que estudió el docente." },
         "oficio": { "type": "string" },
         "institucion": { "type": "string" },
         "sexo": { "type": "string", "enum": ["Masculino", "Femenino", "Otro"] },
