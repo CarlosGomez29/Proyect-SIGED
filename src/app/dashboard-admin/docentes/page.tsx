@@ -86,6 +86,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Firebase imports
 import { useFirestore, useCollection } from "@/firebase";
@@ -130,12 +131,14 @@ function DocenteSeccionesList({ docenteId }: { docenteId: string }) {
 
     const cursosUnicos = Array.from(new Set(secciones?.map(s => s.curso) || []));
 
-    if (cursosUnicos.length === 0) return <p className="text-xs text-muted-foreground italic mt-1">No tiene secciones asignadas actualmente.</p>;
+    if (cursosUnicos.length === 0) return <p className="text-sm font-semibold text-muted-foreground italic">No tiene secciones asignadas actualmente.</p>;
 
     return (
-        <div className="flex flex-wrap gap-1.5 mt-1.5">
+        <div className="flex flex-wrap gap-2">
             {cursosUnicos.map((curso, i) => (
-                <Badge key={i} variant="secondary" className="text-[10px] font-bold py-0">{curso}</Badge>
+                <Badge key={i} variant="secondary" className="text-[10px] font-bold py-1 px-3 rounded-lg border-border/50">
+                    {curso}
+                </Badge>
             ))}
         </div>
     );
@@ -378,22 +381,22 @@ export default function DocentesPage() {
                   </TabsList>
 
                   <div className="p-8 space-y-6">
-                    <TabsContent value="personal" className="mt-0 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <TabsContent value="personal" className="mt-0 space-y-4 text-left">
+                      <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2"><Label>Nombre(s) *</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Apellido(s) *</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Cédula *</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
                           <div className="space-y-2">
-                            <Label>Edad (Cálculo Automático)</Label>
+                            <Label>Edad</Label>
                             <Input disabled value={calculateAge(formData.fecha_nacimiento)} className="bg-muted font-bold" />
                           </div>
                         </div>
                         <div className="space-y-2">
                           <Label>Sexo</Label>
                           <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Masculino">Masculino</SelectItem>
                               <SelectItem value="Femenino">Femenino</SelectItem>
@@ -403,7 +406,7 @@ export default function DocentesPage() {
                         <div className="space-y-2">
                           <Label>Estado Civil</Label>
                           <Select value={formData.estado_civil} onValueChange={v => setFormData({...formData, estado_civil: v})}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="Soltero">Soltero/a</SelectItem>
                               <SelectItem value="Casado">Casado/a</SelectItem>
@@ -417,17 +420,17 @@ export default function DocentesPage() {
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="contacto" className="mt-0 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <TabsContent value="contacto" className="mt-0 space-y-4 text-left">
+                      <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2"><Label>Correo Electrónico *</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Teléfono</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
                         <div className="space-y-2 col-span-2"><Label>Dirección Residencial</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="laboral" className="mt-0 space-y-4">
-                      <div className="grid grid-cols-1 gap-6">
-                        <div className="grid grid-cols-2 gap-4">
+                    <TabsContent value="laboral" className="mt-0 space-y-4 text-left">
+                      <div className="grid grid-cols-1 gap-8">
+                        <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
                                 <Label>Formación profesional</Label>
                                 <Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} />
@@ -436,10 +439,10 @@ export default function DocentesPage() {
                             <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
                         </div>
                         
-                        <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
+                        <div className="space-y-4 p-6 border rounded-2xl bg-muted/20">
                           <Label className="text-sm font-bold flex items-center gap-2"><FileText className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
                           <div className="space-y-2">
-                              <Label className="text-[10px] opacity-60 text-left">Enlace directo al currículum</Label>
+                              <Label className="text-[10px] uppercase font-bold opacity-60">Enlace directo al currículum</Label>
                               <div className="relative">
                                   <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                   <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
@@ -449,9 +452,9 @@ export default function DocentesPage() {
                       </div>
                     </TabsContent>
 
-                    <TabsContent value="institucional" className="mt-0 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
+                    <TabsContent value="institucional" className="mt-0 space-y-4 text-left">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Rango Militar (Opcional)</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Escuela (Referencia ID)</Label><Input placeholder="ID de la escuela" value={formData.escuelaId} onChange={e => setFormData({...formData, escuelaId: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Clave de Acceso Temporal</Label><Input type="password" value={formData.clave_acceso} onChange={e => setFormData({...formData, clave_acceso: e.target.value})} /></div>
@@ -459,9 +462,9 @@ export default function DocentesPage() {
                     </TabsContent>
                   </div>
 
-                  <DialogFooter className="p-8 bg-muted/30">
+                  <DialogFooter className="p-8 bg-muted/30 border-t">
                     <DialogClose asChild><Button variant="ghost" disabled={isSaving}>Cancelar</Button></DialogClose>
-                    <Button type="submit" disabled={isSaving}>
+                    <Button type="submit" disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px] px-8">
                         {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...</> : 'Finalizar Registro'}
                     </Button>
                   </DialogFooter>
@@ -518,7 +521,10 @@ export default function DocentesPage() {
                       <TableCell className="py-6 pl-8 font-bold text-xs text-muted-foreground">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                       <TableCell className="py-6">
                         <div className="flex items-center gap-3">
-                          <UserCircle className="h-8 w-8 text-muted-foreground opacity-50" />
+                          <Avatar className="h-8 w-8 border border-border/50">
+                            <AvatarImage src={d.foto_perfil} />
+                            <AvatarFallback><UserCircle className="h-5 w-5 text-muted-foreground opacity-50" /></AvatarFallback>
+                          </Avatar>
                           <div className="flex flex-col">
                             <span className="font-bold text-xs">{d.nombre} {d.apellido}</span>
                             <span className="text-[10px] opacity-60">{d.correo}</span>
@@ -583,79 +589,156 @@ export default function DocentesPage() {
 
       {/* Expediente Completo */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden text-left">
-          <DialogHeader className="p-8 bg-primary/5 border-b text-left">
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden text-left border-none shadow-2xl">
+          <DialogHeader className="p-8 bg-primary/5 border-b border-border/50 text-left">
             <div className="flex items-center gap-6">
-               <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
-                  <UserCircle className="h-12 w-12 text-primary" />
+               <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20 shrink-0">
+                  {selectedDocente?.foto_perfil ? (
+                    <Avatar className="h-full w-full">
+                      <AvatarImage src={selectedDocente.foto_perfil} className="object-cover" />
+                      <AvatarFallback><UserCircle className="h-12 w-12 text-primary" /></AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <UserCircle className="h-12 w-12 text-primary" />
+                  )}
                </div>
-               <div className="text-left">
-                  <DialogTitle className="text-2xl font-black">{selectedDocente?.nombre} {selectedDocente?.apellido}</DialogTitle>
-                  <Badge variant="outline" className="mt-2">{selectedDocente?.estado}</Badge>
+               <div className="text-left space-y-1">
+                  <DialogTitle className="text-3xl font-black font-headline tracking-tighter text-foreground">
+                    {selectedDocente?.nombre} {selectedDocente?.apellido}
+                  </DialogTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={selectedDocente?.estado === 'Activo' ? 'success' : 'destructive'} className="font-bold uppercase tracking-widest text-[9px] px-3">
+                      {selectedDocente?.estado}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">• Registro Institucional</span>
+                  </div>
                </div>
             </div>
           </DialogHeader>
-          <div className="p-8 grid grid-cols-2 gap-8 text-sm max-h-[60vh] overflow-y-auto">
-            <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><UserCircle className="h-4 w-4"/> DATOS PERSONALES</h4>
-              <div className="grid gap-2 text-left">
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Cédula</Label><p className="font-bold">{selectedDocente?.cedula}</p></div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Fecha Nacimiento</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
-                  <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Edad</Label><p className="font-bold text-primary">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p></div>
+          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 text-sm max-h-[60vh] overflow-y-auto">
+            
+            {/* SECCIÓN PERSONAL */}
+            <section className="space-y-5">
+              <h4 className="font-bold text-[10px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 border-b border-primary/10 pb-2 mb-4">
+                  <UserCircle className="h-4 w-4"/> Datos Personales
+              </h4>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Cédula de Identidad</Label>
+                  <p className="font-bold text-foreground text-base tracking-tight">{selectedDocente?.cedula}</p>
                 </div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Sexo / E. Civil</Label><p className="font-bold">{selectedDocente?.sexo} - {selectedDocente?.estado_civil}</p></div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Hijos</Label><p className="font-bold">{selectedDocente?.cantidad_hijos}</p></div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">F. de Nacimiento</Label>
+                    <p className="font-bold text-foreground">{selectedDocente?.fecha_nacimiento || "N/A"}</p>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Edad Actual</Label>
+                    <p className="font-black text-primary text-base">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Sexo y Estado Civil</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.sexo} — {selectedDocente?.estado_civil}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Hijos</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.cantidad_hijos || "0"}</p>
+                </div>
               </div>
             </section>
-            <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Mail className="h-4 w-4"/> CONTACTO</h4>
-              <div className="grid gap-2 text-left">
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Correo</Label><p className="font-bold">{selectedDocente?.correo}</p></div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Teléfono</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Dirección</Label><p className="font-bold text-xs">{selectedDocente?.direccion || "N/A"}</p></div>
+
+            {/* SECCIÓN CONTACTO */}
+            <section className="space-y-5">
+              <h4 className="font-bold text-[10px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 border-b border-primary/10 pb-2 mb-4">
+                  <Mail className="h-4 w-4"/> Contacto
+              </h4>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Correo Electrónico</Label>
+                  <p className="font-bold text-foreground break-all">{selectedDocente?.correo}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Teléfono</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.telefono || "N/A"}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Dirección Residencial</Label>
+                  <p className="font-bold text-foreground text-xs leading-relaxed">{selectedDocente?.direccion || "N/A"}</p>
+                </div>
               </div>
             </section>
-            <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Briefcase className="h-4 w-4"/> PERFIL LABORAL</h4>
-              <div className="grid gap-2 items-start text-left">
-                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60 uppercase">Formación profesional</Label><p className="font-bold text-left">{selectedDocente?.profesion || "N/A"}</p></div>
-                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60 uppercase">Fecha Ingreso</Label><p className="font-bold text-left">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
+
+            {/* PERFIL LABORAL */}
+            <section className="space-y-5">
+              <h4 className="font-bold text-[10px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 border-b border-primary/10 pb-2 mb-4">
+                  <Briefcase className="h-4 w-4"/> Perfil Laboral
+              </h4>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Formación profesional</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.profesion || "N/A"}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Fecha de Ingreso</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.fecha_ingreso || "N/A"}</p>
+                </div>
                 
-                {/* Módulos automáticos basados en Secciones */}
-                <div className="pt-2 flex flex-col items-start text-left">
-                    <Label className="text-[10px] opacity-60 uppercase">CURSO QUE IMPARTE</Label>
-                    <DocenteSeccionesList docenteId={selectedDocente?.id} />
+                <div className="flex flex-col gap-1 pt-2">
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Cursos que Imparte</Label>
+                    <div className="pt-2">
+                        <DocenteSeccionesList docenteId={selectedDocente?.id} />
+                    </div>
                 </div>
 
                 {selectedDocente?.cv_url && (
-                   <div className="pt-2 flex flex-col items-start text-left">
-                      <Label className="text-[10px] opacity-60 uppercase">CURRÍCULUM / PORTAFOLIO</Label>
-                      <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1 justify-start">
+                   <div className="flex flex-col gap-1 pt-2">
+                      <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Currículum / Portafolio</Label>
+                      <Button asChild variant="link" className="p-0 h-auto font-black text-xs text-primary hover:text-primary/80 flex items-center gap-1.5 justify-start transition-colors">
                         <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
-                          Ver Currículum / Portafolio <ExternalLink className="h-3 w-3" />
+                          Ver Portafolio Digital <ExternalLink className="h-3 w-3" />
                         </a>
                       </Button>
                    </div>
                 )}
               </div>
             </section>
-            <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Shield className="h-4 w-4"/> INSTITUCIONAL</h4>
-              <div className="grid gap-2 text-left">
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Institución / Rango</Label><p className="font-bold">{selectedDocente?.institucion || "N/A"} - {selectedDocente?.rango_militar || "N/A"}</p></div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Escuela ID</Label><p className="font-bold">{selectedDocente?.escuelaId || "N/A"}</p></div>
+
+            {/* INSTITUCIONAL */}
+            <section className="space-y-5">
+              <h4 className="font-bold text-[10px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 border-b border-primary/10 pb-2 mb-4">
+                  <Shield className="h-4 w-4"/> Institucional
+              </h4>
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Institución de Origen</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.institucion || "Sociedad Civil"}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Rango Militar / Policial</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.rango_militar || "N/A"}</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">ID de Escuela</Label>
+                  <p className="font-mono text-xs font-black bg-muted px-3 py-1 rounded-lg w-fit text-primary">{selectedDocente?.escuelaId || "Sin Asignar"}</p>
+                </div>
               </div>
             </section>
           </div>
-          <DialogFooter className="p-8 bg-muted/30 border-t"><DialogClose asChild><Button variant="outline">Cerrar Expediente</Button></DialogClose></DialogFooter>
+          <DialogFooter className="p-8 bg-muted/30 border-t border-border/50">
+            <DialogClose asChild>
+              <Button variant="outline" className="font-bold uppercase tracking-widest text-[10px] px-10 h-11 rounded-xl shadow-inner">
+                Cerrar Expediente
+              </Button>
+            </DialogClose>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Editar Perfil */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden">
-          <DialogHeader className="p-8 bg-muted/30">
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden text-left">
+          <DialogHeader className="p-8 bg-muted/30 text-left">
             <DialogTitle className="text-2xl font-black">Modificar Docente</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
@@ -667,23 +750,23 @@ export default function DocentesPage() {
                 <TabsTrigger value="institucional" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Institucional</TabsTrigger>
               </TabsList>
 
-              <div className="p-8 space-y-6">
-                <TabsContent value="personal" className="mt-0 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="p-8 space-y-6 text-left">
+                <TabsContent value="personal" className="mt-0 space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2"><Label>Nombre(s)</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Apellido(s)</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Cédula</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
                       <div className="space-y-2">
-                        <Label>Edad (Cálculo Automático)</Label>
+                        <Label>Edad</Label>
                         <Input disabled value={calculateAge(formData.fecha_nacimiento)} className="bg-muted font-bold" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Sexo</Label>
                       <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Masculino">Masculino</SelectItem>
                           <SelectItem value="Femenino">Femenino</SelectItem>
@@ -693,7 +776,7 @@ export default function DocentesPage() {
                     <div className="space-y-2">
                       <Label>Estado Civil</Label>
                       <Select value={formData.estado_civil} onValueChange={v => setFormData({...formData, estado_civil: v})}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-12 rounded-xl"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Soltero">Soltero/a</SelectItem>
                           <SelectItem value="Casado">Casado/a</SelectItem>
@@ -705,17 +788,17 @@ export default function DocentesPage() {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="contacto" className="mt-0 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <TabsContent value="contacto" className="mt-0 space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Teléfono</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
-                    <div className="space-y-2 col-span-2"><Label>Dirección</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label>Dirección Residencial</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="laboral" className="mt-0 space-y-4">
-                  <div className="grid grid-cols-1 gap-6">
-                    <div className="grid grid-cols-2 gap-4">
+                <TabsContent value="laboral" className="mt-0 space-y-6">
+                  <div className="grid grid-cols-1 gap-8">
+                    <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <Label>Formación profesional</Label>
                             <Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} />
@@ -724,33 +807,30 @@ export default function DocentesPage() {
                         <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
                     </div>
                     
-                    <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
+                    <div className="space-y-4 p-6 border rounded-2xl bg-muted/20">
                         <Label className="text-sm font-bold flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
                         <div className="space-y-2">
-                            <Label className="text-[10px] opacity-60 text-left">Actualizar enlace directo</Label>
+                            <Label className="text-[10px] font-bold uppercase opacity-60">Actualizar enlace directo</Label>
                             <div className="relative">
                                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
                             </div>
                         </div>
-                        {formData.cv_url && (
-                            <p className="text-[10px] text-primary font-bold">Currículum actual: <a href={formData.cv_url} target="_blank" rel="noopener noreferrer" className="underline">Ver portafolio</a></p>
-                        )}
                     </div>
                   </div>
                 </TabsContent>
 
-                <TabsContent value="institucional" className="mt-0 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                <TabsContent value="institucional" className="mt-0 space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2"><Label>Rango Militar</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
                   </div>
                 </TabsContent>
               </div>
 
               <DialogFooter className="p-8 bg-muted/30 border-t">
                 <DialogClose asChild><Button variant="ghost" disabled={isSaving}>Cancelar</Button></DialogClose>
-                <Button type="submit" disabled={isSaving}>
+                <Button type="submit" disabled={isSaving} className="font-bold uppercase tracking-widest text-[10px] px-8">
                     {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...</> : 'Guardar Cambios'}
                 </Button>
               </DialogFooter>
