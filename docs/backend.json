@@ -112,6 +112,15 @@
         "fechaInscripcion": { "type": "string", "format": "date-time" }
       },
       "required": ["seccionId", "estudianteId", "estado"]
+    },
+    "MetadataCounters": {
+      "title": "Contadores de Sistema",
+      "description": "Estado de los contadores secuenciales para IDs institucionales.",
+      "type": "object",
+      "properties": {
+        "inst_secciones_count": { "type": "integer", "description": "Último número usado para secciones (SEC-XXXX)" },
+        "inst_docentes_count": { "type": "integer", "description": "Último número usado para docentes (REG-XXXX)" }
+      }
     }
   },
   "auth": {
@@ -125,6 +134,9 @@
     "/estudiantes/{estudianteId}": { "schema": "Estudiante", "description": "Alumnos." },
     "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
-    "/metadata/counters": { "schema": "object", "description": "Contadores para IDs secuenciales." }
+    "/metadata/counters": { 
+      "schema": { "$ref": "#/backend/entities/MetadataCounters" }, 
+      "description": "Contadores atómicos para la generación de identificadores secuenciales únicos." 
+    }
   }
 }
