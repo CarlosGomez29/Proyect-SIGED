@@ -139,7 +139,6 @@ export default function DocentesPage() {
     estado_civil: "Soltero",
     cantidad_hijos: "0",
     modulos_asignaturas_imparte: "",
-    educacion_academica: "",
     clave_acceso: "",
     estado: "Activo",
   });
@@ -257,7 +256,7 @@ export default function DocentesPage() {
       fecha_nacimiento: "", foto_perfil: "", fecha_ingreso: "", escuelaId: "", 
       rango_militar: "", profesion: "", institucion: "", 
       sexo: "Masculino", estado_civil: "Soltero", cantidad_hijos: "0", 
-      modulos_asignaturas_imparte: "", educacion_academica: "", 
+      modulos_asignaturas_imparte: "", 
       clave_acceso: "", estado: "Activo" 
     });
     setSelectedDocente(null);
@@ -283,7 +282,6 @@ export default function DocentesPage() {
       estado_civil: docente.estado_civil || "Soltero",
       cantidad_hijos: docente.cantidad_hijos?.toString() || "0",
       modulos_asignaturas_imparte: docente.modulos_asignaturas_imparte || "",
-      educacion_academica: docente.educacion_academica || "",
       clave_acceso: docente.clave_acceso || "",
       estado: docente.estado || "Activo",
     });
@@ -377,7 +375,6 @@ export default function DocentesPage() {
                         </div>
                         <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
                         <div className="space-y-2 col-span-2"><Label>Módulos / Asignaturas que Imparte</Label><Textarea placeholder="Lista de materias..." value={formData.modulos_asignaturas_imparte} onChange={e => setFormData({...formData, modulos_asignaturas_imparte: e.target.value})} /></div>
-                        <div className="space-y-2 col-span-2"><Label>Educación Académica</Label><Textarea placeholder="Resumen de formación..." value={formData.educacion_academica} onChange={e => setFormData({...formData, educacion_academica: e.target.value})} /></div>
                       </div>
                     </TabsContent>
 
@@ -558,10 +555,6 @@ export default function DocentesPage() {
                 <div><Label className="text-[10px] opacity-60">ESCUELA ID</Label><p className="font-bold">{selectedDocente?.escuelaId || "N/A"}</p></div>
               </div>
             </section>
-            <section className="col-span-2 space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><GraduationCap className="h-4 w-4"/> Educación Académica</h4>
-              <p className="text-xs leading-relaxed italic bg-muted/50 p-4 rounded-xl border">{selectedDocente?.educacion_academica || "No se ha registrado información académica detallada."}</p>
-            </section>
           </div>
           <DialogFooter className="p-8 bg-muted/30 border-t"><DialogClose asChild><Button variant="outline">Cerrar Expediente</Button></DialogClose></DialogFooter>
         </DialogContent>
@@ -630,7 +623,6 @@ export default function DocentesPage() {
                       <Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} />
                       <p className="text-[10px] text-muted-foreground italic">Carrera que estudió el docente.</p>
                     </div>
-                    <div className="space-y-2 col-span-2"><Label>Educación Académica</Label><Textarea value={formData.educacion_academica} onChange={e => setFormData({...formData, educacion_academica: e.target.value})} /></div>
                   </div>
                 </TabsContent>
 
