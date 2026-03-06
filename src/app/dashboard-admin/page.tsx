@@ -173,7 +173,7 @@ export default function DashboardAdminPage() {
               <Eye className="h-6 w-6" /> Visión
             </h3>
             <p className="text-muted-foreground leading-relaxed font-medium text-sm md:text-base">
-              Ser la institución líder en formación técnico-vocacional a nivel nacional, reconocida por su excelencia académica, valores éticos y compromiso inquebrantable con el progreso socioeconómico de la República Dominicana.
+              Una Organización que como parte del Sistema Nacional de Formación y Promoción Técnico Profesional de Trabajadores, sea reconocida por la calidad de sus programas dirigidos al desarrollo Humano de los dominicanos y dominicanas, de preparar mano de obra calificada para satisfacer las necesidades productivas nacionales y por el fomento de una cultura de emprendedurismo de los miembros de las Fuerzas Armadas, de la Policía Nacional y de la sociedad en general que cursan sus programas.
             </p>
           </div>
         </Card>
