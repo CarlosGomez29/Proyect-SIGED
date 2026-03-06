@@ -151,7 +151,8 @@ export default function DocentesPage() {
         d.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.cedula?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.correo?.toLowerCase().includes(searchTerm.toLowerCase());
+        d.correo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.profesion?.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesEstado = statusFilter === "Todos" || d.estado === statusFilter;
 
@@ -408,7 +409,7 @@ export default function DocentesPage() {
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Buscar por nombre o cédula..." 
+            placeholder="Buscar por nombre, cédula o formación..." 
             className="pl-12 h-12 bg-card/50 border-border/50 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -439,6 +440,7 @@ export default function DocentesPage() {
                     <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">No.</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Cédula</TableHead>
+                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Formación profesional</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estado</TableHead>
                     <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
                   </TableRow>
@@ -457,6 +459,7 @@ export default function DocentesPage() {
                         </div>
                       </TableCell>
                       <TableCell className="py-6 font-mono text-xs opacity-80">{d.cedula}</TableCell>
+                      <TableCell className="py-6 font-medium text-xs truncate max-w-[180px]">{d.profesion || "N/A"}</TableCell>
                       <TableCell className="py-6 text-center">
                         <Badge className={`font-bold px-3 ${d.estado === 'Activo' ? 'bg-success/15 text-success border-success/20' : 'bg-destructive/15 text-destructive border-destructive/20'}`}>
                           {d.estado}
