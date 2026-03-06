@@ -103,6 +103,19 @@ const itemVariants = {
   visible: { y: 0, opacity: 1 },
 };
 
+// Función para calcular la edad dinámicamente
+function calculateAge(birthday: string) {
+  if (!birthday) return "N/A";
+  const birthDate = new Date(birthday);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return isNaN(age) ? "N/A" : age;
+}
+
 // Subcomponente para mostrar asignaturas basadas en secciones
 function DocenteSeccionesList({ docenteId }: { docenteId: string }) {
     const db = useFirestore();
@@ -370,7 +383,13 @@ export default function DocentesPage() {
                         <div className="space-y-2"><Label>Nombre(s) *</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Apellido(s) *</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Cédula *</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                          <div className="space-y-2">
+                            <Label>Edad (Cálculo Automático)</Label>
+                            <Input disabled value={calculateAge(formData.fecha_nacimiento)} className="bg-muted font-bold" />
+                          </div>
+                        </div>
                         <div className="space-y-2">
                           <Label>Sexo</Label>
                           <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
@@ -581,7 +600,10 @@ export default function DocentesPage() {
               <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><UserCircle className="h-4 w-4"/> DATOS PERSONALES</h4>
               <div className="grid gap-2 text-left">
                 <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Cédula</Label><p className="font-bold">{selectedDocente?.cedula}</p></div>
-                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Fecha Nacimiento</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Fecha Nacimiento</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
+                  <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Edad</Label><p className="font-bold text-primary">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p></div>
+                </div>
                 <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Sexo / E. Civil</Label><p className="font-bold">{selectedDocente?.sexo} - {selectedDocente?.estado_civil}</p></div>
                 <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Hijos</Label><p className="font-bold">{selectedDocente?.cantidad_hijos}</p></div>
               </div>
@@ -651,7 +673,13 @@ export default function DocentesPage() {
                     <div className="space-y-2"><Label>Nombre(s)</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Apellido(s)</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Cédula</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                      <div className="space-y-2">
+                        <Label>Edad (Cálculo Automático)</Label>
+                        <Input disabled value={calculateAge(formData.fecha_nacimiento)} className="bg-muted font-bold" />
+                      </div>
+                    </div>
                     <div className="space-y-2">
                       <Label>Sexo</Label>
                       <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
