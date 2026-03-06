@@ -13,7 +13,9 @@ import {
   UserPlus, 
   FileStack,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Target,
+  Eye
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -148,6 +150,58 @@ export default function DashboardAdminPage() {
             </Link>
           ))}
         </div>
+      </motion.section>
+
+      {/* Misión y Visión Institucional */}
+      <motion.section variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
+        <Card className="relative overflow-hidden glass-card h-full min-h-[400px] border-none">
+          <Image 
+            src={images.vision_institutional.url} 
+            alt={images.vision_institutional.alt}
+            fill
+            className="object-cover brightness-50"
+            data-ai-hint={images.vision_institutional.hint}
+          />
+          <CardContent className="relative z-10 h-full flex flex-col justify-center p-12 text-white">
+            <Badge className="w-fit mb-6 bg-primary/20 backdrop-blur-md border-primary/40 text-primary-foreground font-bold px-4 py-1 uppercase tracking-widest text-[10px]">
+              Valores Patrios
+            </Badge>
+            <h3 className="text-3xl font-black font-headline mb-6 tracking-tighter flex items-center gap-3">
+              <Target className="h-8 w-8 text-primary" /> Misión Institucional
+            </h3>
+            <p className="text-lg leading-relaxed font-medium text-white/90 italic border-l-4 border-primary pl-6">
+              "Capacitar a los miembros de las Fuerzas Armadas, la Policía Nacional y la población civil, en carreras técnicas y de artes y oficios, a fin de contribuir con el desarrollo nacional y su bienestar personal."
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card h-full p-12 flex flex-col justify-center gap-8">
+          <div>
+            <h3 className="text-2xl font-black font-headline mb-4 tracking-tighter flex items-center gap-3 text-primary">
+              <Eye className="h-6 w-6" /> Visión
+            </h3>
+            <p className="text-muted-foreground leading-relaxed font-medium text-sm md:text-base">
+              Ser la institución líder en formación técnico-vocacional a nivel nacional, reconocida por su excelencia académica, valores éticos y compromiso inquebrantable con el progreso socioeconómico de la República Dominicana.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+             <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-60">Principios Rectores</h4>
+             <div className="grid grid-cols-2 gap-4">
+               {[
+                 { label: "Disciplina", icon: ShieldCheck },
+                 { label: "Excelencia", icon: GraduationCap },
+                 { label: "Lealtad", icon: ShieldCheck },
+                 { label: "Patriotismo", icon: Target },
+               ].map((v) => (
+                 <div key={v.label} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
+                    <v.icon className="h-4 w-4 text-primary" />
+                    <span className="text-xs font-bold uppercase tracking-tighter">{v.label}</span>
+                 </div>
+               ))}
+             </div>
+          </div>
+        </Card>
       </motion.section>
     </motion.div>
   );
