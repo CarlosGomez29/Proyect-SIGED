@@ -127,6 +127,11 @@ export default function AperturaSeccionesPage() {
 
   const secciones = useMemo(() => seccionesRaw || [], [seccionesRaw]);
 
+  // Regla 1: Solo docentes activos para selección
+  const docentesActivos = useMemo(() => {
+    return docentesData.filter(d => d.estado === "Activo");
+  }, [docentesData]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -320,6 +325,17 @@ export default function AperturaSeccionesPage() {
       return;
     }
 
+    // Regla 2: Intento de asignación (Validación manual extra)
+    const docente = docentesData.find(d => d.id === formData.docenteId);
+    if (docente?.estado !== "Activo") {
+        toast({
+            variant: "destructive",
+            title: "Error de Asignación",
+            description: "Este docente se encuentra inactivo y no puede ser asignado a una sección."
+        });
+        return;
+    }
+
     try {
       await runTransaction(db, async (transaction) => {
         const counterRef = doc(db, "metadata", "counters");
@@ -333,9 +349,8 @@ export default function AperturaSeccionesPage() {
         const codigoSeccion = `SEC-${newCount.toString().padStart(4, "0")}`;
         const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
         
-        // Obtenemos los nombres para denormalización visual (opcional, pero ayuda a la tabla)
         const cursoNombre = cursosData.find(c => c.id === formData.cursoId)?.nombre || "Desconocido";
-        const docenteNombre = docentesData.find(d => d.id === formData.docenteId)?.nombre || "Desconocido";
+        const docenteNombre = `${docente?.nombre} ${docente?.apellido}` || "Desconocido";
         const periodoNombre = periodosData.find(p => p.id === formData.periodoId)?.nombre || "Desconocido";
 
         const newSeccionData = {
@@ -344,7 +359,6 @@ export default function AperturaSeccionesPage() {
           cursoId: formData.cursoId,
           docenteId: formData.docenteId,
           sedeId: formData.sedeId,
-          // Guardamos nombres para visualización rápida en tablas sin joins pesados
           curso: cursoNombre,
           docente: docenteNombre,
           periodo: periodoNombre,
@@ -356,7 +370,7 @@ export default function AperturaSeccionesPage() {
           estado: formData.estado,
           inscritos: 0,
           capacidad: parseInt(formData.capacidad),
-          fechaInicio: "2024-06-01", // Estos podrían venir del periodo seleccionado
+          fechaInicio: "2024-06-01",
           fechaFin: "2024-08-31",
           createdAt: serverTimestamp(),
         };
@@ -368,7 +382,7 @@ export default function AperturaSeccionesPage() {
 
       setIsCreateDialogOpen(false);
       resetForm();
-      toast({ title: "Sección creada exitosamente", description: "Se ha asignado el código secuencial correctamente." });
+      toast({ title: "Sección creada exitosamente" });
     } catch (err) {
       errorEmitter.emit('permission-error', new FirestorePermissionError({
         path: 'secciones',
@@ -381,8 +395,19 @@ export default function AperturaSeccionesPage() {
     e.preventDefault();
     if (!db || !selectedSeccion) return;
 
+    // Regla 2: Intento de asignación (Validación manual extra)
+    const docente = docentesData.find(d => d.id === formData.docenteId);
+    if (docente?.estado !== "Activo") {
+        toast({
+            variant: "destructive",
+            title: "Error de Asignación",
+            description: "Este docente se encuentra inactivo y no puede ser asignado a una sección."
+        });
+        return;
+    }
+
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
-    const docenteNombre = docentesData.find(d => d.id === formData.docenteId)?.nombre || "Desconocido";
+    const docenteNombre = `${docente?.nombre} ${docente?.apellido}` || "Desconocido";
 
     const updateData = {
       docenteId: formData.docenteId,
@@ -520,7 +545,6 @@ export default function AperturaSeccionesPage() {
                       <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar período..." /></SelectTrigger>
                       <SelectContent>
                         {periodosData.map((p) => (<SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>))}
-                        {periodosData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay periodos registrados</p>}
                       </SelectContent>
                     </Select>
                   </div>
@@ -530,7 +554,6 @@ export default function AperturaSeccionesPage() {
                       <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar curso..." /></SelectTrigger>
                       <SelectContent>
                         {cursosData.map((c) => (<SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>))}
-                        {cursosData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay cursos registrados</p>}
                       </SelectContent>
                     </Select>
                   </div>
@@ -540,17 +563,16 @@ export default function AperturaSeccionesPage() {
                       <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar sede..." /></SelectTrigger>
                       <SelectContent>
                         {sedesData.map((s) => (<SelectItem key={s.id} value={s.id}>{s.nombre}</SelectItem>))}
-                        {sedesData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay sedes registradas</p>}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
                     <Select onValueChange={(val) => setFormData({ ...formData, docenteId: val })}>
-                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente..." /></SelectTrigger>
+                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente activo..." /></SelectTrigger>
                       <SelectContent>
-                        {docentesData.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
-                        {docentesData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay docentes registrados</p>}
+                        {docentesActivos.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
+                        {docentesActivos.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay docentes activos disponibles.</p>}
                       </SelectContent>
                     </Select>
                   </div>
@@ -663,9 +685,9 @@ export default function AperturaSeccionesPage() {
                 <div className="space-y-2">
                   <Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
                   <Select value={formData.docenteId} onValueChange={(val) => setFormData({ ...formData, docenteId: val })}>
-                    <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar docente..." /></SelectTrigger>
+                    <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar docente activo..." /></SelectTrigger>
                     <SelectContent>
-                      {docentesData.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
+                      {docentesActivos.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
                     </SelectContent>
                   </Select>
                 </div>

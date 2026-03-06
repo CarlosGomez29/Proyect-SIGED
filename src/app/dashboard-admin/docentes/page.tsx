@@ -74,7 +74,7 @@ import {
 
 // Firebase imports
 import { useFirestore, useCollection } from "@/firebase";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, where, getDocs } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
@@ -153,7 +153,7 @@ export default function DocentesPage() {
       .then(() => {
         setIsCreateDialogOpen(false);
         resetForm();
-        toast({ title: "Docente Registrado", description: "El instructor ha sido añadido exitosamente." });
+        toast({ title: "Docente Registrado" });
       })
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collectionRef.path, operation: 'create', requestResourceData: payload })));
   };
@@ -172,7 +172,7 @@ export default function DocentesPage() {
       .then(() => {
         setIsEditDialogOpen(false);
         resetForm();
-        toast({ title: "Docente Actualizado", description: "Los datos han sido guardados correctamente." });
+        toast({ title: "Docente Actualizado" });
       })
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: payload })));
   };
@@ -180,8 +180,27 @@ export default function DocentesPage() {
   const toggleStatus = async (docente: any) => {
     if (!db) return;
     const nuevoEstado = docente.estado === "Activo" ? "Inactivo" : "Activo";
-    const docRef = doc(db, "docentes", docente.id);
+    
+    // Regla 3: Intento de desactivar un docente con secciones activas
+    if (nuevoEstado === "Inactivo") {
+        const sectionsQuery = query(
+            collection(db, "secciones"), 
+            where("docenteId", "==", docente.id),
+            where("estado", "!=", "Finalizada")
+        );
+        const snapshot = await getDocs(sectionsQuery);
+        
+        if (!snapshot.empty) {
+            toast({
+                variant: "destructive",
+                title: "Bloqueo de Desactivación",
+                description: "No es posible desactivar este docente porque está asignado a una o más secciones. Debe removerlo o finalizar esas secciones antes de cambiar su estado."
+            });
+            return;
+        }
+    }
 
+    const docRef = doc(db, "docentes", docente.id);
     updateDoc(docRef, { estado: nuevoEstado, updatedAt: serverTimestamp() })
       .then(() => toast({ title: `Estado cambiado a ${nuevoEstado}` }))
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: { estado: nuevoEstado } })));
@@ -408,9 +427,6 @@ export default function DocentesPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {paginatedDocentes.length === 0 && (
-                    <TableRow><TableCell colSpan={9} className="text-center py-10 text-muted-foreground font-bold italic">No se encontraron docentes.</TableCell></TableRow>
-                  )}
                 </TableBody>
               </Table>
             )}
