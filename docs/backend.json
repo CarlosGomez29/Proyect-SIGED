@@ -120,6 +120,16 @@
       },
       "required": ["nombre", "orden"]
     },
+    "Institucion": {
+      "title": "Institución",
+      "description": "Catálogo oficial de instituciones castrenses y policiales.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre o siglas de la institución" },
+        "orden": { "type": "integer", "description": "Orden de visualización" }
+      },
+      "required": ["nombre", "orden"]
+    },
     "MetadataCounters": {
       "title": "Contadores de Systema",
       "description": "Estado de los contadores secuenciales para IDs institucionales.",
@@ -142,6 +152,7 @@
     "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
     "/rangos_militares/{rangoId}": { "schema": "RangoMilitar", "description": "Catálogo de rangos militares." },
+    "/instituciones/{institucionId}": { "schema": "Institucion", "description": "Catálogo de instituciones oficiales." },
     "/metadata/counters": { 
       "schema": { "$ref": "#/backend/entities/MetadataCounters" }, 
       "description": "Contadores atómicos para la generación de identificadores secuenciales únicos." 

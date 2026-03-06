@@ -8,13 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database, Loader2 } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2, Landmark } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase imports
 import { useFirestore } from '@/firebase';
-import { doc, setDoc, collection, writeBatch, getDocs, query, limit } from 'firebase/firestore';
+import { doc, setDoc, collection, writeBatch, getDocs, query, limit, orderBy } from 'firebase/firestore';
 
 const RANGOS_MILITARES_DEFAULT = [
     { nombre: "Civil", orden: 1 },
@@ -34,11 +34,21 @@ const RANGOS_MILITARES_DEFAULT = [
     { nombre: "Teniente General", orden: 15 },
 ];
 
+const INSTITUCIONES_DEFAULT = [
+    { nombre: "E.R.D.", orden: 1 },
+    { nombre: "A.R.D.", orden: 2 },
+    { nombre: "F.A.R.D.", orden: 3 },
+    { nombre: "P.N.", orden: 4 },
+    { nombre: "N/A", orden: 5 },
+];
+
 export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
 
-    const [isSeeding, setIsSeeding] = useState(false);
+    const [isSeedingRangos, setIsSeedingRangos] = useState(false);
+    const [isSeedingInstituciones, setIsSeedingInstituciones] = useState(false);
+    
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
         courseReminders: false,
@@ -64,9 +74,8 @@ export default function AjustesPage() {
 
     const handleSeedRangos = async () => {
         if (!db) return;
-        setIsSeeding(true);
+        setIsSeedingRangos(true);
         try {
-            // Verificar si ya existen rangos para evitar duplicados
             const rangosRef = collection(db, "rangos_militares");
             const snapshot = await getDocs(query(rangosRef, limit(1)));
             
@@ -75,7 +84,7 @@ export default function AjustesPage() {
                     title: "Información", 
                     description: "El catálogo de rangos ya ha sido inicializado anteriormente." 
                 });
-                setIsSeeding(false);
+                setIsSeedingRangos(false);
                 return;
             }
 
@@ -87,16 +96,53 @@ export default function AjustesPage() {
             await batch.commit();
             toast({ 
                 title: "Catálogo Inicializado", 
-                description: "Se han cargado los 15 rangos militares correctamente en Firestore." 
+                description: "Se han cargado los 15 rangos militares correctamente." 
             });
         } catch (error) {
             toast({ 
                 variant: "destructive", 
                 title: "Error de inicialización", 
-                description: "No se pudo cargar el catálogo de rangos. Revise sus permisos." 
+                description: "No se pudo cargar el catálogo de rangos." 
             });
         } finally {
-            setIsSeeding(false);
+            setIsSeedingRangos(false);
+        }
+    };
+
+    const handleSeedInstituciones = async () => {
+        if (!db) return;
+        setIsSeedingInstituciones(true);
+        try {
+            const instRef = collection(db, "instituciones");
+            const snapshot = await getDocs(query(instRef, limit(1)));
+            
+            if (!snapshot.empty) {
+                toast({ 
+                    title: "Información", 
+                    description: "El catálogo de instituciones ya ha sido inicializado anteriormente." 
+                });
+                setIsSeedingInstituciones(false);
+                return;
+            }
+
+            const batch = writeBatch(db);
+            INSTITUCIONES_DEFAULT.forEach((inst) => {
+                const docRef = doc(collection(db, "instituciones"));
+                batch.set(docRef, inst);
+            });
+            await batch.commit();
+            toast({ 
+                title: "Catálogo Inicializado", 
+                description: "Se han cargado las 5 instituciones oficiales correctamente." 
+            });
+        } catch (error) {
+            toast({ 
+                variant: "destructive", 
+                title: "Error de inicialización", 
+                description: "No se pudo cargar el catálogo de instituciones." 
+            });
+        } finally {
+            setIsSeedingInstituciones(false);
         }
     };
 
@@ -158,7 +204,7 @@ export default function AjustesPage() {
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
                                 <p className="text-xs text-muted-foreground max-w-md">
-                                    Restaura el contador a cero. Al confirmar, la próxima sección que se cree en el módulo de Apertura tendrá el código <strong>SEC-0001</strong>. 
+                                    Restaura el contador a cero. Al confirmar, la próxima sección que se cree tendrá el código <strong>SEC-0001</strong>. 
                                 </p>
                             </div>
                             <AlertDialog>
@@ -195,19 +241,35 @@ export default function AjustesPage() {
                         </div>
                         <CardDescription>Poblar la base de datos con valores predeterminados del sistema.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="flex items-center justify-between p-4 rounded-xl border">
+                    <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Poblar Rangos Militares</h4>
                                 <p className="text-xs text-muted-foreground">
-                                    Crea el catálogo oficial de rangos militares en Firestore para su uso en formularios.
+                                    Crea el catálogo oficial de rangos militares en Firestore para formularios.
                                 </p>
                             </div>
-                            <Button variant="outline" size="sm" onClick={handleSeedRangos} disabled={isSeeding}>
-                                {isSeeding ? (
+                            <Button variant="outline" size="sm" onClick={handleSeedRangos} disabled={isSeedingRangos}>
+                                {isSeedingRangos ? (
                                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
                                 ) : (
                                     <><Database className="mr-2 h-4 w-4" /> Inicializar Rangos</>
+                                )}
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Poblar Instituciones</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    Crea el catálogo oficial de instituciones (ERD, ARD, FARD, PN, N/A).
+                                </p>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handleSeedInstituciones} disabled={isSeedingInstituciones}>
+                                {isSeedingInstituciones ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
+                                ) : (
+                                    <><Landmark className="mr-2 h-4 w-4" /> Inicializar Instituciones</>
                                 )}
                             </Button>
                         </div>

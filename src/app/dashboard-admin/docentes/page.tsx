@@ -24,7 +24,8 @@ import {
   ExternalLink,
   FileText,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Landmark
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -96,12 +97,15 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
 };
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1 },
+  visible: { y: 0, opacity: 1 }
 };
 
 // Función para calcular la edad dinámicamente
@@ -154,17 +158,24 @@ export default function DocentesPage() {
     return query(collection(db, "docentes"), orderBy("createdAt", "desc"));
   }, [db]);
 
-  // Catálogo de Rangos Militares dinámico
+  // Catálogos dinámicos
   const rangosQuery = useMemo(() => {
     if (!db) return null;
     return query(collection(db, "rangos_militares"), orderBy("orden", "asc"));
   }, [db]);
 
+  const institucionesQuery = useMemo(() => {
+    if (!db) return null;
+    return query(collection(db, "instituciones"), orderBy("orden", "asc"));
+  }, [db]);
+
   const { data: docentesRaw, loading: loadingDocentes } = useCollection(docentesQuery);
   const { data: rangosData, loading: loadingRangos } = useCollection(rangosQuery);
+  const { data: institucionesData, loading: loadingInstituciones } = useCollection(institucionesQuery);
   
   const docentes = useMemo(() => docentesRaw || [], [docentesRaw]);
   const rangos = useMemo(() => rangosData || [], [rangosData]);
+  const instituciones = useMemo(() => institucionesData || [], [institucionesData]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("Todos");
@@ -465,7 +476,27 @@ export default function DocentesPage() {
 
                     <TabsContent value="institucional" className="mt-0 space-y-4 text-left">
                       <div className="grid grid-cols-2 gap-6">
-                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
+                        <div className="space-y-2">
+                          <Label>Institución *</Label>
+                          <Select value={formData.institucion} onValueChange={v => setFormData({...formData, institucion: v})} disabled={loadingInstituciones}>
+                            <SelectTrigger className="h-12 rounded-xl">
+                              <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {instituciones.map((i: any) => (
+                                <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
+                              ))}
+                              {!loadingInstituciones && instituciones.length === 0 && (
+                                <div className="p-4 text-center space-y-2">
+                                  <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
+                                  <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
+                                    <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
+                                  </Button>
+                                </div>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="space-y-2">
                           <Label>Rango Militar *</Label>
                           <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})} disabled={loadingRangos}>
@@ -738,12 +769,12 @@ export default function DocentesPage() {
             {/* INSTITUCIONAL */}
             <section className="space-y-5">
               <h4 className="font-bold text-[10px] uppercase tracking-[0.2em] text-primary flex items-center gap-2 border-b border-primary/10 pb-2 mb-4 text-left">
-                  <Shield className="h-4 w-4"/> INSTITUCIONAL
+                  <Landmark className="h-4 w-4"/> INSTITUCIONAL
               </h4>
               <div className="space-y-4 text-left">
                 <div className="flex flex-col gap-1 text-left">
-                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">INSTITUCIÓN DE ORIGEN</Label>
-                  <p className="font-bold text-foreground">{selectedDocente?.institucion || "SOCIEDAD CIVIL"}</p>
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">INSTITUCIÓN</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.institucion || "N/A"}</p>
                 </div>
                 <div className="flex flex-col gap-1 text-left">
                   <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">RANGO MILITAR / POLICIAL</Label>
@@ -853,6 +884,27 @@ export default function DocentesPage() {
 
                 <TabsContent value="institucional" className="mt-0 space-y-6">
                   <div className="grid grid-cols-2 gap-6 text-left">
+                    <div className="space-y-2">
+                      <Label>Institución *</Label>
+                      <Select value={formData.institucion} onValueChange={v => setFormData({...formData, institucion: v})} disabled={loadingInstituciones}>
+                        <SelectTrigger className="h-12 rounded-xl">
+                          <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {instituciones.map((i: any) => (
+                            <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
+                          ))}
+                          {!loadingInstituciones && instituciones.length === 0 && (
+                            <div className="p-4 text-center space-y-2">
+                              <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
+                              <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
+                                <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
+                              </Button>
+                            </div>
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="space-y-2 text-left">
                       <Label>Rango Militar</Label>
                       <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})} disabled={loadingRangos}>
@@ -877,7 +929,6 @@ export default function DocentesPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2 text-left"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
                   </div>
                 </TabsContent>
               </div>
