@@ -7,7 +7,6 @@ import {
   Users,
   PlusCircle,
   Library,
-  Trash2,
   UsersRound,
   UserPlus,
   ClipboardList,
@@ -39,7 +38,6 @@ const academicOffering = [
     { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
     { href: "/dashboard-admin/cursos", label: "Gestión de Secciones", icon: Library },
     { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
-    { href: "/dashboard-admin/secciones/limpieza", label: "Eliminar Sección Vacía", icon: Trash2 },
 ];
 
 const studentsModule = [
