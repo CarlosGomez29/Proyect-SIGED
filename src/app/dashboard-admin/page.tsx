@@ -53,7 +53,6 @@ export default function DashboardAdminPage() {
   const { data: seccionesAbiertas } = useCollection(seccionesAbiertasQuery);
 
   const activeRecinto = "Escuela Vocacional Santo Domingo Este";
-  const academicPeriod = "Gestión Institucional Real-time";
 
   const metrics = [
     { title: "Estudiantes Activos", value: estudiantes?.length.toString() || "0", icon: Users, color: "text-blue-500" },
@@ -91,9 +90,6 @@ export default function DashboardAdminPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <Badge className="w-fit mb-4 bg-white/10 backdrop-blur-md border-white/20 text-white px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase">
-              {academicPeriod}
-            </Badge>
             <h1 className="text-2xl md:text-4xl lg:text-5xl font-black font-headline text-white mb-3 tracking-tighter">
               {activeRecinto}
             </h1>
@@ -163,7 +159,6 @@ export default function DashboardAdminPage() {
             data-ai-hint={images.vision_institutional.hint}
           />
           <CardContent className="relative z-10 h-full flex flex-col justify-center p-12 text-white">
-            {/* Mission paragraph removed per user request */}
           </CardContent>
         </Card>
 
@@ -181,3 +176,4 @@ export default function DashboardAdminPage() {
     </motion.div>
   );
 }
+
