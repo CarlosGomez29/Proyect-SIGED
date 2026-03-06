@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
@@ -163,7 +162,7 @@ export default function DocentesPage() {
   const [selectedDocente, setSelectedDocente] = useState<any>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(itemsPerPage || 10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   const [isSaving, setIsSaving] = useState(false);
 
