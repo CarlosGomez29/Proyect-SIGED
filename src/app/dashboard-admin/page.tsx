@@ -152,7 +152,7 @@ export default function DashboardAdminPage() {
         </div>
       </motion.section>
 
-      {/* Misión y Visión Institucional */}
+      {/* Sección Institucional */}
       <motion.section variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
         <Card className="relative overflow-hidden glass-card h-full min-h-[400px] border-none">
           <Image 
@@ -163,9 +163,7 @@ export default function DashboardAdminPage() {
             data-ai-hint={images.vision_institutional.hint}
           />
           <CardContent className="relative z-10 h-full flex flex-col justify-center p-12 text-white">
-            <p className="text-lg leading-relaxed font-medium text-white/90 italic border-l-4 border-primary pl-6">
-              "Capacitar a los miembros de las Fuerzas Armadas, la Policía Nacional y la población civil, en carreras técnicas y de artes y oficios, a fin de contribuir con el desarrollo nacional y su bienestar personal."
-            </p>
+            {/* Mission paragraph removed per user request */}
           </CardContent>
         </Card>
 
