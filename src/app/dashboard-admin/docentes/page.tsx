@@ -215,7 +215,7 @@ export default function DocentesPage() {
   useEffect(() => {
     if (formData.rango_militar === "Igualado") {
       if (formData.institucion !== "N/A") {
-        setFormData(prev => ({ ...prev, institucion: "N/A" }));
+        setFormData(prev => ({ ...prev, instituciones: "N/A" }));
       }
     } else if (formData.rango_militar !== "" && formData.institucion === "N/A") {
         // Reset si se cambia de Igualado a otro rango
@@ -786,7 +786,7 @@ export default function DocentesPage() {
                 </div>
                 
                 <div className="flex flex-col gap-1 pt-2 text-left">
-                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">CURSO QUE IMPARTE</Label>
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Curso que Imparte</Label>
                     <div className="pt-2">
                         <DocenteSeccionesList docenteId={selectedDocente?.id} />
                     </div>
@@ -812,12 +812,12 @@ export default function DocentesPage() {
               </h4>
               <div className="space-y-4 text-left">
                 <div className="flex flex-col gap-1 text-left">
-                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">INSTITUCIÓN</Label>
-                  <p className="font-bold text-foreground">{selectedDocente?.institucion || "N/A"}</p>
-                </div>
-                <div className="flex flex-col gap-1 text-left">
                   <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">RANGO MILITAR / POLICIAL</Label>
                   <p className="font-bold text-foreground">{selectedDocente?.rango_militar || "N/A"}</p>
+                </div>
+                <div className="flex flex-col gap-1 text-left">
+                  <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">INSTITUCIÓN</Label>
+                  <p className="font-bold text-foreground">{selectedDocente?.institucion || "N/A"}</p>
                 </div>
                 <div className="flex flex-col gap-1 text-left">
                   <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">ID DE ESCUELA</Label>
