@@ -211,6 +211,18 @@ export default function DocentesPage() {
     estado: "Activo",
   });
 
+  // Lógica condicional: Rango vs Institución
+  useEffect(() => {
+    if (formData.rango_militar === "Igualado") {
+      if (formData.institucion !== "N/A") {
+        setFormData(prev => ({ ...prev, institucion: "N/A" }));
+      }
+    } else if (formData.rango_militar !== "" && formData.institucion === "N/A") {
+        // Reset si se cambia de Igualado a otro rango
+        setFormData(prev => ({ ...prev, institucion: "" }));
+    }
+  }, [formData.rango_militar]);
+
   const filteredDocentes = useMemo(() => {
     return docentes.filter((d) => {
       const matchesSearch = 
@@ -240,6 +252,16 @@ export default function DocentesPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db) return;
+
+    // Validación de Institución según Rango
+    if (formData.rango_militar !== "Igualado" && (!formData.institucion || formData.institucion === "N/A")) {
+      toast({ 
+        variant: "destructive", 
+        title: "Institución requerida", 
+        description: "Debe seleccionar una institución oficial para rangos militares/policiales." 
+      });
+      return;
+    }
 
     const cedulaExists = docentes.some(d => d.cedula === formData.cedula);
     const correoExists = docentes.some(d => d.correo === formData.correo);
@@ -279,6 +301,16 @@ export default function DocentesPage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db || !selectedDocente) return;
+
+    // Validación de Institución según Rango
+    if (formData.rango_militar !== "Igualado" && (!formData.institucion || formData.institucion === "N/A")) {
+      toast({ 
+        variant: "destructive", 
+        title: "Institución requerida", 
+        description: "Debe seleccionar una institución oficial para rangos militares/policiales." 
+      });
+      return;
+    }
 
     setIsSaving(true);
 
@@ -477,28 +509,7 @@ export default function DocentesPage() {
                     <TabsContent value="institucional" className="mt-0 space-y-4 text-left">
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <Label>Institución *</Label>
-                          <Select value={formData.institucion} onValueChange={v => setFormData({...formData, institucion: v})} disabled={loadingInstituciones}>
-                            <SelectTrigger className="h-12 rounded-xl">
-                              <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {instituciones.map((i: any) => (
-                                <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
-                              ))}
-                              {!loadingInstituciones && instituciones.length === 0 && (
-                                <div className="p-4 text-center space-y-2">
-                                  <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
-                                  <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
-                                    <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
-                                  </Button>
-                                </div>
-                              )}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Rango Militar *</Label>
+                          <Label>Rango Militar / Igualado *</Label>
                           <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})} disabled={loadingRangos}>
                             <SelectTrigger className="h-12 rounded-xl">
                               <SelectValue placeholder={loadingRangos ? "Cargando catálogo..." : "Seleccionar rango..."} />
@@ -517,6 +528,34 @@ export default function DocentesPage() {
                               )}
                             </SelectContent>
                           </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Institución *</Label>
+                          <Select 
+                            value={formData.institucion} 
+                            onValueChange={v => setFormData({...formData, institucion: v})} 
+                            disabled={loadingInstituciones || formData.rango_militar === "Igualado"}
+                          >
+                            <SelectTrigger className="h-12 rounded-xl">
+                              <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {instituciones.map((i: any) => (
+                                <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
+                              ))}
+                              {!loadingInstituciones && instituciones.length === 0 && (
+                                <div className="p-4 text-center space-y-2">
+                                  <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
+                                  <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
+                                    <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
+                                  </Button>
+                                </div>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          {formData.rango_militar !== "Igualado" && !formData.institucion && (
+                            <p className="text-[10px] text-destructive font-bold mt-1 uppercase tracking-tighter">Campo obligatorio</p>
+                          )}
                         </div>
                         <div className="space-y-2"><Label>Escuela (Referencia ID)</Label><Input placeholder="ID de la escuela" value={formData.escuelaId} onChange={e => setFormData({...formData, escuelaId: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Clave de Acceso Temporal</Label><Input type="password" value={formData.clave_acceso} onChange={e => setFormData({...formData, clave_acceso: e.target.value})} /></div>
@@ -885,28 +924,7 @@ export default function DocentesPage() {
                 <TabsContent value="institucional" className="mt-0 space-y-6">
                   <div className="grid grid-cols-2 gap-6 text-left">
                     <div className="space-y-2">
-                      <Label>Institución *</Label>
-                      <Select value={formData.institucion} onValueChange={v => setFormData({...formData, institucion: v})} disabled={loadingInstituciones}>
-                        <SelectTrigger className="h-12 rounded-xl">
-                          <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {instituciones.map((i: any) => (
-                            <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
-                          ))}
-                          {!loadingInstituciones && instituciones.length === 0 && (
-                            <div className="p-4 text-center space-y-2">
-                              <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
-                              <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
-                                <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
-                              </Button>
-                            </div>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2 text-left">
-                      <Label>Rango Militar</Label>
+                      <Label>Rango Militar / Igualado *</Label>
                       <Select value={formData.rango_militar} onValueChange={v => setFormData({...formData, rango_militar: v})} disabled={loadingRangos}>
                         <SelectTrigger className="h-12 rounded-xl">
                           <SelectValue placeholder={loadingRangos ? "Cargando catálogo..." : "Seleccionar rango..."} />
@@ -928,6 +946,34 @@ export default function DocentesPage() {
                               )}
                         </SelectContent>
                       </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Institución *</Label>
+                      <Select 
+                        value={formData.institucion} 
+                        onValueChange={v => setFormData({...formData, institucion: v})} 
+                        disabled={loadingInstituciones || formData.rango_militar === "Igualado"}
+                      >
+                        <SelectTrigger className="h-12 rounded-xl">
+                          <SelectValue placeholder={loadingInstituciones ? "Cargando instituciones..." : "Seleccionar institución..."} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {instituciones.map((i: any) => (
+                            <SelectItem key={i.id} value={i.nombre}>{i.nombre}</SelectItem>
+                          ))}
+                          {!loadingInstituciones && instituciones.length === 0 && (
+                            <div className="p-4 text-center space-y-2">
+                              <p className="text-xs text-muted-foreground italic">Catálogo no inicializado.</p>
+                              <Button asChild variant="link" size="sm" className="h-auto p-0 text-[10px] font-bold uppercase">
+                                <Link href="/dashboard-admin/ajustes">Ir a Ajustes</Link>
+                              </Button>
+                            </div>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      {formData.rango_militar !== "Igualado" && !formData.institucion && (
+                        <p className="text-[10px] text-destructive font-bold mt-1 uppercase tracking-tighter">Campo obligatorio</p>
+                      )}
                     </div>
                   </div>
                 </TabsContent>

@@ -17,7 +17,7 @@ import { useFirestore } from '@/firebase';
 import { doc, setDoc, collection, writeBatch, getDocs, query, limit, orderBy } from 'firebase/firestore';
 
 const RANGOS_MILITARES_DEFAULT = [
-    { nombre: "Civil", orden: 1 },
+    { nombre: "Igualado", orden: 1 },
     { nombre: "Asimilado", orden: 2 },
     { nombre: "Raso", orden: 3 },
     { nombre: "Cabo", orden: 4 },
