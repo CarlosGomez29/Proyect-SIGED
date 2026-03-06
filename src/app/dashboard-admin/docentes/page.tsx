@@ -184,7 +184,7 @@ export default function DocentesPage() {
       
       const matchesEstado = statusFilter === "Todos" || d.estado === statusFilter;
 
-      return matchesSearch && matchesEstado && matchesPrograma;
+      return matchesSearch && matchesEstado;
     });
   }, [docentes, searchTerm, statusFilter]);
 
@@ -602,13 +602,13 @@ export default function DocentesPage() {
                 
                 {/* Módulos automáticos basados en Secciones */}
                 <div className="pt-2 flex flex-col items-start text-left">
-                    <Label className="text-[10px] opacity-60 uppercase">Curso que Imparte</Label>
+                    <Label className="text-[10px] opacity-60 uppercase">CURSO QUE IMPARTE</Label>
                     <DocenteSeccionesList docenteId={selectedDocente?.id} />
                 </div>
 
                 {selectedDocente?.cv_url && (
                    <div className="pt-2 flex flex-col items-start text-left">
-                      <Label className="text-[10px] opacity-60 uppercase">Currículum / Portafolio</Label>
+                      <Label className="text-[10px] opacity-60 uppercase">CURRÍCULUM / PORTAFOLIO</Label>
                       <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1 justify-start">
                         <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
                           Ver Currículum / Portafolio <ExternalLink className="h-3 w-3" />
