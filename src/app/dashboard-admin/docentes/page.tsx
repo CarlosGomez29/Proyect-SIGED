@@ -184,7 +184,7 @@ export default function DocentesPage() {
       
       const matchesEstado = statusFilter === "Todos" || d.estado === statusFilter;
 
-      return matchesSearch && matchesEstado;
+      return matchesSearch && matchesEstado && matchesPrograma;
     });
   }, [docentes, searchTerm, statusFilter]);
 
@@ -420,7 +420,7 @@ export default function DocentesPage() {
                         <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
                           <Label className="text-sm font-bold flex items-center gap-2"><FileText className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
                           <div className="space-y-2">
-                              <Label className="text-[10px] opacity-60">Enlace directo al currículum</Label>
+                              <Label className="text-[10px] opacity-60 text-left">Enlace directo al currículum</Label>
                               <div className="relative">
                                   <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                   <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
@@ -565,7 +565,7 @@ export default function DocentesPage() {
       {/* Expediente Completo */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden text-left">
-          <DialogHeader className="p-8 bg-primary/5 border-b">
+          <DialogHeader className="p-8 bg-primary/5 border-b text-left">
             <div className="flex items-center gap-6">
                <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                   <UserCircle className="h-12 w-12 text-primary" />
@@ -578,37 +578,37 @@ export default function DocentesPage() {
           </DialogHeader>
           <div className="p-8 grid grid-cols-2 gap-8 text-sm max-h-[60vh] overflow-y-auto">
             <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><UserCircle className="h-4 w-4"/> Datos Personales</h4>
-              <div className="grid gap-2">
-                <div><Label className="text-[10px] opacity-60">CÉDULA</Label><p className="font-bold">{selectedDocente?.cedula}</p></div>
-                <div><Label className="text-[10px] opacity-60">FECHA NACIMIENTO</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
-                <div><Label className="text-[10px] opacity-60">SEXO / E. CIVIL</Label><p className="font-bold">{selectedDocente?.sexo} - {selectedDocente?.estado_civil}</p></div>
-                <div><Label className="text-[10px] opacity-60">HIJOS</Label><p className="font-bold">{selectedDocente?.cantidad_hijos}</p></div>
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><UserCircle className="h-4 w-4"/> DATOS PERSONALES</h4>
+              <div className="grid gap-2 text-left">
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Cédula</Label><p className="font-bold">{selectedDocente?.cedula}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Fecha Nacimiento</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Sexo / E. Civil</Label><p className="font-bold">{selectedDocente?.sexo} - {selectedDocente?.estado_civil}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Hijos</Label><p className="font-bold">{selectedDocente?.cantidad_hijos}</p></div>
               </div>
             </section>
             <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Mail className="h-4 w-4"/> Contacto</h4>
-              <div className="grid gap-2">
-                <div><Label className="text-[10px] opacity-60">CORREO</Label><p className="font-bold">{selectedDocente?.correo}</p></div>
-                <div><Label className="text-[10px] opacity-60">TELÉFONO</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
-                <div><Label className="text-[10px] opacity-60">DIRECCIÓN</Label><p className="font-bold text-xs">{selectedDocente?.direccion || "N/A"}</p></div>
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Mail className="h-4 w-4"/> CONTACTO</h4>
+              <div className="grid gap-2 text-left">
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Correo</Label><p className="font-bold">{selectedDocente?.correo}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Teléfono</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Dirección</Label><p className="font-bold text-xs">{selectedDocente?.direccion || "N/A"}</p></div>
               </div>
             </section>
             <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Briefcase className="h-4 w-4"/> Perfil Laboral</h4>
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Briefcase className="h-4 w-4"/> PERFIL LABORAL</h4>
               <div className="grid gap-2 items-start text-left">
-                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60">FORMACIÓN PROFESIONAL</Label><p className="font-bold text-left">{selectedDocente?.profesion || "N/A"}</p></div>
-                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold text-left">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
+                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60 uppercase">Formación profesional</Label><p className="font-bold text-left">{selectedDocente?.profesion || "N/A"}</p></div>
+                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60 uppercase">Fecha Ingreso</Label><p className="font-bold text-left">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
                 
                 {/* Módulos automáticos basados en Secciones */}
                 <div className="pt-2 flex flex-col items-start text-left">
-                    <Label className="text-[10px] opacity-60">Curso que Imparte</Label>
+                    <Label className="text-[10px] opacity-60 uppercase">Curso que Imparte</Label>
                     <DocenteSeccionesList docenteId={selectedDocente?.id} />
                 </div>
 
                 {selectedDocente?.cv_url && (
                    <div className="pt-2 flex flex-col items-start text-left">
-                      <Label className="text-[10px] opacity-60">CURRICULUM / PORTAFOLIO</Label>
+                      <Label className="text-[10px] opacity-60 uppercase">Currículum / Portafolio</Label>
                       <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1 justify-start">
                         <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
                           Ver Currículum / Portafolio <ExternalLink className="h-3 w-3" />
@@ -619,10 +619,10 @@ export default function DocentesPage() {
               </div>
             </section>
             <section className="space-y-4">
-              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Shield className="h-4 w-4"/> Institucional</h4>
-              <div className="grid gap-2">
-                <div><Label className="text-[10px] opacity-60">INSTITUCIÓN / RANGO</Label><p className="font-bold">{selectedDocente?.institucion || "N/A"} - {selectedDocente?.rango_militar || "N/A"}</p></div>
-                <div><Label className="text-[10px] opacity-60">ESCUELA ID</Label><p className="font-bold">{selectedDocente?.escuelaId || "N/A"}</p></div>
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Shield className="h-4 w-4"/> INSTITUCIONAL</h4>
+              <div className="grid gap-2 text-left">
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Institución / Rango</Label><p className="font-bold">{selectedDocente?.institucion || "N/A"} - {selectedDocente?.rango_militar || "N/A"}</p></div>
+                <div className="flex flex-col items-start"><Label className="text-[10px] opacity-60 uppercase">Escuela ID</Label><p className="font-bold">{selectedDocente?.escuelaId || "N/A"}</p></div>
               </div>
             </section>
           </div>
@@ -699,7 +699,7 @@ export default function DocentesPage() {
                     <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
                         <Label className="text-sm font-bold flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
                         <div className="space-y-2">
-                            <Label className="text-[10px] opacity-60">Actualizar enlace directo</Label>
+                            <Label className="text-[10px] opacity-60 text-left">Actualizar enlace directo</Label>
                             <div className="relative">
                                 <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
