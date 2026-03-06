@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -44,11 +45,11 @@ const profiles = [
     href: "/login/admision",
   },
   {
-    role: "instructor",
+    role: "docente",
     name: "Docente",
     description: "Gestión de cursos y estudiantes",
     icon: BookUser,
-    href: "/login/instructor",
+    href: "/login/docente",
   },
   {
     role: "alumno",

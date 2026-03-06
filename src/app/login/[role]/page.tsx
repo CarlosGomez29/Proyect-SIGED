@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -25,7 +26,7 @@ const profileDetails: { [key: string]: { name: string; icon: React.ElementType; 
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
   'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador' },
   'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones' },
-  'instructor': { name: 'Docente', icon: BookUser, user: 'instructor', dashboard: '/dashboard/instructor', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
+  'docente': { name: 'Docente', icon: BookUser, user: 'docente', dashboard: '/dashboard-docente', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
   'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante' },
 };
 

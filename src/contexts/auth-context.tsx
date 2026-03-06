@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { useRouter, usePathname } from 'next/navigation';
 
-type UserRole = 'super-admin' | 'administrador' | 'admision' | 'instructor' | 'alumno' | null;
+type UserRole = 'super-admin' | 'administrador' | 'admision' | 'docente' | 'alumno' | null;
 
 interface AuthContextType {
   user: User | null;

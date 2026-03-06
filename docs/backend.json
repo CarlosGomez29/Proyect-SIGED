@@ -38,7 +38,7 @@
       "required": ["nombre", "tipo", "anio"]
     },
     "Docente": {
-      "title": "Docente / Instructor",
+      "title": "Docente",
       "description": "Personal encargado de impartir docencia con perfil extendido.",
       "type": "object",
       "properties": {
@@ -130,7 +130,7 @@
     "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos." },
     "/cursos/{cursoId}": { "schema": "Curso", "description": "Maestro de programas." },
     "/periodos/{periodoId}": { "schema": "Periodo", "description": "Ciclos lectivos." },
-    "/docentes/{docenteId}": { "schema": "Docente", "description": "Instructores." },
+    "/docentes/{docenteId}": { "schema": "Docente", "description": "Docentes." },
     "/estudiantes/{estudianteId}": { "schema": "Estudiante", "description": "Alumnos." },
     "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },

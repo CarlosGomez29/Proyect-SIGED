@@ -201,7 +201,7 @@ export default function DocentesPage() {
       .then(() => {
         setIsCreateDialogOpen(false);
         resetForm();
-        toast({ title: "Docente Registrado", description: "El instructor ha sido añadido exitosamente." });
+        toast({ title: "Docente Registrado", description: "El docente ha sido añadido exitosamente." });
       })
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collectionRef.path, operation: 'create', requestResourceData: payload })));
   };
@@ -302,7 +302,7 @@ export default function DocentesPage() {
             <Users className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-black font-headline tracking-tighter">Módulo de Docentes</h1>
           </div>
-          <p className="text-muted-foreground font-medium text-sm">Registro integral y perfil extendido de instructores.</p>
+          <p className="text-muted-foreground font-medium text-sm">Registro integral y perfil extendido de docentes.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
@@ -318,7 +318,7 @@ export default function DocentesPage() {
             <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden">
               <DialogHeader className="p-8 bg-muted/30">
                 <DialogTitle className="text-2xl font-black">Expediente de Docente</DialogTitle>
-                <DialogDescription>Complete el perfil institucional del nuevo instructor.</DialogDescription>
+                <DialogDescription>Complete el perfil institucional del nuevo docente.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreate}>
                 <Tabs defaultValue="personal" className="w-full">
@@ -437,7 +437,7 @@ export default function DocentesPage() {
                 <TableHeader className="bg-muted/30">
                   <TableRow>
                     <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">No.</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Instructor</TableHead>
+                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Docente</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Cédula</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Especialidad</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estado</TableHead>
@@ -574,7 +574,7 @@ export default function DocentesPage() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden">
           <DialogHeader className="p-8 bg-muted/30">
-            <DialogTitle className="text-2xl font-black">Modificar Instructor</DialogTitle>
+            <DialogTitle className="text-2xl font-black">Modificar Docente</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
             <Tabs defaultValue="personal" className="w-full">

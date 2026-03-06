@@ -113,7 +113,7 @@ export default function SignupForm() {
                 <SelectContent>
                   <SelectItem value="administrador">Administrador</SelectItem>
                   <SelectItem value="admision">Admisión</SelectItem>
-                  <SelectItem value="instructor">Instructor</SelectItem>
+                  <SelectItem value="docente">Docente</SelectItem>
                   <SelectItem value="alumno">Alumno</SelectItem>
                   <SelectItem value="super-admin">Super Admin</SelectItem>
                 </SelectContent>
