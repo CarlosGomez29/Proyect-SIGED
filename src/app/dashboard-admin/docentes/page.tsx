@@ -117,10 +117,10 @@ function DocenteSeccionesList({ docenteId }: { docenteId: string }) {
 
     const cursosUnicos = Array.from(new Set(secciones?.map(s => s.curso) || []));
 
-    if (cursosUnicos.length === 0) return <p className="text-xs text-muted-foreground italic">No tiene secciones asignadas actualmente.</p>;
+    if (cursosUnicos.length === 0) return <p className="text-xs text-muted-foreground italic mt-1">No tiene secciones asignadas actualmente.</p>;
 
     return (
-        <div className="flex flex-wrap gap-1.5 mt-1">
+        <div className="flex flex-wrap gap-1.5 mt-1.5">
             {cursosUnicos.map((curso, i) => (
                 <Badge key={i} variant="secondary" className="text-[10px] font-bold py-0">{curso}</Badge>
             ))}
@@ -564,13 +564,13 @@ export default function DocentesPage() {
 
       {/* Expediente Completo */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden text-left">
           <DialogHeader className="p-8 bg-primary/5 border-b">
             <div className="flex items-center gap-6">
                <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
                   <UserCircle className="h-12 w-12 text-primary" />
                </div>
-               <div>
+               <div className="text-left">
                   <DialogTitle className="text-2xl font-black">{selectedDocente?.nombre} {selectedDocente?.apellido}</DialogTitle>
                   <Badge variant="outline" className="mt-2">{selectedDocente?.estado}</Badge>
                </div>
@@ -596,20 +596,20 @@ export default function DocentesPage() {
             </section>
             <section className="space-y-4">
               <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Briefcase className="h-4 w-4"/> Perfil Laboral</h4>
-              <div className="grid gap-2">
-                <div><Label className="text-[10px] opacity-60">FORMACIÓN PROFESIONAL</Label><p className="font-bold">{selectedDocente?.profesion || "N/A"}</p></div>
-                <div><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
+              <div className="grid gap-2 items-start text-left">
+                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60">FORMACIÓN PROFESIONAL</Label><p className="font-bold text-left">{selectedDocente?.profesion || "N/A"}</p></div>
+                <div className="flex flex-col items-start text-left"><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold text-left">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
                 
                 {/* Módulos automáticos basados en Secciones */}
-                <div className="pt-2">
+                <div className="pt-2 flex flex-col items-start text-left">
                     <Label className="text-[10px] opacity-60">Curso que Imparte</Label>
                     <DocenteSeccionesList docenteId={selectedDocente?.id} />
                 </div>
 
                 {selectedDocente?.cv_url && (
-                   <div className="pt-2">
+                   <div className="pt-2 flex flex-col items-start text-left">
                       <Label className="text-[10px] opacity-60">CURRICULUM / PORTAFOLIO</Label>
-                      <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1">
+                      <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1 justify-start">
                         <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
                           Ver Currículum / Portafolio <ExternalLink className="h-3 w-3" />
                         </a>
@@ -681,7 +681,7 @@ export default function DocentesPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
                     <div className="space-y-2"><Label>Teléfono</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
-                    <div className="space-y-2 col-span-2"><Label>Dirección</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label>Dirección</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
                   </div>
                 </TabsContent>
 
