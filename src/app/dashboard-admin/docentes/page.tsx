@@ -22,6 +22,8 @@ import {
   Briefcase,
   GraduationCap,
   BookOpen,
+  Link as LinkIcon,
+  ExternalLink
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -139,6 +141,7 @@ export default function DocentesPage() {
     estado_civil: "Soltero",
     cantidad_hijos: "0",
     modulos_asignaturas_imparte: "",
+    cv_url: "",
     clave_acceso: "",
     estado: "Activo",
   });
@@ -256,7 +259,7 @@ export default function DocentesPage() {
       fecha_nacimiento: "", foto_perfil: "", fecha_ingreso: "", escuelaId: "", 
       rango_militar: "", profesion: "", institucion: "", 
       sexo: "Masculino", estado_civil: "Soltero", cantidad_hijos: "0", 
-      modulos_asignaturas_imparte: "", 
+      modulos_asignaturas_imparte: "", cv_url: "",
       clave_acceso: "", estado: "Activo" 
     });
     setSelectedDocente(null);
@@ -282,6 +285,7 @@ export default function DocentesPage() {
       estado_civil: docente.estado_civil || "Soltero",
       cantidad_hijos: docente.cantidad_hijos?.toString() || "0",
       modulos_asignaturas_imparte: docente.modulos_asignaturas_imparte || "",
+      cv_url: docente.cv_url || "",
       clave_acceso: docente.clave_acceso || "",
       estado: docente.estado || "Activo",
     });
@@ -374,6 +378,14 @@ export default function DocentesPage() {
                         </div>
                         <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
                         <div className="space-y-2 col-span-2"><Label>Módulos / Asignaturas que Imparte</Label><Textarea placeholder="Lista de materias..." value={formData.modulos_asignaturas_imparte} onChange={e => setFormData({...formData, modulos_asignaturas_imparte: e.target.value})} /></div>
+                        <div className="space-y-2 col-span-2">
+                          <Label>Enlace a Curriculum / Portafolio</Label>
+                          <div className="relative">
+                            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input placeholder="https://drive.google.com/... o portafolio" className="pl-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
+                          </div>
+                          <p className="text-[10px] text-muted-foreground italic mt-1">Sube tu archivo a un servicio de almacenamiento y pega el enlace aquí.</p>
+                        </div>
                       </div>
                     </TabsContent>
 
@@ -545,6 +557,16 @@ export default function DocentesPage() {
                 <div><Label className="text-[10px] opacity-60">FORMACIÓN PROFESIONAL</Label><p className="font-bold">{selectedDocente?.profesion || "N/A"}</p></div>
                 <div><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
                 <div><Label className="text-[10px] opacity-60">MÓDULOS</Label><p className="font-bold text-xs">{selectedDocente?.modulos_asignaturas_imparte || "N/A"}</p></div>
+                {selectedDocente?.cv_url && (
+                   <div className="pt-2">
+                      <Label className="text-[10px] opacity-60">CURRICULUM / PORTAFOLIO</Label>
+                      <Button asChild variant="link" className="p-0 h-auto font-bold text-xs flex items-center gap-1">
+                        <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
+                          Ver Documento <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </Button>
+                   </div>
+                )}
               </div>
             </section>
             <section className="space-y-4">
@@ -620,6 +642,13 @@ export default function DocentesPage() {
                       <Label>Formación profesional</Label>
                       <Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} />
                       <p className="text-[10px] text-muted-foreground italic">Carrera que estudió el docente.</p>
+                    </div>
+                    <div className="space-y-2 col-span-2">
+                      <Label>Enlace a Curriculum / Portafolio</Label>
+                      <div className="relative">
+                        <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input placeholder="https://..." className="pl-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
+                      </div>
                     </div>
                   </div>
                 </TabsContent>

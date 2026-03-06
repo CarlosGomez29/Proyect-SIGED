@@ -59,6 +59,7 @@
         "estado_civil": { "type": "string", "enum": ["Soltero", "Casado", "Divorciado", "Viudo"] },
         "cantidad_hijos": { "type": "integer" },
         "modulos_asignaturas_imparte": { "type": "string" },
+        "cv_url": { "type": "string", "description": "Enlace al CV (PDF) o Portafolio digital" },
         "clave_acceso": { "type": "string" },
         "estado": { "type": "string", "enum": ["Activo", "Inactivo"] },
         "createdAt": { "type": "string", "format": "date-time" },
