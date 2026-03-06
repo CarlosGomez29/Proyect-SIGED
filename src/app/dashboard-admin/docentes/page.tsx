@@ -183,14 +183,16 @@ export default function DocentesPage() {
     
     // Regla 3: Intento de desactivar un docente con secciones activas
     if (nuevoEstado === "Inactivo") {
+        // Obtenemos todas las secciones del docente. 
+        // Filtramos "estado != Finalizada" en memoria para evitar requerir un índice compuesto en Firestore.
         const sectionsQuery = query(
             collection(db, "secciones"), 
-            where("docenteId", "==", docente.id),
-            where("estado", "!=", "Finalizada")
+            where("docenteId", "==", docente.id)
         );
         const snapshot = await getDocs(sectionsQuery);
+        const activeSections = snapshot.docs.filter(s => s.data().estado !== "Finalizada");
         
-        if (!snapshot.empty) {
+        if (activeSections.length > 0) {
             toast({
                 variant: "destructive",
                 title: "Bloqueo de Desactivación",
