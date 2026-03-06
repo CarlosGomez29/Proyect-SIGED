@@ -114,6 +114,41 @@
     content: '';
     @apply absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 bg-primary rounded-r-full transition-all duration-300;
   }
+
+  /* Custom Scrollbar - Minimalista y Sutil */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsla(var(--muted-foreground) / 0.15);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--muted-foreground) / 0.3);
+  }
+
+  /* Específico para el Sidebar para que sea aún más discreto */
+  [data-sidebar="sidebar"] *::-webkit-scrollbar-thumb {
+    background: hsla(var(--sidebar-foreground) / 0.1);
+  }
+
+  [data-sidebar="sidebar"] *::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--sidebar-foreground) / 0.2);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsla(var(--muted-foreground) / 0.15) transparent;
+  }
 }
 
 /* Efectos Modernos */
