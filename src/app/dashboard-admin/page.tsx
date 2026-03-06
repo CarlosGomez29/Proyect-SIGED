@@ -163,9 +163,6 @@ export default function DashboardAdminPage() {
             data-ai-hint={images.vision_institutional.hint}
           />
           <CardContent className="relative z-10 h-full flex flex-col justify-center p-12 text-white">
-            <Badge className="w-fit mb-6 bg-primary/20 backdrop-blur-md border-primary/40 text-primary-foreground font-bold px-4 py-1 uppercase tracking-widest text-[10px]">
-              Valores Patrios
-            </Badge>
             <h3 className="text-3xl font-black font-headline mb-6 tracking-tighter flex items-center gap-3">
               <Target className="h-8 w-8 text-primary" /> Misión Institucional
             </h3>
