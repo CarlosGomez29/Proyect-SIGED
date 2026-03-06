@@ -367,7 +367,7 @@ export default function DocentesPage() {
                     <TabsContent value="contacto" className="mt-0 space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2"><Label>Correo Electrónico *</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
-                        <div className="space-y-2"><Label>Teléfono de Contacto</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Celular</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
                         <div className="space-y-2 col-span-2"><Label>Dirección Residencial</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
                       </div>
                     </TabsContent>
@@ -542,7 +542,7 @@ export default function DocentesPage() {
               <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Mail className="h-4 w-4"/> Contacto</h4>
               <div className="grid gap-2">
                 <div><Label className="text-[10px] opacity-60">CORREO</Label><p className="font-bold">{selectedDocente?.correo}</p></div>
-                <div><Label className="text-[10px] opacity-60">TELÉFONO</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">CELULAR</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
                 <div><Label className="text-[10px] opacity-60">DIRECCIÓN</Label><p className="font-bold text-xs">{selectedDocente?.direccion || "N/A"}</p></div>
               </div>
             </section>
@@ -621,7 +621,7 @@ export default function DocentesPage() {
                 <TabsContent value="contacto" className="mt-0 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>Teléfono</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Celular</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
                     <div className="space-y-2 col-span-2"><Label>Dirección</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
                   </div>
                 </TabsContent>
