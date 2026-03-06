@@ -55,7 +55,7 @@
         "rango_militar": { "type": "string" },
         "profesion": { "type": "string", "description": "Formación profesional: Carrera que estudió el docente." },
         "institucion": { "type": "string" },
-        "sexo": { "type": "string", "enum": ["Masculino", "Femenino", "Otro"] },
+        "sexo": { "type": "string", "enum": ["Masculino", "Femenino"] },
         "estado_civil": { "type": "string", "enum": ["Soltero", "Casado", "Divorciado", "Viudo"] },
         "cantidad_hijos": { "type": "integer" },
         "modulos_asignaturas_imparte": { "type": "string" },

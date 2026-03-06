@@ -337,7 +337,6 @@ export default function DocentesPage() {
                             <SelectContent>
                               <SelectItem value="Masculino">Masculino</SelectItem>
                               <SelectItem value="Femenino">Femenino</SelectItem>
-                              <SelectItem value="Otro">Otro</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -589,7 +588,6 @@ export default function DocentesPage() {
                         <SelectContent>
                           <SelectItem value="Masculino">Masculino</SelectItem>
                           <SelectItem value="Femenino">Femenino</SelectItem>
-                          <SelectItem value="Otro">Otro</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
