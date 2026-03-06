@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   PlusCircle,
   FileDown,
@@ -108,6 +108,9 @@ export default function DocentesPage() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [selectedDocente, setSelectedDocente] = useState<any>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -133,10 +136,16 @@ export default function DocentesPage() {
     });
   }, [docentes, searchTerm, statusFilter]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredDocentes.length / itemsPerPage);
-  const paginatedDocentes = filteredDocentes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  
+  const paginatedDocentes = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredDocentes.slice(start, start + itemsPerPage);
+  }, [filteredDocentes, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, itemsPerPage, statusFilter]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,10 +190,7 @@ export default function DocentesPage() {
     if (!db) return;
     const nuevoEstado = docente.estado === "Activo" ? "Inactivo" : "Activo";
     
-    // Regla 3: Intento de desactivar un docente con secciones activas
     if (nuevoEstado === "Inactivo") {
-        // Obtenemos todas las secciones del docente. 
-        // Filtramos "estado != Finalizada" en memoria para evitar requerir un índice compuesto en Firestore.
         const sectionsQuery = query(
             collection(db, "secciones"), 
             where("docenteId", "==", docente.id)
@@ -434,15 +440,24 @@ export default function DocentesPage() {
             )}
           </CardContent>
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
-            <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-              Registros: {filteredDocentes.length}
+            <div className="flex items-center gap-6">
+              <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
+                Mostrando {paginatedDocentes.length} de {filteredDocentes.length}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Ver:</span>
+                <Select value={itemsPerPage.toString()} onValueChange={(val) => setItemsPerPage(parseInt(val))}>
+                  <SelectTrigger className="h-7 w-16 rounded-lg text-[10px] font-bold"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="10">10</SelectItem><SelectItem value="50">50</SelectItem><SelectItem value="100">100</SelectItem></SelectContent>
+                </Select>
+              </div>
             </div>
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
                     <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} /></PaginationItem>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <PaginationItem key={page} className="hidden sm:block">
-                        <PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }}>{page}</PaginationLink>
+                        <PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }} className="text-xs h-8 w-8">{page}</PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} /></PaginationItem>
