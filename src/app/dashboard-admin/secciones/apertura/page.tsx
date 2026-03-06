@@ -14,6 +14,7 @@ import {
   File,
   FileSpreadsheet,
   Settings2,
+  MapPin,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -83,34 +84,6 @@ import { FirestorePermissionError } from '@/firebase/errors';
 
 const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
-const PERIODOS_MAESTROS = [
-  { id: "2024-2", nombre: "2024-2", inicio: "2024-06-01", fin: "2024-08-31" },
-  { id: "2024-S2", nombre: "2024-S2", inicio: "2024-07-01", fin: "2024-12-31" },
-];
-
-const CURSOS_MAESTROS = [
-  "Seguridad de la Carga Aérea",
-  "Mercancías Peligrosas",
-  "AVSEC para Tripulación",
-  "Manejo de Crisis",
-  "Seguridad Aeroportuaria",
-  "Inteligencia Emocional",
-  "Ciberseguridad en Aviación",
-  "Primeros Auxilios Aeroportuarios",
-  "Protocolo y Etiqueta",
-  "Gestión de Carga Peligrosa",
-  "Inglés Técnico Aeronáutico",
-  "Psicología del Pasajero",
-];
-
-const DOCENTES_MAESTROS = [
-  "Juan Pérez",
-  "María García",
-  "Carlos López",
-  "Ana Martínez",
-  "Luis Hernández",
-];
-
 const DIAS_SEMANA = [
   { id: "lun", label: "Lunes" },
   { id: "mar", label: "Martes" },
@@ -134,12 +107,24 @@ const itemVariants = {
 export default function AperturaSeccionesPage() {
   const { toast } = useToast();
   const db = useFirestore();
+
+  // Queries reales a Firestore
   const seccionesQuery = useMemo(() => {
     if (!db) return null;
     return query(collection(db, "secciones"), orderBy("createdAt", "desc"));
   }, [db]);
 
+  const periodosQuery = useMemo(() => db ? collection(db, "periodos") : null, [db]);
+  const cursosQuery = useMemo(() => db ? collection(db, "cursos") : null, [db]);
+  const docentesQuery = useMemo(() => db ? collection(db, "docentes") : null, [db]);
+  const sedesQuery = useMemo(() => db ? collection(db, "sedes") : null, [db]);
+
   const { data: seccionesRaw, loading } = useCollection(seccionesQuery);
+  const { data: periodosData } = useCollection(periodosQuery);
+  const { data: cursosData } = useCollection(cursosQuery);
+  const { data: docentesData } = useCollection(docentesQuery);
+  const { data: sedesData } = useCollection(sedesQuery);
+
   const secciones = useMemo(() => seccionesRaw || [], [seccionesRaw]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -168,8 +153,9 @@ export default function AperturaSeccionesPage() {
 
   const [formData, setFormData] = useState({
     periodoId: "",
-    curso: "",
-    docente: "",
+    cursoId: "",
+    docenteId: "",
+    sedeId: "",
     capacidad: "40",
     dias: [] as string[],
     horaInicio: "08:00",
@@ -329,8 +315,8 @@ export default function AperturaSeccionesPage() {
   const handleCreateSeccion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db) return;
-    if (!formData.periodoId || !formData.curso || !formData.docente || formData.dias.length === 0) {
-      toast({ variant: "destructive", title: "Campos incompletos" });
+    if (!formData.periodoId || !formData.cursoId || !formData.docenteId || !formData.sedeId || formData.dias.length === 0) {
+      toast({ variant: "destructive", title: "Campos incompletos", description: "Por favor, complete todos los campos obligatorios." });
       return;
     }
 
@@ -341,19 +327,28 @@ export default function AperturaSeccionesPage() {
         
         let newCount = 1;
         if (counterSnap.exists()) {
-          // Usamos inst_secciones_count para el contador global institucional
           newCount = (counterSnap.data().inst_secciones_count || 0) + 1;
         }
         
         const codigoSeccion = `SEC-${newCount.toString().padStart(4, "0")}`;
         const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
         
+        // Obtenemos los nombres para denormalización visual (opcional, pero ayuda a la tabla)
+        const cursoNombre = cursosData.find(c => c.id === formData.cursoId)?.nombre || "Desconocido";
+        const docenteNombre = docentesData.find(d => d.id === formData.docenteId)?.nombre || "Desconocido";
+        const periodoNombre = periodosData.find(p => p.id === formData.periodoId)?.nombre || "Desconocido";
+
         const newSeccionData = {
           codigoSeccion,
-          periodo: formData.periodoId,
-          curso: formData.curso,
+          periodoId: formData.periodoId,
+          cursoId: formData.cursoId,
+          docenteId: formData.docenteId,
+          sedeId: formData.sedeId,
+          // Guardamos nombres para visualización rápida en tablas sin joins pesados
+          curso: cursoNombre,
+          docente: docenteNombre,
+          periodo: periodoNombre,
           programa: "DIGEP Directo",
-          docente: formData.docente,
           horario: `${diasStr} ${formatTime12h(formData.horaInicio)} - ${formatTime12h(formData.horaFin)}`,
           dias: formData.dias,
           horaInicio: formData.horaInicio,
@@ -361,14 +356,13 @@ export default function AperturaSeccionesPage() {
           estado: formData.estado,
           inscritos: 0,
           capacidad: parseInt(formData.capacidad),
-          fechaInicio: "2024-06-01",
+          fechaInicio: "2024-06-01", // Estos podrían venir del periodo seleccionado
           fechaFin: "2024-08-31",
           createdAt: serverTimestamp(),
         };
 
         const newDocRef = doc(collection(db, "secciones"));
         transaction.set(newDocRef, newSeccionData);
-        // Actualizamos el contador institucional en Firestore
         transaction.set(counterRef, { inst_secciones_count: newCount }, { merge: true });
       });
 
@@ -388,8 +382,11 @@ export default function AperturaSeccionesPage() {
     if (!db || !selectedSeccion) return;
 
     const diasStr = formData.dias.map(d => DIAS_SEMANA.find(ds => ds.id === d)?.label.substring(0, 3)).join('-');
+    const docenteNombre = docentesData.find(d => d.id === formData.docenteId)?.nombre || "Desconocido";
+
     const updateData = {
-      docente: formData.docente,
+      docenteId: formData.docenteId,
+      docente: docenteNombre,
       capacidad: parseInt(formData.capacidad),
       dias: formData.dias,
       horaInicio: formData.horaInicio,
@@ -404,26 +401,26 @@ export default function AperturaSeccionesPage() {
         toast({ title: "Sección actualizada exitosamente" });
       })
       .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: `secciones/${selectedSeccion.id}`,
           operation: 'update',
           requestResourceData: updateData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       });
   };
 
   const resetForm = () => {
-    setFormData({ periodoId: "", curso: "", docente: "", capacidad: "40", dias: [], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta" });
+    setFormData({ periodoId: "", cursoId: "", docenteId: "", sedeId: "", capacidad: "40", dias: [], horaInicio: "08:00", horaFin: "12:00", estado: "Abierta" });
     setSelectedSeccion(null);
   };
 
   const openEditSection = (seccion: any) => {
     setSelectedSeccion(seccion);
     setFormData({
-      periodoId: seccion.periodo || "",
-      curso: seccion.curso || "",
-      docente: seccion.docente || "",
+      periodoId: seccion.periodoId || "",
+      cursoId: seccion.cursoId || "",
+      docenteId: seccion.docenteId || "",
+      sedeId: seccion.sedeId || "",
       capacidad: seccion.capacidad?.toString() || "40",
       dias: seccion.dias || [],
       horaInicio: seccion.horaInicio || "08:00",
@@ -517,9 +514,46 @@ export default function AperturaSeccionesPage() {
               </DialogHeader>
               <form onSubmit={handleCreateSeccion} className="space-y-6 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Período Académico</Label><Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar período..." /></SelectTrigger><SelectContent>{PERIODOS_MAESTROS.map((p) => (<SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>))}</SelectContent></Select></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Curso</Label><Select onValueChange={(val) => setFormData({ ...formData, curso: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar curso..." /></SelectTrigger><SelectContent>{CURSOS_MAESTROS.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}</SelectContent></Select></div>
-                  <div className="space-y-2 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label><Select onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente..." /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select></div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Período Académico</Label>
+                    <Select onValueChange={(val) => setFormData({ ...formData, periodoId: val })}>
+                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar período..." /></SelectTrigger>
+                      <SelectContent>
+                        {periodosData.map((p) => (<SelectItem key={p.id} value={p.id}>{p.nombre}</SelectItem>))}
+                        {periodosData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay periodos registrados</p>}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Curso / Programa</Label>
+                    <Select onValueChange={(val) => setFormData({ ...formData, cursoId: val })}>
+                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar curso..." /></SelectTrigger>
+                      <SelectContent>
+                        {cursosData.map((c) => (<SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>))}
+                        {cursosData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay cursos registrados</p>}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Sede / Recinto</Label>
+                    <Select onValueChange={(val) => setFormData({ ...formData, sedeId: val })}>
+                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar sede..." /></SelectTrigger>
+                      <SelectContent>
+                        {sedesData.map((s) => (<SelectItem key={s.id} value={s.id}>{s.nombre}</SelectItem>))}
+                        {sedesData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay sedes registradas</p>}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
+                    <Select onValueChange={(val) => setFormData({ ...formData, docenteId: val })}>
+                      <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Buscar docente..." /></SelectTrigger>
+                      <SelectContent>
+                        {docentesData.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
+                        {docentesData.length === 0 && <p className="p-2 text-xs text-muted-foreground italic">No hay docentes registrados</p>}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label><Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} /></div>
                   <div className="space-y-3"><Label className="text-xs font-bold uppercase opacity-60">Días de Clase</Label><div className="flex flex-wrap gap-2">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-1"><Checkbox id={dia.id} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={dia.id} className="text-[10px]">{dia.label}</Label></div>))}</div></div>
                   <div className="space-y-2 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Horario</Label><div className="flex gap-4"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
@@ -626,7 +660,15 @@ export default function AperturaSeccionesPage() {
           <DialogHeader><DialogTitle className="text-2xl font-black">Editar Estructura Académica</DialogTitle></DialogHeader>
           <form onSubmit={handleUpdateSeccion} className="space-y-8 py-6">
              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label><Select value={formData.docente} onValueChange={(val) => setFormData({ ...formData, docente: val })}><SelectTrigger className="rounded-xl h-11"><SelectValue /></SelectTrigger><SelectContent>{DOCENTES_MAESTROS.map((d) => (<SelectItem key={d} value={d}>{d}</SelectItem>))}</SelectContent></Select></div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase opacity-60">Docente Asignado</Label>
+                  <Select value={formData.docenteId} onValueChange={(val) => setFormData({ ...formData, docenteId: val })}>
+                    <SelectTrigger className="rounded-xl h-11"><SelectValue placeholder="Seleccionar docente..." /></SelectTrigger>
+                    <SelectContent>
+                      {docentesData.map((d) => (<SelectItem key={d.id} value={d.id}>{d.nombre} {d.apellido}</SelectItem>))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-2"><Label className="text-xs font-bold uppercase opacity-60">Capacidad Máxima</Label><Input type="number" value={formData.capacidad} onChange={(e) => setFormData({ ...formData, capacidad: e.target.value })} /></div>
                 <div className="space-y-4 md:col-span-2"><Label className="text-xs font-bold uppercase opacity-60">Horario (Días y Horas)</Label><div className="flex flex-wrap gap-4">{DIAS_SEMANA.map((dia) => (<div key={dia.id} className="flex items-center space-x-2"><Checkbox id={`edit-${dia.id}`} checked={formData.dias.includes(dia.id)} onCheckedChange={(checked) => { const newDias = checked ? [...formData.dias, dia.id] : formData.dias.filter(d => d !== dia.id); setFormData({ ...formData, dias: newDias }); }} /><Label htmlFor={`edit-${dia.id}`} className="text-xs">{dia.label}</Label></div>))}</div><div className="flex gap-4 mt-4"><Input type="time" value={formData.horaInicio} onChange={(e) => setFormData({ ...formData, horaInicio: e.target.value })} /><Input type="time" value={formData.horaFin} onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })} /></div></div>
              </div>
