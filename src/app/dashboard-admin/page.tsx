@@ -163,9 +163,6 @@ export default function DashboardAdminPage() {
             data-ai-hint={images.vision_institutional.hint}
           />
           <CardContent className="relative z-10 h-full flex flex-col justify-center p-12 text-white">
-            <h3 className="text-3xl font-black font-headline mb-6 tracking-tighter flex items-center gap-3">
-              <Target className="h-8 w-8 text-primary" /> Misión Institucional
-            </h3>
             <p className="text-lg leading-relaxed font-medium text-white/90 italic border-l-4 border-primary pl-6">
               "Capacitar a los miembros de las Fuerzas Armadas, la Policía Nacional y la población civil, en carreras técnicas y de artes y oficios, a fin de contribuir con el desarrollo nacional y su bienestar personal."
             </p>
