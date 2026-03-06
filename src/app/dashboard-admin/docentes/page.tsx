@@ -12,10 +12,16 @@ import {
   Eye,
   CheckCircle2,
   XCircle,
-  FileText,
-  File,
-  FileSpreadsheet,
   Users,
+  UserCircle,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  Briefcase,
+  GraduationCap,
+  BookOpen,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -25,7 +31,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -60,8 +65,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
   Pagination,
@@ -77,8 +89,6 @@ import { useFirestore, useCollection } from "@/firebase";
 import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, where, getDocs } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-
-const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -115,9 +125,24 @@ export default function DocentesPage() {
     nombre: "",
     apellido: "",
     cedula: "",
-    telefono: "",
     correo: "",
+    telefono: "",
+    direccion: "",
+    fecha_nacimiento: "",
+    foto_perfil: "",
+    fecha_ingreso: "",
+    escuelaId: "",
+    rango_militar: "",
+    profesion: "",
+    oficio: "",
+    institucion: "",
+    sexo: "Masculino",
+    estado_civil: "Soltero",
+    cantidad_hijos: "0",
     especialidad: "",
+    modulos_asignaturas_imparte: "",
+    educacion_academica: "",
+    clave_acceso: "",
     estado: "Activo",
   });
 
@@ -151,6 +176,20 @@ export default function DocentesPage() {
     e.preventDefault();
     if (!db) return;
 
+    // Validación de unicidad
+    const cedulaExists = docentes.some(d => d.cedula === formData.cedula);
+    const correoExists = docentes.some(d => d.correo === formData.correo);
+
+    if (cedulaExists) {
+      toast({ variant: "destructive", title: "Cédula duplicada", description: "Ya existe un docente registrado con esta cédula." });
+      return;
+    }
+
+    if (correoExists) {
+      toast({ variant: "destructive", title: "Correo duplicado", description: "Ya existe un docente registrado con este correo." });
+      return;
+    }
+
     const payload = {
       ...formData,
       createdAt: serverTimestamp(),
@@ -162,7 +201,7 @@ export default function DocentesPage() {
       .then(() => {
         setIsCreateDialogOpen(false);
         resetForm();
-        toast({ title: "Docente Registrado" });
+        toast({ title: "Docente Registrado", description: "El instructor ha sido añadido exitosamente." });
       })
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: collectionRef.path, operation: 'create', requestResourceData: payload })));
   };
@@ -181,7 +220,7 @@ export default function DocentesPage() {
       .then(() => {
         setIsEditDialogOpen(false);
         resetForm();
-        toast({ title: "Docente Actualizado" });
+        toast({ title: "Docente Actualizado", description: "Los cambios han sido guardados en Firestore." });
       })
       .catch((err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: docRef.path, operation: 'update', requestResourceData: payload })));
   };
@@ -202,7 +241,7 @@ export default function DocentesPage() {
             toast({
                 variant: "destructive",
                 title: "Bloqueo de Desactivación",
-                description: "No es posible desactivar este docente porque está asignado a una o más secciones. Debe removerlo o finalizar esas secciones antes de cambiar su estado."
+                description: "No es posible desactivar este docente porque está asignado a una o más secciones activas."
             });
             return;
         }
@@ -215,7 +254,14 @@ export default function DocentesPage() {
   };
 
   const resetForm = () => {
-    setFormData({ nombre: "", apellido: "", cedula: "", telefono: "", correo: "", especialidad: "", estado: "Activo" });
+    setFormData({ 
+      nombre: "", apellido: "", cedula: "", correo: "", telefono: "", direccion: "", 
+      fecha_nacimiento: "", foto_perfil: "", fecha_ingreso: "", escuelaId: "", 
+      rango_militar: "", profesion: "", oficio: "", institucion: "", 
+      sexo: "Masculino", estado_civil: "Soltero", cantidad_hijos: "0", 
+      especialidad: "", modulos_asignaturas_imparte: "", educacion_academica: "", 
+      clave_acceso: "", estado: "Activo" 
+    });
     setSelectedDocente(null);
   };
 
@@ -225,89 +271,27 @@ export default function DocentesPage() {
       nombre: docente.nombre || "",
       apellido: docente.apellido || "",
       cedula: docente.cedula || "",
-      telefono: docente.telefono || "",
       correo: docente.correo || "",
+      telefono: docente.telefono || "",
+      direccion: docente.direccion || "",
+      fecha_nacimiento: docente.fecha_nacimiento || "",
+      foto_perfil: docente.foto_perfil || "",
+      fecha_ingreso: docente.fecha_ingreso || "",
+      escuelaId: docente.escuelaId || "",
+      rango_militar: docente.rango_militar || "",
+      profesion: docente.profesion || "",
+      oficio: docente.oficio || "",
+      institucion: docente.institucion || "",
+      sexo: docente.sexo || "Masculino",
+      estado_civil: docente.estado_civil || "Soltero",
+      cantidad_hijos: docente.cantidad_hijos?.toString() || "0",
       especialidad: docente.especialidad || "",
+      modulos_asignaturas_imparte: docente.modulos_asignaturas_imparte || "",
+      educacion_academica: docente.educacion_academica || "",
+      clave_acceso: docente.clave_acceso || "",
       estado: docente.estado || "Activo",
     });
     setIsEditDialogOpen(true);
-  };
-
-  const openView = (docente: any) => {
-    setSelectedDocente(docente);
-    setIsViewDialogOpen(true);
-  };
-
-  const handleExport = async (format: 'excel' | 'pdf' | 'word') => {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('es-DO', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const fullDate = `Fecha: ${dateStr}`;
-    const fileName = `Listado_Docentes_${now.toISOString().split('T')[0]}`;
-
-    const dataToExport = filteredDocentes.map((d, index) => ({
-      "No.": index + 1,
-      "Nombre": d.nombre,
-      "Apellido": d.apellido,
-      "Cédula": d.cedula,
-      "Teléfono": d.telefono,
-      "Correo": d.correo,
-      "Especialidad": d.especialidad,
-      "Estado": d.estado,
-    }));
-
-    const exportHeaders = ["No.", "Nombre", "Apellido", "Cédula", "Teléfono", "Correo", "Especialidad", "Estado"];
-
-    toast({ title: "Generando reporte", description: `Exportando a ${format.toUpperCase()}...` });
-
-    try {
-      if (format === 'excel') {
-        const { utils, writeFile } = await import('xlsx');
-        const worksheet = utils.json_to_sheet(dataToExport);
-        const workbook = utils.book_new();
-        utils.book_append_sheet(workbook, worksheet, "Docentes");
-        writeFile(workbook, `${fileName}.xlsx`);
-      } else if (format === 'pdf') {
-        const { default: jsPDF } = await import('jspdf');
-        const { default: autoTable } = await import('jspdf-autotable');
-        const doc = new jsPDF('landscape');
-        doc.setFontSize(14).text("DIGEV - LISTADO OFICIAL DE DOCENTES", 14, 20);
-        doc.setFontSize(10).text(fullDate, 14, 26);
-        autoTable(doc, {
-          startY: 32,
-          head: [exportHeaders],
-          body: dataToExport.map(row => Object.values(row)),
-          headStyles: { fillColor: [38, 101, 140] },
-        });
-        doc.save(`${fileName}.pdf`);
-      } else if (format === 'word') {
-        const { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType, TextRun } = await import('docx');
-        const { saveAs } = await import('file-saver');
-        const docWord = new Document({
-          sections: [{
-            children: [
-              new Paragraph({ children: [new TextRun({ text: "DIGEV - LISTADO OFICIAL DE DOCENTES", bold: true, size: 28 })] }),
-              new Paragraph({ children: [new TextRun({ text: fullDate, size: 20 })], spacing: { after: 200 } }),
-              new Table({
-                width: { size: 100, type: WidthType.PERCENTAGE },
-                rows: [
-                  new TableRow({
-                    children: exportHeaders.map(h => new TableCell({ children: [new Paragraph({ text: h, bold: true })] }))
-                  }),
-                  ...dataToExport.map(row => new TableRow({
-                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ text: String(v) })] }))
-                  }))
-                ]
-              })
-            ]
-          }]
-        });
-        const blob = await Packer.toBlob(docWord);
-        saveAs(blob, `${fileName}.docx`);
-      }
-      toast({ title: "Exportación completada" });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Error al exportar" });
-    }
   };
 
   return (
@@ -316,45 +300,104 @@ export default function DocentesPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <Users className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-black font-headline tracking-tighter">Gestión de Docentes</h1>
+            <h1 className="text-3xl font-black font-headline tracking-tighter">Módulo de Docentes</h1>
           </div>
-          <p className="text-muted-foreground font-medium text-sm">Registro institucional de instructores y especialistas.</p>
+          <p className="text-muted-foreground font-medium text-sm">Registro integral y perfil extendido de instructores.</p>
         </div>
         <div className="flex items-center gap-3">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
-                <FileDown className="mr-2 h-4 w-4" /> Exportar
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 rounded-xl border-border/50 p-2 shadow-xl">
-              <DropdownMenuItem onClick={() => handleExport('word')} className="cursor-pointer">Word (.docx)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('pdf')} className="cursor-pointer">PDF (.pdf)</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer">Excel (.xlsx)</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="outline" size="sm" className="font-bold uppercase tracking-wider text-[10px] h-9">
+            <FileDown className="mr-2 h-4 w-4" /> Exportar
+          </Button>
 
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" onClick={resetForm} className="font-bold shadow-lg shadow-primary/20 uppercase tracking-wider text-[10px] h-9">
-                <PlusCircle className="mr-2 h-4 w-4" /> Nuevo Docente
+                <PlusCircle className="mr-2 h-4 w-4" /> Registrar Docente
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] rounded-[1.5rem]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black">Registrar Docente</DialogTitle>
-                <DialogDescription>Añada un nuevo instructor al sistema.</DialogDescription>
+            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden">
+              <DialogHeader className="p-8 bg-muted/30">
+                <DialogTitle className="text-2xl font-black">Expediente de Docente</DialogTitle>
+                <DialogDescription>Complete el perfil institucional del nuevo instructor.</DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleCreate} className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Nombre</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
-                  <div className="space-y-2"><Label>Apellido</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
-                  <div className="space-y-2"><Label>Cédula</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-                  <div className="space-y-2"><Label>Teléfono</Label><Input required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
-                  <div className="space-y-2 col-span-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
-                  <div className="space-y-2 col-span-2"><Label>Especialidad / Profesión</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
-                </div>
-                <DialogFooter className="pt-4"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar</Button></DialogFooter>
+              <form onSubmit={handleCreate}>
+                <Tabs defaultValue="personal" className="w-full">
+                  <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-8 h-12">
+                    <TabsTrigger value="personal" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Personal</TabsTrigger>
+                    <TabsTrigger value="contacto" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Contacto</TabsTrigger>
+                    <TabsTrigger value="laboral" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Laboral / Académico</TabsTrigger>
+                    <TabsTrigger value="institucional" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Institucional</TabsTrigger>
+                  </TabsList>
+
+                  <div className="p-8 space-y-6">
+                    <TabsContent value="personal" className="mt-0 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label>Nombre(s) *</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Apellido(s) *</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Cédula *</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                        <div className="space-y-2">
+                          <Label>Sexo</Label>
+                          <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Masculino">Masculino</SelectItem>
+                              <SelectItem value="Femenino">Femenino</SelectItem>
+                              <SelectItem value="Otro">Otro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Estado Civil</Label>
+                          <Select value={formData.estado_civil} onValueChange={v => setFormData({...formData, estado_civil: v})}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Soltero">Soltero/a</SelectItem>
+                              <SelectItem value="Casado">Casado/a</SelectItem>
+                              <SelectItem value="Divorciado">Divorciado/a</SelectItem>
+                              <SelectItem value="Viudo">Viudo/a</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2"><Label>Cantidad de Hijos</Label><Input type="number" min="0" value={formData.cantidad_hijos} onChange={e => setFormData({...formData, cantidad_hijos: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Foto de Perfil (URL)</Label><Input placeholder="https://..." value={formData.foto_perfil} onChange={e => setFormData({...formData, foto_perfil: e.target.value})} /></div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="contacto" className="mt-0 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label>Correo Electrónico *</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Teléfono de Contacto</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
+                        <div className="space-y-2 col-span-2"><Label>Dirección Residencial</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="laboral" className="mt-0 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label>Especialidad *</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Profesión</Label><Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Oficio</Label><Input value={formData.oficio} onChange={e => setFormData({...formData, oficio: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
+                        <div className="space-y-2 col-span-2"><Label>Módulos / Asignaturas que Imparte</Label><Textarea placeholder="Lista de materias..." value={formData.modulos_asignaturas_imparte} onChange={e => setFormData({...formData, modulos_asignaturas_imparte: e.target.value})} /></div>
+                        <div className="space-y-2 col-span-2"><Label>Educación Académica</Label><Textarea placeholder="Resumen de formación..." value={formData.educacion_academica} onChange={e => setFormData({...formData, educacion_academica: e.target.value})} /></div>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="institucional" className="mt-0 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Rango Militar (Opcional)</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Escuela (Referencia ID)</Label><Input placeholder="ID de la escuela" value={formData.escuelaId} onChange={e => setFormData({...formData, escuelaId: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Clave de Acceso Temporal</Label><Input type="password" value={formData.clave_acceso} onChange={e => setFormData({...formData, clave_acceso: e.target.value})} /></div>
+                      </div>
+                    </TabsContent>
+                  </div>
+
+                  <DialogFooter className="p-8 bg-muted/30">
+                    <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
+                    <Button type="submit">Finalizar Registro</Button>
+                  </DialogFooter>
+                </Tabs>
               </form>
             </DialogContent>
           </Dialog>
@@ -365,7 +408,7 @@ export default function DocentesPage() {
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Buscar por nombre, apellido, cédula, especialidad..." 
+            placeholder="Buscar por nombre, cédula o especialidad..." 
             className="pl-12 h-12 bg-card/50 border-border/50 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -374,10 +417,10 @@ export default function DocentesPage() {
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full md:w-48 h-12 rounded-xl">
             <Filter className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Filtrar por estado" />
+            <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Todos">Todos los estados</SelectItem>
+            <SelectItem value="Todos">Todos</SelectItem>
             <SelectItem value="Activo">Activos</SelectItem>
             <SelectItem value="Inactivo">Inactivos</SelectItem>
           </SelectContent>
@@ -394,11 +437,8 @@ export default function DocentesPage() {
                 <TableHeader className="bg-muted/30">
                   <TableRow>
                     <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">No.</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Nombre</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Apellido</TableHead>
+                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Instructor</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Cédula</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Teléfono</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Correo</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Especialidad</TableHead>
                     <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Estado</TableHead>
                     <TableHead className="font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60 text-right">Acciones</TableHead>
@@ -408,11 +448,16 @@ export default function DocentesPage() {
                   {paginatedDocentes.map((d, index) => (
                     <TableRow key={d.id} className="hover:bg-muted/20 border-border/50 transition-colors">
                       <TableCell className="py-6 pl-8 font-bold text-xs text-muted-foreground">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-                      <TableCell className="py-6 font-bold text-xs">{d.nombre}</TableCell>
-                      <TableCell className="py-6 font-bold text-xs">{d.apellido}</TableCell>
+                      <TableCell className="py-6">
+                        <div className="flex items-center gap-3">
+                          <UserCircle className="h-8 w-8 text-muted-foreground opacity-50" />
+                          <div className="flex flex-col">
+                            <span className="font-bold text-xs">{d.nombre} {d.apellido}</span>
+                            <span className="text-[10px] opacity-60">{d.correo}</span>
+                          </div>
+                        </div>
+                      </TableCell>
                       <TableCell className="py-6 font-mono text-xs opacity-80">{d.cedula}</TableCell>
-                      <TableCell className="py-6 text-xs">{d.telefono}</TableCell>
-                      <TableCell className="py-6 text-xs opacity-70">{d.correo}</TableCell>
                       <TableCell className="py-6 font-medium text-xs tracking-tight">{d.especialidad}</TableCell>
                       <TableCell className="py-6 text-center">
                         <Badge className={`font-bold px-3 ${d.estado === 'Activo' ? 'bg-success/15 text-success border-success/20' : 'bg-destructive/15 text-destructive border-destructive/20'}`}>
@@ -423,9 +468,9 @@ export default function DocentesPage() {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-52 rounded-xl p-2 shadow-2xl">
-                             <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Acciones</DropdownMenuLabel>
-                             <DropdownMenuItem onClick={() => openView(d)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles</DropdownMenuItem>
-                             <DropdownMenuItem onClick={() => openEdit(d)} className="cursor-pointer text-xs"><Edit className="h-4 w-4 mr-2" /> Editar</DropdownMenuItem>
+                             <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Acciones de Perfil</DropdownMenuLabel>
+                             <DropdownMenuItem onClick={() => setSelectedDocente(d) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Expediente</DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => openEdit(d)} className="cursor-pointer text-xs"><Edit className="h-4 w-4 mr-2" /> Editar Datos</DropdownMenuItem>
                              <DropdownMenuSeparator />
                              <DropdownMenuItem onClick={() => toggleStatus(d)} className="cursor-pointer text-xs">
                                 {d.estado === 'Activo' ? <><XCircle className="h-4 w-4 mr-2 text-destructive" /> Desactivar</> : <><CheckCircle2 className="h-4 w-4 mr-2 text-success" /> Activar</>}
@@ -439,6 +484,7 @@ export default function DocentesPage() {
               </Table>
             )}
           </CardContent>
+          
           <div className="p-6 border-t border-border/50 bg-muted/5 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
@@ -467,48 +513,137 @@ export default function DocentesPage() {
         </Card>
       </motion.div>
 
-      {/* Ver Detalles */}
+      {/* Expediente Completo */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] rounded-[1.5rem]">
-          <DialogHeader><DialogTitle className="text-2xl font-black">Expediente de Docente</DialogTitle></DialogHeader>
-          {selectedDocente && (
-            <div className="space-y-6 py-4">
-              <div className="flex items-center gap-4 p-4 bg-muted/20 rounded-xl border border-border/50">
-                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Users className="h-8 w-8 text-primary" />
-                 </div>
-                 <div>
-                    <h3 className="text-lg font-bold">{selectedDocente.nombre} {selectedDocente.apellido}</h3>
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-widest">{selectedDocente.especialidad}</p>
-                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1"><Label className="text-[10px] opacity-60">CÉDULA</Label><p className="font-bold">{selectedDocente.cedula}</p></div>
-                <div className="space-y-1"><Label className="text-[10px] opacity-60">TELÉFONO</Label><p className="font-bold">{selectedDocente.telefono}</p></div>
-                <div className="space-y-1 col-span-2"><Label className="text-[10px] opacity-60">CORREO ELECTRÓNICO</Label><p className="font-bold">{selectedDocente.correo}</p></div>
-                <div className="space-y-1"><Label className="text-[10px] opacity-60">ESTADO</Label><p className="font-bold uppercase">{selectedDocente.estado}</p></div>
-                <div className="space-y-1"><Label className="text-[10px] opacity-60">FECHA REGISTRO</Label><p className="font-bold">{selectedDocente.createdAt?.toDate ? selectedDocente.createdAt.toDate().toLocaleDateString() : "Reciente"}</p></div>
-              </div>
+        <DialogContent className="sm:max-w-[700px] rounded-[1.5rem] p-0 overflow-hidden">
+          <DialogHeader className="p-8 bg-primary/5 border-b">
+            <div className="flex items-center gap-6">
+               <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center border-2 border-primary/20">
+                  <UserCircle className="h-12 w-12 text-primary" />
+               </div>
+               <div>
+                  <DialogTitle className="text-2xl font-black">{selectedDocente?.nombre} {selectedDocente?.apellido}</DialogTitle>
+                  <p className="text-xs text-primary font-bold uppercase tracking-widest">{selectedDocente?.especialidad}</p>
+                  <Badge variant="outline" className="mt-2">{selectedDocente?.estado}</Badge>
+               </div>
             </div>
-          )}
-          <DialogFooter><DialogClose asChild><Button variant="outline">Cerrar</Button></DialogClose></DialogFooter>
+          </DialogHeader>
+          <div className="p-8 grid grid-cols-2 gap-8 text-sm max-h-[60vh] overflow-y-auto">
+            <section className="space-y-4">
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><UserCircle className="h-4 w-4"/> Datos Personales</h4>
+              <div className="grid gap-2">
+                <div><Label className="text-[10px] opacity-60">CÉDULA</Label><p className="font-bold">{selectedDocente?.cedula}</p></div>
+                <div><Label className="text-[10px] opacity-60">FECHA NACIMIENTO</Label><p className="font-bold">{selectedDocente?.fecha_nacimiento || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">SEXO / E. CIVIL</Label><p className="font-bold">{selectedDocente?.sexo} - {selectedDocente?.estado_civil}</p></div>
+                <div><Label className="text-[10px] opacity-60">HIJOS</Label><p className="font-bold">{selectedDocente?.cantidad_hijos}</p></div>
+              </div>
+            </section>
+            <section className="space-y-4">
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Mail className="h-4 w-4"/> Contacto</h4>
+              <div className="grid gap-2">
+                <div><Label className="text-[10px] opacity-60">CORREO</Label><p className="font-bold">{selectedDocente?.correo}</p></div>
+                <div><Label className="text-[10px] opacity-60">TELÉFONO</Label><p className="font-bold">{selectedDocente?.telefono || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">DIRECCIÓN</Label><p className="font-bold text-xs">{selectedDocente?.direccion || "N/A"}</p></div>
+              </div>
+            </section>
+            <section className="space-y-4">
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Briefcase className="h-4 w-4"/> Perfil Laboral</h4>
+              <div className="grid gap-2">
+                <div><Label className="text-[10px] opacity-60">PROFESIÓN / OFICIO</Label><p className="font-bold">{selectedDocente?.profesion || "N/A"} / {selectedDocente?.oficio || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">MÓDULOS</Label><p className="font-bold text-xs">{selectedDocente?.modulos_asignaturas_imparte || "N/A"}</p></div>
+              </div>
+            </section>
+            <section className="space-y-4">
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><Shield className="h-4 w-4"/> Institucional</h4>
+              <div className="grid gap-2">
+                <div><Label className="text-[10px] opacity-60">INSTITUCIÓN / RANGO</Label><p className="font-bold">{selectedDocente?.institucion || "N/A"} - {selectedDocente?.rango_militar || "N/A"}</p></div>
+                <div><Label className="text-[10px] opacity-60">ESCUELA ID</Label><p className="font-bold">{selectedDocente?.escuelaId || "N/A"}</p></div>
+              </div>
+            </section>
+            <section className="col-span-2 space-y-4">
+              <h4 className="font-bold flex items-center gap-2 text-primary border-b pb-2"><GraduationCap className="h-4 w-4"/> Educación Académica</h4>
+              <p className="text-xs leading-relaxed italic bg-muted/50 p-4 rounded-xl border">{selectedDocente?.educacion_academica || "No se ha registrado información académica detallada."}</p>
+            </section>
+          </div>
+          <DialogFooter className="p-8 bg-muted/30 border-t"><DialogClose asChild><Button variant="outline">Cerrar Expediente</Button></DialogClose></DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Editar */}
+      {/* Editar Perfil */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[600px] rounded-[1.5rem]">
-          <DialogHeader><DialogTitle className="text-2xl font-black">Editar Docente</DialogTitle></DialogHeader>
-          <form onSubmit={handleUpdate} className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Nombre</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
-              <div className="space-y-2"><Label>Apellido</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
-              <div className="space-y-2"><Label>Cédula</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
-              <div className="space-y-2"><Label>Teléfono</Label><Input required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
-              <div className="space-y-2 col-span-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
-              <div className="space-y-2 col-span-2"><Label>Especialidad / Profesión</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
-            </div>
-            <DialogFooter className="pt-4"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Actualizar Datos</Button></DialogFooter>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto rounded-[1.5rem] p-0 overflow-hidden">
+          <DialogHeader className="p-8 bg-muted/30">
+            <DialogTitle className="text-2xl font-black">Modificar Instructor</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdate}>
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="w-full justify-start rounded-none border-b bg-transparent px-8 h-12">
+                <TabsTrigger value="personal" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Personal</TabsTrigger>
+                <TabsTrigger value="contacto" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Contacto</TabsTrigger>
+                <TabsTrigger value="laboral" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Laboral</TabsTrigger>
+                <TabsTrigger value="institucional" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">Institucional</TabsTrigger>
+              </TabsList>
+
+              <div className="p-8 space-y-6">
+                <TabsContent value="personal" className="mt-0 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Nombre(s)</Label><Input required value={formData.nombre} onChange={e => setFormData({...formData, nombre: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Apellido(s)</Label><Input required value={formData.apellido} onChange={e => setFormData({...formData, apellido: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Cédula</Label><Input required value={formData.cedula} onChange={e => setFormData({...formData, cedula: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Fecha de Nacimiento</Label><Input type="date" value={formData.fecha_nacimiento} onChange={e => setFormData({...formData, fecha_nacimiento: e.target.value})} /></div>
+                    <div className="space-y-2">
+                      <Label>Sexo</Label>
+                      <Select value={formData.sexo} onValueChange={v => setFormData({...formData, sexo: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Masculino">Masculino</SelectItem>
+                          <SelectItem value="Femenino">Femenino</SelectItem>
+                          <SelectItem value="Otro">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Estado Civil</Label>
+                      <Select value={formData.estado_civil} onValueChange={v => setFormData({...formData, estado_civil: v})}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Soltero">Soltero/a</SelectItem>
+                          <SelectItem value="Casado">Casado/a</SelectItem>
+                          <SelectItem value="Divorciado">Divorciado/a</SelectItem>
+                          <SelectItem value="Viudo">Viudo/a</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="contacto" className="mt-0 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Correo Electrónico</Label><Input type="email" required value={formData.correo} onChange={e => setFormData({...formData, correo: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Teléfono</Label><Input value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label>Dirección</Label><Input value={formData.direccion} onChange={e => setFormData({...formData, direccion: e.target.value})} /></div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="laboral" className="mt-0 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Especialidad</Label><Input required value={formData.especialidad} onChange={e => setFormData({...formData, especialidad: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Profesión</Label><Input value={formData.profesion} onChange={e => setFormData({...formData, profesion: e.target.value})} /></div>
+                    <div className="space-y-2 col-span-2"><Label>Educación Académica</Label><Textarea value={formData.educacion_academica} onChange={e => setFormData({...formData, educacion_academica: e.target.value})} /></div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="institucional" className="mt-0 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><Label>Rango Militar</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
+                  </div>
+                </TabsContent>
+              </div>
+
+              <DialogFooter className="p-8 bg-muted/30 border-t"><DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose><Button type="submit">Guardar Cambios</Button></DialogFooter>
+            </Tabs>
           </form>
         </DialogContent>
       </Dialog>
