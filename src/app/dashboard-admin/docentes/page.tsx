@@ -26,7 +26,6 @@ import {
   ExternalLink,
   FileText,
   Loader2,
-  Upload
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -78,7 +77,6 @@ import {
 } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
   Pagination,
@@ -91,8 +89,6 @@ import {
 
 // Firebase imports
 import { useFirestore, useCollection } from "@/firebase";
-import { storage } from "@/lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, updateDoc, doc, serverTimestamp, query, orderBy, where, getDocs } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -153,8 +149,7 @@ export default function DocentesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
-  const [cvFile, setCvFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -204,18 +199,10 @@ export default function DocentesPage() {
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage, statusFilter]);
 
-  const handleFileUpload = async (file: File): Promise<string> => {
-    if (!storage) throw new Error("Storage no inicializado");
-    const storageRef = ref(storage, `cvs/${Date.now()}_${file.name}`);
-    const snapshot = await uploadBytes(storageRef, file);
-    return getDownloadURL(snapshot.ref);
-  };
-
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!db) return;
 
-    // Validación de unicidad
     const cedulaExists = docentes.some(d => d.cedula === formData.cedula);
     const correoExists = docentes.some(d => d.correo === formData.correo);
 
@@ -229,17 +216,11 @@ export default function DocentesPage() {
       return;
     }
 
-    setIsUploading(true);
-    let finalCvUrl = formData.cv_url;
+    setIsSaving(true);
 
     try {
-      if (cvFile) {
-        finalCvUrl = await handleFileUpload(cvFile);
-      }
-
       const payload = {
         ...formData,
-        cv_url: finalCvUrl,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -253,7 +234,7 @@ export default function DocentesPage() {
     } catch (err: any) {
       toast({ variant: "destructive", title: "Error", description: err.message || "Ocurrió un error al guardar." });
     } finally {
-      setIsUploading(false);
+      setIsSaving(false);
     }
   };
 
@@ -261,17 +242,11 @@ export default function DocentesPage() {
     e.preventDefault();
     if (!db || !selectedDocente) return;
 
-    setIsUploading(true);
-    let finalCvUrl = formData.cv_url;
+    setIsSaving(true);
 
     try {
-      if (cvFile) {
-        finalCvUrl = await handleFileUpload(cvFile);
-      }
-
       const payload = {
         ...formData,
-        cv_url: finalCvUrl,
         updatedAt: serverTimestamp(),
       };
 
@@ -284,7 +259,7 @@ export default function DocentesPage() {
     } catch (err: any) {
       toast({ variant: "destructive", title: "Error", description: err.message || "Ocurrió un error al actualizar." });
     } finally {
-      setIsUploading(false);
+      setIsSaving(false);
     }
   };
 
@@ -326,7 +301,6 @@ export default function DocentesPage() {
       clave_acceso: "", estado: "Activo" 
     });
     setSelectedDocente(null);
-    setCvFile(null);
   };
 
   const openEdit = (docente: any) => {
@@ -352,7 +326,6 @@ export default function DocentesPage() {
       clave_acceso: docente.clave_acceso || "",
       estado: docente.estado || "Activo",
     });
-    setCvFile(null);
     setIsEditDialogOpen(true);
   };
 
@@ -445,27 +418,13 @@ export default function DocentesPage() {
                         </div>
                         
                         <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
-                          <Label className="text-sm font-bold flex items-center gap-2"><FileText className="h-4 w-4" /> Currículum Vitae (PDF o Enlace)</Label>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] opacity-60">Subir archivo PDF</Label>
-                                <div className="flex items-center gap-2">
-                                    <Input 
-                                        type="file" 
-                                        accept=".pdf" 
-                                        onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-                                        className="h-10 py-1 cursor-pointer"
-                                    />
-                                    {cvFile && <Button type="button" variant="ghost" size="icon" onClick={() => setCvFile(null)} className="h-10 w-10"><XCircle className="h-4 w-4 text-destructive" /></Button>}
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] opacity-60">O pegar enlace directo</Label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
-                                </div>
-                            </div>
+                          <Label className="text-sm font-bold flex items-center gap-2"><FileText className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
+                          <div className="space-y-2">
+                              <Label className="text-[10px] opacity-60">Enlace directo al currículum</Label>
+                              <div className="relative">
+                                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                  <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
+                              </div>
                           </div>
                         </div>
                       </div>
@@ -482,9 +441,9 @@ export default function DocentesPage() {
                   </div>
 
                   <DialogFooter className="p-8 bg-muted/30">
-                    <DialogClose asChild><Button variant="ghost" disabled={isUploading}>Cancelar</Button></DialogClose>
-                    <Button type="submit" disabled={isUploading}>
-                        {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Subiendo CV...</> : 'Finalizar Registro'}
+                    <DialogClose asChild><Button variant="ghost" disabled={isSaving}>Cancelar</Button></DialogClose>
+                    <Button type="submit" disabled={isSaving}>
+                        {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...</> : 'Finalizar Registro'}
                     </Button>
                   </DialogFooter>
                 </Tabs>
@@ -738,30 +697,16 @@ export default function DocentesPage() {
                     </div>
                     
                     <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
-                        <Label className="text-sm font-bold flex items-center gap-2"><Upload className="h-4 w-4" /> Actualizar Currículum Vitae</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] opacity-60">Subir nuevo archivo PDF</Label>
-                                <div className="flex items-center gap-2">
-                                    <Input 
-                                        type="file" 
-                                        accept=".pdf" 
-                                        onChange={(e) => setCvFile(e.target.files?.[0] || null)}
-                                        className="h-10 py-1 cursor-pointer"
-                                    />
-                                    {cvFile && <Button type="button" variant="ghost" size="icon" onClick={() => setCvFile(null)} className="h-10 w-10"><XCircle className="h-4 w-4 text-destructive" /></Button>}
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] opacity-60">O actualizar enlace directo</Label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
-                                </div>
+                        <Label className="text-sm font-bold flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Currículum Vitae (Enlace / Portafolio)</Label>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] opacity-60">Actualizar enlace directo</Label>
+                            <div className="relative">
+                                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input placeholder="https://..." className="pl-10 h-10" value={formData.cv_url} onChange={e => setFormData({...formData, cv_url: e.target.value})} />
                             </div>
                         </div>
-                        {formData.cv_url && !cvFile && (
-                            <p className="text-[10px] text-primary font-bold">Currículum actual: <a href={formData.cv_url} target="_blank" rel="noopener noreferrer" className="underline">Ver archivo</a></p>
+                        {formData.cv_url && (
+                            <p className="text-[10px] text-primary font-bold">Currículum actual: <a href={formData.cv_url} target="_blank" rel="noopener noreferrer" className="underline">Ver portafolio</a></p>
                         )}
                     </div>
                   </div>
@@ -776,9 +721,9 @@ export default function DocentesPage() {
               </div>
 
               <DialogFooter className="p-8 bg-muted/30 border-t">
-                <DialogClose asChild><Button variant="ghost" disabled={isUploading}>Cancelar</Button></DialogClose>
-                <Button type="submit" disabled={isUploading}>
-                    {isUploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...</> : 'Guardar Cambios'}
+                <DialogClose asChild><Button variant="ghost" disabled={isSaving}>Cancelar</Button></DialogClose>
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Guardando...</> : 'Guardar Cambios'}
                 </Button>
               </DialogFooter>
             </Tabs>
