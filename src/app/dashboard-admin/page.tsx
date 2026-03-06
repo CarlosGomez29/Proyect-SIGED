@@ -176,23 +176,6 @@ export default function DashboardAdminPage() {
               Ser la institución líder en formación técnico-vocacional a nivel nacional, reconocida por su excelencia académica, valores éticos y compromiso inquebrantable con el progreso socioeconómico de la República Dominicana.
             </p>
           </div>
-
-          <div className="space-y-4">
-             <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground opacity-60">Principios Rectores</h4>
-             <div className="grid grid-cols-2 gap-4">
-               {[
-                 { label: "Disciplina", icon: ShieldCheck },
-                 { label: "Excelencia", icon: GraduationCap },
-                 { label: "Lealtad", icon: ShieldCheck },
-                 { label: "Patriotismo", icon: Target },
-               ].map((v) => (
-                 <div key={v.label} className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 border border-border/50">
-                    <v.icon className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-bold uppercase tracking-tighter">{v.label}</span>
-                 </div>
-               ))}
-             </div>
-          </div>
         </Card>
       </motion.section>
     </motion.div>
