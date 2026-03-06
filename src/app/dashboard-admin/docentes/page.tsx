@@ -633,8 +633,8 @@ export default function DocentesPage() {
                     <p className="font-bold text-foreground">{selectedDocente?.fecha_nacimiento || "N/A"}</p>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Edad Actual</Label>
-                    <p className="font-black text-primary text-base">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p>
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Edad</Label>
+                    <p className="font-bold text-foreground">{calculateAge(selectedDocente?.fecha_nacimiento)} años</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
@@ -685,7 +685,7 @@ export default function DocentesPage() {
                 </div>
                 
                 <div className="flex flex-col gap-1 pt-2">
-                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Cursos que Imparte</Label>
+                    <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Curso que Imparte</Label>
                     <div className="pt-2">
                         <DocenteSeccionesList docenteId={selectedDocente?.id} />
                     </div>
@@ -694,7 +694,7 @@ export default function DocentesPage() {
                 {selectedDocente?.cv_url && (
                    <div className="flex flex-col gap-1 pt-2">
                       <Label className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Currículum / Portafolio</Label>
-                      <Button asChild variant="link" className="p-0 h-auto font-black text-xs text-primary hover:text-primary/80 flex items-center gap-1.5 justify-start transition-colors">
+                      <Button asChild variant="link" className="p-0 h-auto font-black text-xs text-primary hover:text-primary/80 flex items-center gap-1.5 justify-start transition-colors text-left">
                         <a href={selectedDocente.cv_url} target="_blank" rel="noopener noreferrer">
                           Ver Portafolio Digital <ExternalLink className="h-3 w-3" />
                         </a>
