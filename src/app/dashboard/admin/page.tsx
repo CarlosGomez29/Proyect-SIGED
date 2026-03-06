@@ -1,13 +1,12 @@
 
 "use client";
+import React, { useMemo } from "react";
 import {
     Users,
     ClipboardCheck,
     BookOpen,
     GraduationCap,
     MoreHorizontal,
-    UserCheck,
-    UserX,
     BookMarked
   } from "lucide-react";
   
@@ -42,68 +41,13 @@ import {
     PaginationNext,
     PaginationPrevious,
   } from "@/components/ui/pagination";
-  import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  import { Avatar, AvatarFallback } from "@/components/ui/avatar";
   import { motion } from "framer-motion";
   import { Progress } from "@/components/ui/progress";
 
-  const GlassmorphismIcon = ({ shape }: { shape: 'circles' | 'squares' | 'swirl' }) => {
-    if (shape === 'squares') {
-        return (
-            <div className="relative w-24 h-24">
-                <div className="absolute top-0 left-4 w-16 h-16 bg-white/20 backdrop-blur-sm rounded-lg transform rotate-[-15deg]"></div>
-                <div className="absolute top-4 left-0 w-16 h-16 bg-white/20 backdrop-blur-sm rounded-lg transform rotate-[-15deg] shadow-lg"></div>
-                <div className="absolute top-2 left-2 w-16 h-16 bg-white/30 backdrop-blur-md rounded-lg transform rotate-[-15deg] shadow-xl"></div>
-            </div>
-        );
-    }
-     if (shape === 'swirl') {
-        return (
-             <div className="relative w-24 h-24 flex items-center justify-center">
-                <div className="absolute w-16 h-16">
-                    <div className="absolute w-16 h-16 border-8 border-white/20 rounded-full border-t-transparent transform rotate-45"></div>
-                    <div className="absolute w-12 h-12 top-2 left-2 border-8 border-white/20 rounded-full border-b-transparent transform -rotate-45"></div>
-                </div>
-            </div>
-        )
-    }
-    // circles
-    return (
-        <div className="relative w-24 h-24">
-            <div className="absolute top-0 left-0 w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full"></div>
-            <div className="absolute top-4 left-4 w-16 h-16 bg-white/30 backdrop-blur-md rounded-full shadow-lg"></div>
-        </div>
-    );
-};
-
-const WavyBg = () => (
-    <svg className="absolute bottom-0 left-0 w-full h-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-      <path fill="currentColor" fillOpacity="0.1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,165.3C960,192,1056,224,1152,218.7C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-    </svg>
-)
-  
-  const statCards = [
-    { title: "Nuevos Alumnos", value: "1,254", icon: Users, fromColor: "from-blue-400", toColor: "to-blue-600", iconShape: 'circles' as const },
-    { title: "Cursos Activos", value: "82", icon: ClipboardCheck, fromColor: "from-cyan-400", toColor: "to-cyan-600", iconShape: 'squares' as const },
-    { title: "Certificados", value: "4,502", icon: GraduationCap, fromColor: "from-emerald-400", toColor: "to-emerald-600", iconShape: 'swirl' as const },
-    { title: "Inscripciones", value: "+350", icon: BookOpen, fromColor: "from-amber-400", toColor: "to-amber-600", iconShape: 'circles' as const },
-  ];
-
-  const academicMetrics = [
-    { title: "Total de Estudiantes", value: "1,254", icon: Users, color: "text-blue-500", progress: 90 },
-    { title: "Estudiantes Activos", value: "1,198", icon: UserCheck, color: "text-green-500", progress: 95 },
-    { title: "Estudiantes Retirados", value: "56", icon: UserX, color: "text-red-500", progress: 5 },
-    { title: "Cursos Abiertos", value: "82", icon: BookMarked, color: "text-purple-500", progress: 60 },
-  ];
-
-  const recentEnrollments = [
-      { name: "Abdullah Al Ahad", status: "Pendiente", course: "Seguridad de la Carga Aérea", date: "03.01.2024", time: "10:00 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Al Shahriar Shawon", status: "Aprobado", course: "Mercancías Peligrosas", date: "03.01.2024", time: "10:20 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Lyn R. Ramos", status: "Aprobado", course: "AVSEC para la Tripulación", date: "03.01.2024", time: "10:40 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Katherine A. Stanfill", status: "Pendiente", course: "Manejo de Crisis", date: "03.01.2024", time: "11:00 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Robert K. Panez", status: "Rechazado", course: "Seguridad Aeroportuaria", date: "03.01.2024", time: "11:20 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Jason L. Bowling", status: "Aprobado", course: "Seguridad de la Carga Aérea", date: "03.01.2024", time: "11:40 AM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-      { name: "Joseph A. Bove", status: "Aprobado", course: "Mercancías Peligrosas", date: "03.01.2024", time: "12:00 PM", avatar: "https://placehold.co/40x40.png", "data-ai-hint": "person" },
-  ];
+  // Firebase imports
+  import { useFirestore, useCollection } from "@/firebase";
+  import { collection, query, orderBy, limit } from "firebase/firestore";
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -129,15 +73,42 @@ const WavyBg = () => (
   };
   
   export default function DashboardAdminPage() {
+    const db = useFirestore();
+
+    // Consultas reales a Firestore
+    const estudiantesQuery = useMemo(() => db ? collection(db, "estudiantes") : null, [db]);
+    const { data: estudiantes } = useCollection(estudiantesQuery);
+
+    const inscripcionesQuery = useMemo(() => {
+        if (!db) return null;
+        return query(collection(db, "inscripciones"), orderBy("createdAt", "desc"), limit(10));
+    }, [db]);
+    const { data: recentInscripciones, loading: loadingInscripciones } = useCollection(inscripcionesQuery);
+
+    const seccionesQuery = useMemo(() => db ? collection(db, "secciones") : null, [db]);
+    const { data: secciones } = useCollection(seccionesQuery);
+
+    // Métricas calculadas
+    const totalEstudiantes = estudiantes?.length || 0;
+    const totalSecciones = secciones?.length || 0;
+    const totalInscripciones = recentInscripciones?.length || 0;
+
+    const academicMetrics = [
+      { title: "Total de Estudiantes", value: totalEstudiantes.toString(), icon: Users, color: "text-blue-500", progress: totalEstudiantes > 0 ? 100 : 0 },
+      { title: "Inscripciones (Período)", value: totalInscripciones.toString(), icon: ClipboardCheck, color: "text-green-500", progress: totalInscripciones > 0 ? 100 : 0 },
+      { title: "Cursos Activos", value: totalSecciones.toString(), icon: BookMarked, color: "text-purple-500", progress: totalSecciones > 0 ? 100 : 0 },
+      { title: "Certificados Emitidos", value: "0", icon: GraduationCap, color: "text-amber-500", progress: 0 },
+    ];
+
     return (
       <div className="flex-1 space-y-6">
         <motion.h1 
-          className="text-2xl font-semibold"
+          className="text-2xl font-bold font-headline tracking-tight"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          Resumen General
+          Resumen General del Sistema
         </motion.h1>
   
         {/* Academic Metrics Cards */}
@@ -153,17 +124,17 @@ const WavyBg = () => (
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02, transition: { type: "spring", stiffness: 300 } }}
               >
-                 <Card>
+                 <Card className="glass-card">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
                         <card.icon className={`h-5 w-5 ${card.color}`} />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{card.value}</div>
-                        <p className="text-xs text-muted-foreground">
-                            +2.1% from last month
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest mt-1">
+                            Sincronizado con Firestore
                         </p>
-                        <Progress value={card.progress} className="mt-4 h-2" />
+                        <Progress value={card.progress} className="mt-4 h-1.5" />
                     </CardContent>
                  </Card>
               </motion.div>
@@ -177,10 +148,10 @@ const WavyBg = () => (
           animate="visible"
           transition={{ delay: 0.4 }}
         >
-            <Card>
+            <Card className="glass-card">
                 <CardHeader>
-                    <CardTitle>Inscripciones de Hoy</CardTitle>
-                    <CardDescription>150 inscripciones en total</CardDescription>
+                    <CardTitle>Inscripciones Recientes</CardTitle>
+                    <CardDescription>Monitoreo de nuevos registros en tiempo real</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -195,79 +166,96 @@ const WavyBg = () => (
                         </TableRow>
                         </TableHeader>
                         <TableBody>
-                        {recentEnrollments.map((enrollment, index) => (
-                           <TableRow 
-                              key={enrollment.name}
-                              className="hover:bg-muted/50 transition-colors"
-                            >
-                                <motion.td 
-                                  className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <Avatar className="h-8 w-8">
-                                            <AvatarImage src={enrollment.avatar} alt={enrollment.name} data-ai-hint={enrollment['data-ai-hint']} />
-                                            <AvatarFallback>{enrollment.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex flex-col">
-                                          <span className="font-medium">{enrollment.name}</span>
-                                          <span className="text-muted-foreground text-xs md:hidden">{enrollment.course}</span>
-                                        </div>
-                                    </div>
-                                </motion.td>
-                                <motion.td 
-                                   className="p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                   initial={{ opacity: 0, y: 10 }}
-                                   animate={{ opacity: 1, y: 0 }}
-                                   transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
-                                >
-                                    <Badge 
-                                        variant={enrollment.status === 'Aprobado' ? 'success' : enrollment.status === 'Pendiente' ? 'secondary' : 'destructive'}
-                                    >
-                                        {enrollment.status}
-                                    </Badge>
-                                </motion.td>
-                                <motion.td 
-                                  className="hidden md:table-cell p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.04 }}
-                                >{enrollment.course}</motion.td>
-                                <motion.td 
-                                  className="hidden lg:table-cell text-right p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.06 }}
-                                >{enrollment.date}</motion.td>
-                                <motion.td 
-                                  className="text-center p-4 align-middle [&:has([role=checkbox])]:pr-0"
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ duration: 0.3, delay: index * 0.05 + 0.08 }}
-                                >
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" className="h-8 w-8 p-0">
-                                            <span className="sr-only">Abrir menú</span>
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                        <DropdownMenuItem>Ver Detalles</DropdownMenuItem>
-                                        <DropdownMenuItem>Aprobar</DropdownMenuItem>
-                                        <DropdownMenuItem>Rechazar</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </motion.td>
+                        {loadingInscripciones ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground animate-pulse">
+                                    Cargando datos...
+                                </TableCell>
                             </TableRow>
-                        ))}
+                        ) : recentInscripciones.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground italic font-medium">
+                                    No hay inscripciones registradas en el sistema actualmente.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            recentInscripciones.map((inscripcion, index) => (
+                                <TableRow 
+                                    key={inscripcion.id}
+                                    className="hover:bg-muted/50 transition-colors"
+                                    >
+                                    <motion.td 
+                                        className="p-4 align-middle"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-8 w-8 border border-border/50">
+                                                <AvatarFallback className="bg-primary/5 text-primary text-[10px] font-bold">
+                                                    {inscripcion.alumno?.charAt(0) || '?'}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-sm">{inscripcion.alumno || 'Sin nombre'}</span>
+                                                <span className="text-muted-foreground text-[10px] font-medium md:hidden">{inscripcion.curso}</span>
+                                            </div>
+                                        </div>
+                                    </motion.td>
+                                    <motion.td 
+                                        className="p-4 align-middle"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 + 0.02 }}
+                                    >
+                                        <Badge 
+                                            className={
+                                                inscripcion.estado === 'Aprobada' ? 'bg-success/15 text-success border-success/20' : 
+                                                inscripcion.estado === 'Pendiente' ? 'bg-amber-100 text-amber-800' : 
+                                                'bg-destructive/15 text-destructive border-destructive/20'
+                                            }
+                                        >
+                                            {inscripcion.estado}
+                                        </Badge>
+                                    </motion.td>
+                                    <motion.td 
+                                        className="hidden md:table-cell p-4 align-middle text-sm font-medium"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 + 0.04 }}
+                                    >{inscripcion.curso}</motion.td>
+                                    <motion.td 
+                                        className="hidden lg:table-cell text-right p-4 align-middle text-xs opacity-70 font-mono"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 + 0.06 }}
+                                    >{inscripcion.createdAt?.toDate ? inscripcion.createdAt.toDate().toLocaleDateString() : 'Reciente'}</motion.td>
+                                    <motion.td 
+                                        className="text-center p-4 align-middle"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 + 0.08 }}
+                                    >
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                                                <span className="sr-only">Abrir menú</span>
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end" className="rounded-xl p-2 shadow-xl border-border/50">
+                                                <DropdownMenuItem className="cursor-pointer text-xs font-medium">Ver Detalles</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </motion.td>
+                                </TableRow>
+                            ))
+                        )}
                         </TableBody>
                     </Table>
                 </CardContent>
-                <div className="p-4 border-t">
-                    <CustomPagination />
+                <div className="p-4 border-t border-border/50">
+                    <CustomPagination total={recentInscripciones.length} />
                 </div>
             </Card>
         </motion.section>
@@ -275,7 +263,7 @@ const WavyBg = () => (
     );
   }
 
-  function CustomPagination() {
+  function CustomPagination({ total }: { total: number }) {
       return (
         <motion.div 
             className="flex items-center justify-between text-sm text-muted-foreground"
@@ -283,38 +271,25 @@ const WavyBg = () => (
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
         >
-            <div className="hidden sm:block">
-                Mostrando 7 de 150 registros
+            <div className="hidden sm:block text-[10px] font-bold uppercase tracking-widest opacity-60">
+                Mostrando {total} registros recientes
             </div>
-             <div className="sm:hidden">
-                7 de 150
+             <div className="sm:hidden text-[10px] font-bold">
+                {total} registros
             </div>
             <Pagination className="w-auto mx-0">
                 <PaginationContent>
                 <PaginationItem>
-                    <PaginationPrevious href="#" />
+                    <PaginationPrevious href="#" className="h-8 w-8" />
                 </PaginationItem>
                 <PaginationItem>
-                    <PaginationLink href="#" isActive>1</PaginationLink>
-                </PaginationItem>
-                <PaginationItem className="hidden sm:block">
-                    <PaginationLink href="#">2</PaginationLink>
-                </PaginationItem>
-                <PaginationItem className="hidden sm:block">
-                    <PaginationLink href="#">3</PaginationLink>
-                </PaginationItem>
-                 <PaginationItem className="hidden sm:block">
-                    <PaginationLink href="#">...</PaginationLink>
+                    <PaginationLink href="#" isActive className="h-8 w-8 text-xs">1</PaginationLink>
                 </PaginationItem>
                 <PaginationItem>
-                    <PaginationLink href="#">25</PaginationLink>
-                </PaginationItem>
-                <PaginationItem>
-                    <PaginationNext href="#" />
+                    <PaginationNext href="#" className="h-8 w-8" />
                 </PaginationItem>
                 </PaginationContent>
             </Pagination>
         </motion.div>
       )
   }
-  
