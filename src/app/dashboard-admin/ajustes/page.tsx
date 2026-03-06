@@ -8,13 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2 } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase imports
 import { useFirestore } from '@/firebase';
-import { doc, setDoc, collection, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, collection, writeBatch, getDocs, query, limit } from 'firebase/firestore';
 
 const RANGOS_MILITARES_DEFAULT = [
     { nombre: "Civil", orden: 1 },
@@ -38,12 +38,12 @@ export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
 
+    const [isSeeding, setIsSeeding] = useState(false);
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
         courseReminders: false,
     });
 
-    // Función para reiniciar el contador secuencial global
     const handleResetCounter = async () => {
         if (!db) return;
         try {
@@ -62,10 +62,23 @@ export default function AjustesPage() {
         }
     };
 
-    // Función para inicializar el catálogo de rangos militares
     const handleSeedRangos = async () => {
         if (!db) return;
+        setIsSeeding(true);
         try {
+            // Verificar si ya existen rangos para evitar duplicados
+            const rangosRef = collection(db, "rangos_militares");
+            const snapshot = await getDocs(query(rangosRef, limit(1)));
+            
+            if (!snapshot.empty) {
+                toast({ 
+                    title: "Información", 
+                    description: "El catálogo de rangos ya ha sido inicializado anteriormente." 
+                });
+                setIsSeeding(false);
+                return;
+            }
+
             const batch = writeBatch(db);
             RANGOS_MILITARES_DEFAULT.forEach((rango) => {
                 const docRef = doc(collection(db, "rangos_militares"));
@@ -74,14 +87,16 @@ export default function AjustesPage() {
             await batch.commit();
             toast({ 
                 title: "Catálogo Inicializado", 
-                description: "Se han cargado los rangos militares correctamente." 
+                description: "Se han cargado los 15 rangos militares correctamente en Firestore." 
             });
         } catch (error) {
             toast({ 
                 variant: "destructive", 
                 title: "Error de inicialización", 
-                description: "No se pudo cargar el catálogo de rangos." 
+                description: "No se pudo cargar el catálogo de rangos. Revise sus permisos." 
             });
+        } finally {
+            setIsSeeding(false);
         }
     };
 
@@ -188,9 +203,12 @@ export default function AjustesPage() {
                                     Crea el catálogo oficial de rangos militares en Firestore para su uso en formularios.
                                 </p>
                             </div>
-                            <Button variant="outline" size="sm" onClick={handleSeedRangos}>
-                                <Database className="mr-2 h-4 w-4" />
-                                Inicializar Rangos
+                            <Button variant="outline" size="sm" onClick={handleSeedRangos} disabled={isSeeding}>
+                                {isSeeding ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
+                                ) : (
+                                    <><Database className="mr-2 h-4 w-4" /> Inicializar Rangos</>
+                                )}
                             </Button>
                         </div>
                     </CardContent>
