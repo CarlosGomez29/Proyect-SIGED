@@ -107,6 +107,31 @@ const itemVariants = {
   visible: { y: 0, opacity: 1 },
 };
 
+// Subcomponente para mostrar asignaturas basadas en secciones
+function DocenteSeccionesList({ docenteId }: { docenteId: string }) {
+    const db = useFirestore();
+    const q = useMemo(() => {
+        if (!db || !docenteId) return null;
+        return query(collection(db, "secciones"), where("docenteId", "==", docenteId));
+    }, [db, docenteId]);
+
+    const { data: secciones, loading } = useCollection(q);
+
+    if (loading) return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />;
+
+    const cursosUnicos = Array.from(new Set(secciones?.map(s => s.curso) || []));
+
+    if (cursosUnicos.length === 0) return <p className="text-xs text-muted-foreground italic">No tiene secciones asignadas actualmente.</p>;
+
+    return (
+        <div className="flex flex-wrap gap-1.5 mt-1">
+            {cursosUnicos.map((curso, i) => (
+                <Badge key={i} variant="secondary" className="text-[10px] font-bold py-0">{curso}</Badge>
+            ))}
+        </div>
+    );
+}
+
 export default function DocentesPage() {
   const { toast } = useToast();
   const db = useFirestore();
@@ -148,7 +173,6 @@ export default function DocentesPage() {
     sexo: "Masculino",
     estado_civil: "Soltero",
     cantidad_hijos: "0",
-    modulos_asignaturas_imparte: "",
     cv_url: "",
     clave_acceso: "",
     estado: "Activo",
@@ -298,7 +322,7 @@ export default function DocentesPage() {
       fecha_nacimiento: "", foto_perfil: "", fecha_ingreso: "", escuelaId: "", 
       rango_militar: "", profesion: "", institucion: "", 
       sexo: "Masculino", estado_civil: "Soltero", cantidad_hijos: "0", 
-      modulos_asignaturas_imparte: "", cv_url: "",
+      cv_url: "",
       clave_acceso: "", estado: "Activo" 
     });
     setSelectedDocente(null);
@@ -324,7 +348,6 @@ export default function DocentesPage() {
       sexo: docente.sexo || "Masculino",
       estado_civil: docente.estado_civil || "Soltero",
       cantidad_hijos: docente.cantidad_hijos?.toString() || "0",
-      modulos_asignaturas_imparte: docente.modulos_asignaturas_imparte || "",
       cv_url: docente.cv_url || "",
       clave_acceso: docente.clave_acceso || "",
       estado: docente.estado || "Activo",
@@ -420,7 +443,6 @@ export default function DocentesPage() {
                             </div>
                             <div className="space-y-2"><Label>Fecha de Ingreso</Label><Input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} /></div>
                         </div>
-                        <div className="space-y-2"><Label>Módulos / Asignaturas que Imparte</Label><Textarea placeholder="Lista de materias..." value={formData.modulos_asignaturas_imparte} onChange={e => setFormData({...formData, modulos_asignaturas_imparte: e.target.value})} /></div>
                         
                         <div className="space-y-4 p-4 border rounded-xl bg-muted/20">
                           <Label className="text-sm font-bold flex items-center gap-2"><FileText className="h-4 w-4" /> Currículum Vitae (PDF o Enlace)</Label>
@@ -445,9 +467,6 @@ export default function DocentesPage() {
                                 </div>
                             </div>
                           </div>
-                          <p className="text-[10px] text-muted-foreground italic">
-                            Puede subir su CV en formato PDF o proporcionar un enlace a su portafolio/LinkedIn.
-                          </p>
                         </div>
                       </div>
                     </TabsContent>
@@ -621,7 +640,13 @@ export default function DocentesPage() {
               <div className="grid gap-2">
                 <div><Label className="text-[10px] opacity-60">FORMACIÓN PROFESIONAL</Label><p className="font-bold">{selectedDocente?.profesion || "N/A"}</p></div>
                 <div><Label className="text-[10px] opacity-60">FECHA INGRESO</Label><p className="font-bold">{selectedDocente?.fecha_ingreso || "N/A"}</p></div>
-                <div><Label className="text-[10px] opacity-60">MÓDULOS</Label><p className="font-bold text-xs">{selectedDocente?.modulos_asignaturas_imparte || "N/A"}</p></div>
+                
+                {/* Módulos automáticos basados en Secciones */}
+                <div className="pt-2">
+                    <Label className="text-[10px] opacity-60">MÓDULOS / ASIGNATURAS (AUTOMÁTICO)</Label>
+                    <DocenteSeccionesList docenteId={selectedDocente?.id} />
+                </div>
+
                 {selectedDocente?.cv_url && (
                    <div className="pt-2">
                       <Label className="text-[10px] opacity-60">CURRICULUM / PORTAFOLIO</Label>
