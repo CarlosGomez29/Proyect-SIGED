@@ -45,10 +45,14 @@
         "nombre": { "type": "string" },
         "apellido": { "type": "string" },
         "cedula": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
-        "especialidad": { "type": "string" }
+        "telefono": { "type": "string" },
+        "correo": { "type": "string", "format": "email" },
+        "especialidad": { "type": "string" },
+        "estado": { "type": "string", "enum": ["Activo", "Inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["nombre", "cedula"]
+      "required": ["nombre", "apellido", "cedula", "correo", "estado"]
     },
     "Estudiante": {
       "title": "Estudiante / Alumno",
