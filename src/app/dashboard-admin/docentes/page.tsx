@@ -432,7 +432,7 @@ export default function DocentesPage() {
 
                     <TabsContent value="institucional" className="mt-0 space-y-4">
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
+                        <div className="space-y-2"><Label>Institución de Origen</Label><Input placeholder="Ej. Fuerzas Armadas" value={formData.institucion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Rango Militar (Opcional)</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Escuela (Referencia ID)</Label><Input placeholder="ID de la escuela" value={formData.escuelaId} onChange={e => setFormData({...formData, escuelaId: e.target.value})} /></div>
                         <div className="space-y-2"><Label>Clave de Acceso Temporal</Label><Input type="password" value={formData.clave_acceso} onChange={e => setFormData({...formData, clave_acceso: e.target.value})} /></div>
@@ -602,7 +602,7 @@ export default function DocentesPage() {
                 
                 {/* Módulos automáticos basados en Secciones */}
                 <div className="pt-2">
-                    <Label className="text-[10px] opacity-60">MÓDULOS / ASIGNATURAS (AUTOMÁTICO)</Label>
+                    <Label className="text-[10px] opacity-60">Curso que Imparte</Label>
                     <DocenteSeccionesList docenteId={selectedDocente?.id} />
                 </div>
 
@@ -715,7 +715,7 @@ export default function DocentesPage() {
                 <TabsContent value="institucional" className="mt-0 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2"><Label>Rango Militar</Label><Input value={formData.rango_militar} onChange={e => setFormData({...formData, rango_militar: e.target.value})} /></div>
-                    <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, institucion: e.target.value})} /></div>
+                    <div className="space-y-2"><Label>Institución</Label><Input value={formData.institucion} onChange={e => setFormData({...formData, instituciones: e.target.value})} /></div>
                   </div>
                 </TabsContent>
               </div>
