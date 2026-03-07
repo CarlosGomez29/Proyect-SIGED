@@ -8,13 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database, Loader2, Landmark } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase imports
 import { useFirestore } from '@/firebase';
-import { doc, setDoc, collection, writeBatch, getDocs, query, limit, orderBy } from 'firebase/firestore';
+import { doc, setDoc, collection, writeBatch, getDocs, query, limit, serverTimestamp } from 'firebase/firestore';
 
 const RANGOS_MILITARES_DEFAULT = [
     { nombre: "Igualado", orden: 1 },
@@ -42,12 +42,20 @@ const INSTITUCIONES_DEFAULT = [
     { nombre: "N/A", orden: 5 },
 ];
 
+const PROGRAMAS_DEFAULT = [
+    { nombre: "DIGEV-Directo", estado: "activo" },
+    { nombre: "DIGEV-INFOTEP", estado: "activo" },
+    { nombre: "Dominicana Digna", estado: "activo" },
+    { nombre: "Oportunidad 14/24", estado: "activo" },
+];
+
 export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
 
     const [isSeedingRangos, setIsSeedingRangos] = useState(false);
     const [isSeedingInstituciones, setIsSeedingInstituciones] = useState(false);
+    const [isSeedingProgramas, setIsSeedingProgramas] = useState(false);
     
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
@@ -146,6 +154,47 @@ export default function AjustesPage() {
         }
     };
 
+    const handleSeedProgramas = async () => {
+        if (!db) return;
+        setIsSeedingProgramas(true);
+        try {
+            const progRef = collection(db, "programas");
+            const snapshot = await getDocs(query(progRef, limit(1)));
+            
+            if (!snapshot.empty) {
+                toast({ 
+                    title: "Información", 
+                    description: "El catálogo de programas ya ha sido inicializado anteriormente." 
+                });
+                setIsSeedingProgramas(false);
+                return;
+            }
+
+            const batch = writeBatch(db);
+            PROGRAMAS_DEFAULT.forEach((prog) => {
+                const docRef = doc(collection(db, "programas"));
+                batch.set(docRef, {
+                    ...prog,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+            });
+            await batch.commit();
+            toast({ 
+                title: "Catálogo Inicializado", 
+                description: "Se han cargado los 4 programas oficiales correctamente." 
+            });
+        } catch (error) {
+            toast({ 
+                variant: "destructive", 
+                title: "Error de inicialización", 
+                description: "No se pudo cargar el catálogo de programas." 
+            });
+        } finally {
+            setIsSeedingProgramas(false);
+        }
+    };
+
   return (
     <motion.div 
       className="flex flex-col gap-6"
@@ -239,7 +288,10 @@ export default function AjustesPage() {
                             <Database className="h-5 w-5 text-primary" />
                             <CardTitle>Inicialización de Catálogos</CardTitle>
                         </div>
-                        <CardDescription>Poblar la base de datos con valores predeterminados del sistema.</CardDescription>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                            <CardDescription>Poblar la base de datos con valores predeterminados del sistema.</CardDescription>
+                        </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
@@ -270,6 +322,22 @@ export default function AjustesPage() {
                                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
                                 ) : (
                                     <><Landmark className="mr-2 h-4 w-4" /> Inicializar Instituciones</>
+                                )}
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Poblar Programas</h4>
+                                <p className="text-xs text-muted-foreground">
+                                    Inicializa DIGEV-Directo, INFOTEP, Dominicana Digna y Oportunidad 14/24.
+                                </p>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handleSeedProgramas} disabled={isSeedingProgramas}>
+                                {isSeedingProgramas ? (
+                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
+                                ) : (
+                                    <><Layers className="mr-2 h-4 w-4" /> Inicializar Programas</>
                                 )}
                             </Button>
                         </div>

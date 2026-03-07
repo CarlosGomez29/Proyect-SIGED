@@ -130,6 +130,18 @@
       },
       "required": ["nombre", "orden"]
     },
+    "Programa": {
+      "title": "Programa Académico",
+      "description": "Clasificación de acciones formativas.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre oficial del programa" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nombre", "estado"]
+    },
     "MetadataCounters": {
       "title": "Contadores de Systema",
       "description": "Estado de los contadores secuenciales para IDs institucionales.",
@@ -153,6 +165,7 @@
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
     "/rangos_militares/{rangoId}": { "schema": "RangoMilitar", "description": "Catálogo de rangos militares." },
     "/instituciones/{institucionId}": { "schema": "Institucion", "description": "Catálogo de instituciones oficiales." },
+    "/programas/{programaId}": { "schema": "Programa", "description": "Catálogo de programas académicos (DIGEV, Dominicana Digna, etc)." },
     "/metadata/counters": { 
       "schema": { "$ref": "#/backend/entities/MetadataCounters" }, 
       "description": "Contadores atómicos para la generación de identificadores secuenciales únicos." 
