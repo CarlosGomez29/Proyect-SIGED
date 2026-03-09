@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers, Map } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -49,6 +49,14 @@ const PROGRAMAS_DEFAULT = [
     { nombre: "Oportunidad 14/24", estado: "activo" },
 ];
 
+const PROVINCIAS_DEFAULT = [
+  "Azua", "Baoruco", "Barahona", "Dajabón", "Distrito Nacional", "Duarte", "El Seibo", "Elías Piña", 
+  "Espaillat", "Hato Mayor", "Hermanas Mirabal", "Independencia", "La Altagracia", "La Romana", 
+  "La Vega", "María Trinidad Sánchez", "Monseñor Nouel", "Monte Cristi", "Monte Plata", "Pedernales", 
+  "Peravia", "Puerto Plata", "Samaná", "San Cristóbal", "San José de Ocoa", "San Juan", 
+  "San Pedro de Macorís", "Sánchez Ramírez", "Santiago", "Santiago Rodríguez", "Valverde", "Santo Domingo"
+];
+
 export default function AjustesPage() {
     const { toast } = useToast();
     const db = useFirestore();
@@ -56,6 +64,7 @@ export default function AjustesPage() {
     const [isSeedingRangos, setIsSeedingRangos] = useState(false);
     const [isSeedingInstituciones, setIsSeedingInstituciones] = useState(false);
     const [isSeedingProgramas, setIsSeedingProgramas] = useState(false);
+    const [isSeedingProvincias, setIsSeedingProvincias] = useState(false);
     
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
@@ -88,10 +97,7 @@ export default function AjustesPage() {
             const snapshot = await getDocs(query(rangosRef, limit(1)));
             
             if (!snapshot.empty) {
-                toast({ 
-                    title: "Información", 
-                    description: "El catálogo de rangos ya ha sido inicializado anteriormente." 
-                });
+                toast({ title: "Información", description: "El catálogo de rangos ya ha sido inicializado." });
                 setIsSeedingRangos(false);
                 return;
             }
@@ -102,16 +108,9 @@ export default function AjustesPage() {
                 batch.set(docRef, rango);
             });
             await batch.commit();
-            toast({ 
-                title: "Catálogo Inicializado", 
-                description: "Se han cargado los 15 rangos militares correctamente." 
-            });
+            toast({ title: "Catálogo Inicializado", description: "Se han cargado los rangos militares correctamente." });
         } catch (error) {
-            toast({ 
-                variant: "destructive", 
-                title: "Error de inicialización", 
-                description: "No se pudo cargar el catálogo de rangos." 
-            });
+            toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el catálogo." });
         } finally {
             setIsSeedingRangos(false);
         }
@@ -125,10 +124,7 @@ export default function AjustesPage() {
             const snapshot = await getDocs(query(instRef, limit(1)));
             
             if (!snapshot.empty) {
-                toast({ 
-                    title: "Información", 
-                    description: "El catálogo de instituciones ya ha sido inicializado anteriormente." 
-                });
+                toast({ title: "Información", description: "El catálogo de instituciones ya ha sido inicializado." });
                 setIsSeedingInstituciones(false);
                 return;
             }
@@ -139,16 +135,9 @@ export default function AjustesPage() {
                 batch.set(docRef, inst);
             });
             await batch.commit();
-            toast({ 
-                title: "Catálogo Inicializado", 
-                description: "Se han cargado las 5 instituciones oficiales correctamente." 
-            });
+            toast({ title: "Catálogo Inicializado", description: "Se han cargado las instituciones oficiales." });
         } catch (error) {
-            toast({ 
-                variant: "destructive", 
-                title: "Error de inicialización", 
-                description: "No se pudo cargar el catálogo de instituciones." 
-            });
+            toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el catálogo." });
         } finally {
             setIsSeedingInstituciones(false);
         }
@@ -162,10 +151,7 @@ export default function AjustesPage() {
             const snapshot = await getDocs(query(progRef, limit(1)));
             
             if (!snapshot.empty) {
-                toast({ 
-                    title: "Información", 
-                    description: "El catálogo de programas ya ha sido inicializado anteriormente." 
-                });
+                toast({ title: "Información", description: "El catálogo de programas ya ha sido inicializado." });
                 setIsSeedingProgramas(false);
                 return;
             }
@@ -173,35 +159,46 @@ export default function AjustesPage() {
             const batch = writeBatch(db);
             PROGRAMAS_DEFAULT.forEach((prog) => {
                 const docRef = doc(collection(db, "programas"));
-                batch.set(docRef, {
-                    ...prog,
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                });
+                batch.set(docRef, { ...prog, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
             });
             await batch.commit();
-            toast({ 
-                title: "Catálogo Inicializado", 
-                description: "Se han cargado los 4 programas oficiales correctamente." 
-            });
+            toast({ title: "Catálogo Inicializado", description: "Se han cargado los programas oficiales." });
         } catch (error) {
-            toast({ 
-                variant: "destructive", 
-                title: "Error de inicialización", 
-                description: "No se pudo cargar el catálogo de programas." 
-            });
+            toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el catálogo." });
         } finally {
             setIsSeedingProgramas(false);
         }
     };
 
+    const handleSeedProvincias = async () => {
+        if (!db) return;
+        setIsSeedingProvincias(true);
+        try {
+            const provRef = collection(db, "provincias");
+            const snapshot = await getDocs(query(provRef, limit(1)));
+            
+            if (!snapshot.empty) {
+                toast({ title: "Información", description: "El catálogo de provincias ya ha sido inicializado." });
+                setIsSeedingProvincias(false);
+                return;
+            }
+
+            const batch = writeBatch(db);
+            PROVINCIAS_DEFAULT.sort().forEach((prov) => {
+                const docRef = doc(collection(db, "provincias"));
+                batch.set(docRef, { nombre: prov });
+            });
+            await batch.commit();
+            toast({ title: "Catálogo Inicializado", description: "Se han cargado las 32 provincias correctamente." });
+        } catch (error) {
+            toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el catálogo de provincias." });
+        } finally {
+            setIsSeedingProvincias(false);
+        }
+    };
+
   return (
-    <motion.div 
-      className="flex flex-col gap-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div className="flex flex-col gap-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
       <div>
         <h1 className="text-3xl font-bold font-headline tracking-tight">Ajustes del Sistema</h1>
         <p className="text-muted-foreground">Configura y gestiona los parámetros globales de la aplicación.</p>
@@ -252,29 +249,20 @@ export default function AjustesPage() {
                         <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
-                                <p className="text-xs text-muted-foreground max-w-md">
-                                    Restaura el contador a cero. Al confirmar, la próxima sección que se cree tendrá el código <strong>SEC-0001</strong>. 
-                                </p>
+                                <p className="text-xs text-muted-foreground max-w-md">Restaura el contador a cero. SEC-0001 será la siguiente.</p>
                             </div>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" size="sm">
-                                        <RefreshCw className="mr-2 h-4 w-4" />
-                                        Reiniciar Contador
-                                    </Button>
+                                    <Button variant="destructive" size="sm"><RefreshCw className="mr-2 h-4 w-4" />Reiniciar</Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle className="text-destructive">¿Confirmar reinicio de secuencia?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            Esta acción establecerá el contador en 0. La siguiente sección creada será la <strong>SEC-0001</strong>. 
-                                        </AlertDialogDescription>
+                                        <AlertDialogTitle className="text-destructive">¿Confirmar reinicio?</AlertDialogTitle>
+                                        <AlertDialogDescription>Esta acción establecerá el contador en 0.</AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleResetCounter} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                            Confirmar Reinicio
-                                        </AlertDialogAction>
+                                        <AlertDialogAction onClick={handleResetCounter} className="bg-destructive">Confirmar Reinicio</AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
@@ -288,57 +276,46 @@ export default function AjustesPage() {
                             <Database className="h-5 w-5 text-primary" />
                             <CardTitle>Inicialización de Catálogos</CardTitle>
                         </div>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                            <CardDescription>Poblar la base de datos con valores predeterminados del sistema.</CardDescription>
-                        </div>
+                        <CardDescription>Poblar la base de datos con valores predeterminados.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Poblar Rangos Militares</h4>
-                                <p className="text-xs text-muted-foreground">
-                                    Crea el catálogo oficial de rangos militares en Firestore para formularios.
-                                </p>
+                                <p className="text-xs text-muted-foreground">Crea el catálogo oficial de rangos militares.</p>
                             </div>
                             <Button variant="outline" size="sm" onClick={handleSeedRangos} disabled={isSeedingRangos}>
-                                {isSeedingRangos ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
-                                ) : (
-                                    <><Database className="mr-2 h-4 w-4" /> Inicializar Rangos</>
-                                )}
+                                {isSeedingRangos ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Database className="mr-2 h-4 w-4" />} Inicializar Rangos
                             </Button>
                         </div>
 
                         <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Poblar Instituciones</h4>
-                                <p className="text-xs text-muted-foreground">
-                                    Crea el catálogo oficial de instituciones (ERD, ARD, FARD, PN, N/A).
-                                </p>
+                                <p className="text-xs text-muted-foreground">Crea el catálogo oficial de instituciones.</p>
                             </div>
                             <Button variant="outline" size="sm" onClick={handleSeedInstituciones} disabled={isSeedingInstituciones}>
-                                {isSeedingInstituciones ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
-                                ) : (
-                                    <><Landmark className="mr-2 h-4 w-4" /> Inicializar Instituciones</>
-                                )}
+                                {isSeedingInstituciones ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Landmark className="mr-2 h-4 w-4" />} Inicializar Instituciones
                             </Button>
                         </div>
 
                         <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Poblar Programas</h4>
-                                <p className="text-xs text-muted-foreground">
-                                    Inicializa DIGEV-Directo, INFOTEP, Dominicana Digna y Oportunidad 14/24.
-                                </p>
+                                <p className="text-xs text-muted-foreground">Inicializa DIGEV-Directo, INFOTEP, etc.</p>
                             </div>
                             <Button variant="outline" size="sm" onClick={handleSeedProgramas} disabled={isSeedingProgramas}>
-                                {isSeedingProgramas ? (
-                                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Procesando...</>
-                                ) : (
-                                    <><Layers className="mr-2 h-4 w-4" /> Inicializar Programas</>
-                                )}
+                                {isSeedingProgramas ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Layers className="mr-2 h-4 w-4" />} Inicializar Programas
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/10">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Poblar Provincias</h4>
+                                <p className="text-xs text-muted-foreground">Inicializa las 32 provincias de la República Dominicana.</p>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handleSeedProvincias} disabled={isSeedingProvincias}>
+                                {isSeedingProvincias ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Map className="mr-2 h-4 w-4" />} Inicializar Provincias
                             </Button>
                         </div>
                     </CardContent>

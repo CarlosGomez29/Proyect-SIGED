@@ -6,6 +6,9 @@ service cloud.firestore {
     match /escuelas/{escuelaId} {
       allow read, write: if true;
     }
+    match /provincias/{provinciaId} {
+      allow read, write: if true;
+    }
     match /sedes/{sedeId} {
       allow read, write: if true;
     }
