@@ -5,7 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 type UserRole = 'super-admin' | 'administrador' | 'admision' | 'docente' | 'alumno' | null;
 
@@ -14,24 +14,43 @@ interface AuthContextType {
   loading: boolean;
   role: UserRole;
   handleLogout: () => void;
+  impersonatedSchool: { id: string; nombre: string } | null;
+  startImpersonation: (school: { id: string; nombre: string }) => void;
+  stopImpersonation: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({ user: null, loading: true, role: null, handleLogout: () => {} });
+const AuthContext = createContext<AuthContextType>({ 
+  user: null, 
+  loading: true, 
+  role: null, 
+  handleLogout: () => {},
+  impersonatedSchool: null,
+  startImpersonation: () => {},
+  stopImpersonation: () => {}
+});
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<UserRole>(null);
+  const [impersonatedSchool, setImpersonatedSchool] = useState<{ id: string; nombre: string } | null>(null);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    // Development mode check
+    // Restore impersonation from local storage
+    const saved = localStorage.getItem('impersonatedSchool');
+    if (saved) {
+      try {
+        setImpersonatedSchool(JSON.parse(saved));
+      } catch (e) {
+        localStorage.removeItem('impersonatedSchool');
+      }
+    }
+
     const devRole = localStorage.getItem('userRole') as UserRole;
     if (devRole && process.env.NODE_ENV === 'development') {
       setRole(devRole);
       setLoading(false);
-      // Let pages handle redirection if needed
       return; 
     }
 
@@ -41,8 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          const userRole = docSnap.data().role as UserRole;
-          setRole(userRole);
+          setRole(docSnap.data().role as UserRole);
         } else {
           setRole(null);
         }
@@ -57,36 +75,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole'); // For dev mode
-    // await auth.signOut(); // For production
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('impersonatedSchool');
     router.push('/');
   };
 
+  const startImpersonation = (school: { id: string; nombre: string }) => {
+    setImpersonatedSchool(school);
+    localStorage.setItem('impersonatedSchool', JSON.stringify(school));
+    router.push('/dashboard-admin');
+  };
+
+  const stopImpersonation = () => {
+    setImpersonatedSchool(null);
+    localStorage.removeItem('impersonatedSchool');
+    router.push('/dashboard/admin/escuelas');
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, role, handleLogout }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      role, 
+      handleLogout, 
+      impersonatedSchool, 
+      startImpersonation, 
+      stopImpersonation 
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-
-export const withAuth = (Component: React.ComponentType<any>, allowedRoles: UserRole[]) => {
-    return function WithAuth(props: any) {
-        const { loading, role } = useAuth();
-        const router = useRouter();
-
-        useEffect(() => {
-            if (!loading && role && !allowedRoles.includes(role)) {
-                router.push('/'); // Or an access denied page
-            }
-        }, [loading, role, router]);
-
-        if (loading || (role && !allowedRoles.includes(role))) {
-            return <div>Loading...</div>; // Or a proper loader
-        }
-
-        return <Component {...props} />;
-    };
-};

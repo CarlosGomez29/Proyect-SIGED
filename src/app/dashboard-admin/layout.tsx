@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -12,12 +13,13 @@ import {
   ClipboardList,
   Globe,
   UserMinus,
-  GraduationCap,
   Search,
   Activity,
   History,
   BarChart3,
   FileStack,
+  ShieldAlert,
+  ArrowLeftCircle
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +34,9 @@ import {
   SidebarFooter,
   SidebarInset,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 import DashboardHeader from "@/components/dashboard-header";
+import { useAuth } from "@/contexts/auth-context";
 
 const academicOffering = [
     { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
@@ -65,6 +69,7 @@ export default function DashboardAdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { impersonatedSchool, stopImpersonation, role } = useAuth();
 
   const renderMenuItems = (items: any[]) => (
     <SidebarMenu className="gap-1 px-2">
@@ -95,14 +100,13 @@ export default function DashboardAdminLayout({
               <AvatarImage 
                 src="https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=35N8dRsWtTgy_9p_7yqYng&_nc_ss=8&oh=00_AfxRE-ecS-k6qO0l6hnbMY25NXpjbn4q3gKAjekZExqomQ&oe=69ACA028" 
                 alt="Admin Profile" 
-                data-ai-hint="institutional logo" 
               />
               <AvatarFallback className="bg-primary/5 text-primary">AD</AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <p className="font-bold text-foreground text-sm tracking-tight">Panel Administrativo</p>
+              <p className="font-bold text-foreground text-sm tracking-tight">Administración de Escuela</p>
               <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-[9px] font-bold text-primary uppercase tracking-widest">
-                DIGEV - Institucional
+                {impersonatedSchool ? impersonatedSchool.nombre : 'DIGEV - Institucional'}
               </div>
             </div>
           </SidebarHeader>
@@ -159,6 +163,24 @@ export default function DashboardAdminLayout({
         </Sidebar>
 
         <div className="flex flex-col flex-1">
+          {impersonatedSchool && (
+            <div className="bg-primary px-6 py-2 flex items-center justify-between animate-in slide-in-from-top duration-500">
+              <div className="flex items-center gap-3 text-white">
+                <ShieldAlert className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">
+                  Modo Super Admin — Administrando: <span className="underline">{impersonatedSchool.nombre}</span>
+                </span>
+              </div>
+              <Button 
+                onClick={stopImpersonation} 
+                variant="outline" 
+                size="sm" 
+                className="h-7 px-4 bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white text-[10px] font-black uppercase tracking-tighter"
+              >
+                <ArrowLeftCircle className="h-3 w-3 mr-2" /> Salir de esta escuela
+              </Button>
+            </div>
+          )}
           <DashboardHeader />
           <SidebarInset className="bg-transparent">
             <main className="flex-1 p-6 lg:p-10">

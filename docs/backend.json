@@ -1,6 +1,22 @@
 
 {
   "entities": {
+    "Escuela": {
+      "title": "Escuela Vocacional",
+      "description": "Centro educativo institucional.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre oficial" },
+        "provincia": { "type": "string" },
+        "sector": { "type": "string" },
+        "direccion": { "type": "string" },
+        "telefono": { "type": "string" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nombre", "provincia", "estado"]
+    },
     "Sede": {
       "title": "Sede / Recinto",
       "description": "Recinto físico donde se imparten los programas académicos.",
@@ -150,13 +166,27 @@
         "inst_secciones_count": { "type": "integer", "description": "Último número usado para secciones (SEC-XXXX)" },
         "inst_docentes_count": { "type": "integer", "description": "Último número usado para docentes (REG-XXXX)" }
       }
+    },
+    "Auditoria": {
+      "title": "Registro de Auditoría",
+      "description": "Trazabilidad de acciones del sistema.",
+      "type": "object",
+      "properties": {
+        "usuario": { "type": "string" },
+        "accion": { "type": "string" },
+        "modulo": { "type": "string" },
+        "escuela": { "type": "string" },
+        "modo": { "type": "string", "enum": ["superadmin", "standard"] },
+        "fecha": { "type": "string", "format": "date-time" }
+      }
     }
   },
   "auth": {
     "providers": ["password"]
   },
   "firestore": {
-    "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos." },
+    "/escuelas/{escuelaId}": { "schema": "Escuela", "description": "Maestro de recintos." },
+    "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos (legacy)." },
     "/cursos/{cursoId}": { "schema": "Curso", "description": "Maestro de programas." },
     "/periodos/{periodoId}": { "schema": "Periodo", "description": "Ciclos lectivos." },
     "/docentes/{docenteId}": { "schema": "Docente", "description": "Docentes." },
@@ -165,10 +195,11 @@
     "/inscripciones/{inscripcionId}": { "schema": "Inscripcion", "description": "Control de alumnos y notas." },
     "/rangos_militares/{rangoId}": { "schema": "RangoMilitar", "description": "Catálogo de rangos militares." },
     "/instituciones/{institucionId}": { "schema": "Institucion", "description": "Catálogo de instituciones oficiales." },
-    "/programas/{programaId}": { "schema": "Programa", "description": "Catálogo de programas académicos (DIGEV, Dominicana Digna, etc)." },
+    "/programas/{programaId}": { "schema": "Programa", "description": "Catálogo de programas académicos." },
+    "/auditoria/{auditId}": { "schema": "Auditoria", "description": "Registros de trazabilidad." },
     "/metadata/counters": { 
       "schema": { "$ref": "#/backend/entities/MetadataCounters" }, 
-      "description": "Contadores atómicos para la generación de identificadores secuenciales únicos." 
+      "description": "Contadores atómicos." 
     }
   }
 }
