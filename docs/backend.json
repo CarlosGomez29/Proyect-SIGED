@@ -26,6 +26,20 @@
       },
       "required": ["nombre"]
     },
+    "AcademicPeriod": {
+      "title": "Periodo Académico",
+      "description": "Ciclo lectivo global gestionado por el SuperAdmin.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Ej. Año Escolar 2025-2026" },
+        "fechaInicio": { "type": "string", "format": "date" },
+        "fechaFin": { "type": "string", "format": "date" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nombre", "fechaInicio", "fechaFin", "estado"]
+    },
     "Sede": {
       "title": "Sede / Recinto",
       "description": "Recinto físico donde se imparten los programas académicos.",
@@ -48,19 +62,6 @@
         "duracionHoras": { "type": "integer" }
       },
       "required": ["nombre", "codigo"]
-    },
-    "Periodo": {
-      "title": "Periodo Académico",
-      "description": "Ciclo lectivo (Trimestral, Semestral o Anual).",
-      "type": "object",
-      "properties": {
-        "nombre": { "type": "string", "description": "Ej. 2024-T2, 2024-S1" },
-        "tipo": { "type": "string", "enum": ["Trimestral", "Semestral", "Anual"] },
-        "anio": { "type": "integer" },
-        "fechaInicio": { "type": "string", "format": "date" },
-        "fechaFin": { "type": "string", "format": "date" }
-      },
-      "required": ["nombre", "tipo", "anio"]
     },
     "Docente": {
       "title": "Docente",
@@ -196,9 +197,9 @@
   "firestore": {
     "/escuelas/{escuelaId}": { "schema": "Escuela", "description": "Maestro de recintos." },
     "/provincias/{provinciaId}": { "schema": "Provincia", "description": "Catálogo de provincias." },
+    "/academic_periods/{periodId}": { "schema": "AcademicPeriod", "description": "Ciclos lectivos globales." },
     "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos (legacy)." },
     "/cursos/{cursoId}": { "schema": "Curso", "description": "Maestro de programas." },
-    "/periodos/{periodoId}": { "schema": "Periodo", "description": "Ciclos lectivos." },
     "/docentes/{docenteId}": { "schema": "Docente", "description": "Docentes." },
     "/estudiantes/{estudianteId}": { "schema": "Estudiante", "description": "Alumnos." },
     "/secciones/{seccionId}": { "schema": "Seccion", "description": "Secciones operativas." },

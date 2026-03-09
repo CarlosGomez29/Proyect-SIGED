@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   LogOut,
   LifeBuoy,
+  CalendarDays
 } from "lucide-react";
 
 import {
@@ -42,6 +43,7 @@ export default function DashboardLayout({
   const superAdminMenu = [
     { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard/admin" },
     { label: "Escuelas", icon: School, href: "/dashboard/admin/escuelas" },
+    { label: "Periodos Académicos", icon: CalendarDays, href: "/dashboard/admin/periodos" },
     { label: "Usuarios", icon: Users, href: "/dashboard/admin/usuarios" },
     { label: "Configuración Académica", icon: Settings, href: "/dashboard/admin/academica" },
     { label: "Certificaciones", icon: Award, href: "/dashboard/admin/certificaciones" },
