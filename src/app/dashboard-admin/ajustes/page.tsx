@@ -50,11 +50,11 @@ const PROGRAMAS_DEFAULT = [
 ];
 
 const PROVINCIAS_DEFAULT = [
-  "Azua", "Baoruco", "Barahona", "Dajabón", "Distrito Nacional", "Duarte", "El Seibo", "Elías Piña", 
+  "Distrito Nacional", "Azua", "Bahoruco", "Barahona", "Dajabón", "Duarte", "Elías Piña", "El Seibo", 
   "Espaillat", "Hato Mayor", "Hermanas Mirabal", "Independencia", "La Altagracia", "La Romana", 
   "La Vega", "María Trinidad Sánchez", "Monseñor Nouel", "Monte Cristi", "Monte Plata", "Pedernales", 
   "Peravia", "Puerto Plata", "Samaná", "San Cristóbal", "San José de Ocoa", "San Juan", 
-  "San Pedro de Macorís", "Sánchez Ramírez", "Santiago", "Santiago Rodríguez", "Valverde", "Santo Domingo"
+  "San Pedro de Macorís", "Sánchez Ramírez", "Santiago", "Santiago Rodríguez", "Santo Domingo", "Valverde"
 ];
 
 export default function AjustesPage() {
@@ -185,11 +185,12 @@ export default function AjustesPage() {
 
             const batch = writeBatch(db);
             PROVINCIAS_DEFAULT.sort().forEach((prov) => {
-                const docRef = doc(collection(db, "provincias"));
+                const docId = prov.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+                const docRef = doc(db, "provincias", docId);
                 batch.set(docRef, { nombre: prov });
             });
             await batch.commit();
-            toast({ title: "Catálogo Inicializado", description: "Se han cargado las 32 provincias correctamente." });
+            toast({ title: "Catálogo Inicializado", description: "Se han cargado las provincias de República Dominicana correctamente." });
         } catch (error) {
             toast({ variant: "destructive", title: "Error", description: "No se pudo cargar el catálogo de provincias." });
         } finally {
