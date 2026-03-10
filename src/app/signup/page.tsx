@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { Button } from "@/components/ui/button";
 import {
@@ -48,11 +48,14 @@ export default function SignupForm() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Store user role in Firestore
+      // Store user role in Firestore with explicit active status
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
         email: user.email,
-        role: role,
+        rol: role, // Usando 'rol' consistentemente
+        estado: 'activo',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
 
       toast({
@@ -60,7 +63,7 @@ export default function SignupForm() {
         description: "Tu cuenta ha sido creada. Ahora puedes iniciar sesión.",
       });
 
-      router.push('/');
+      router.push('/login');
 
     } catch (error: any) {
       toast({
@@ -72,7 +75,7 @@ export default function SignupForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
       <Card className="mx-auto max-w-sm">
         <CardHeader className="text-center">
           <Icons.logo className="h-12 w-12 text-primary mx-auto" />
@@ -111,11 +114,9 @@ export default function SignupForm() {
                   <SelectValue placeholder="Selecciona un rol" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="administrador">Administrador</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
                   <SelectItem value="admision">Admisión</SelectItem>
-                  <SelectItem value="docente">Docente</SelectItem>
-                  <SelectItem value="alumno">Alumno</SelectItem>
-                  <SelectItem value="super-admin">Super Admin</SelectItem>
+                  <SelectItem value="superadmin">Super Admin</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -124,7 +125,7 @@ export default function SignupForm() {
             </Button>
             <div className="mt-4 text-center text-sm">
               ¿Ya tienes una cuenta?{" "}
-              <Link href="/" className="underline">
+              <Link href="/login" className="underline">
                 Iniciar Sesión
               </Link>
             </div>

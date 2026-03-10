@@ -48,8 +48,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         
-        // Validación de estado activo
-        if (data.estado !== 'activo') {
+        // Bloqueo solo si es explícitamente 'inactivo'
+        if (data.estado === 'inactivo') {
           await signOut(auth);
           toast({
             variant: "destructive",
