@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from "next/link";
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -21,7 +21,7 @@ import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import images from "@/app/lib/placeholder-images";
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { useAuth as useFirebaseInstance, useFirestore } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
@@ -39,6 +39,9 @@ export default function RoleLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { role } = useParams() as { role: string };
+  
+  const auth = useFirebaseInstance();
+  const db = useFirestore();
 
   const details = profileDetails[role];
 
@@ -61,7 +64,7 @@ export default function RoleLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || !auth || !db) return;
 
     setIsSubmitting(true);
 
@@ -69,27 +72,26 @@ export default function RoleLoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Consultar perfil en Firestore para validación de estado y redirección
       const userDoc = await getDoc(doc(db, "users", user.uid));
       
       if (!userDoc.exists()) {
         await auth.signOut();
-        throw new Error("No se encontró el perfil de usuario en el sistema.");
+        throw new Error("No se encontró un perfil administrativo vinculado a esta cuenta.");
       }
 
       const userData = userDoc.data();
 
       if (userData.estado !== 'activo') {
         await auth.signOut();
-        throw new Error("Su cuenta se encuentra inactiva.");
+        throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin.");
       }
 
       toast({
         title: "Sesión Iniciada",
-        description: `Bienvenido, ${userData.nombre}.`,
+        description: `Bienvenido al sistema, ${userData.nombre}.`,
       });
 
-      // Redirección según rol real de Firestore
+      // Redirección por rol
       switch (userData.rol) {
         case 'superadmin':
           router.push('/dashboard/admin');
@@ -111,19 +113,21 @@ export default function RoleLoginPage() {
       }
 
     } catch (error: any) {
-      console.error(error);
-      let message = "Correo electrónico o contraseña incorrectos.";
-      
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        message = "Las credenciales ingresadas son inválidas.";
+      console.error("Error de autenticación:", error);
+      let errorMessage = "Ocurrió un error al intentar iniciar sesión.";
+
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMessage = "Credenciales inválidas. Verifique su correo y contraseña.";
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage = "Demasiados intentos fallidos. Su cuenta ha sido bloqueada temporalmente.";
       } else if (error.message) {
-        message = error.message;
+        errorMessage = error.message;
       }
 
       toast({
         variant: "destructive",
-        title: "Error de Autenticación",
-        description: message,
+        title: "Error de Acceso",
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);
