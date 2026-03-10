@@ -47,9 +47,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (docSnap.exists()) {
         const data = docSnap.data();
+        const userRole = data.rol as UserRole;
+        const userStatus = (data.estado || 'activo').toLowerCase();
         
-        // Bloqueo solo si es explícitamente 'inactivo'
-        if (data.estado === 'inactivo') {
+        // Bloqueo solo si el estado es inactivo y NO es superadmin
+        if (userRole !== 'superadmin' && userStatus === 'inactivo') {
           await signOut(auth);
           toast({
             variant: "destructive",
@@ -59,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return null;
         }
         
-        return data.rol as UserRole;
+        return userRole;
       }
       return null;
     } catch (error) {

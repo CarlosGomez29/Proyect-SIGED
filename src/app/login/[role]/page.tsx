@@ -76,14 +76,15 @@ export default function RoleLoginPage() {
       
       if (!userDoc.exists()) {
         await auth.signOut();
-        throw new Error("No se encontró un perfil administrativo vinculado a esta cuenta en la base de datos.");
+        throw new Error("No se encontró un perfil vinculado a esta cuenta en la base de datos.");
       }
 
       const userData = userDoc.data();
+      const userRole = userData.rol;
+      const userStatus = (userData.estado || 'activo').toLowerCase();
 
-      // Bloquear acceso solo si el estado es explícitamente 'inactivo'
-      // Si el campo no existe o es 'activo', permitimos el paso
-      if (userData.estado === 'inactivo') {
+      // Permitir acceso siempre si es SuperAdmin, de lo contrario validar estado
+      if (userRole !== 'superadmin' && userStatus === 'inactivo') {
         await auth.signOut();
         throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin para habilitar su acceso.");
       }
@@ -93,8 +94,7 @@ export default function RoleLoginPage() {
         description: `Bienvenido al sistema, ${userData.nombre || 'Usuario'}.`,
       });
 
-      // Redirección por rol (normalizando el rol de la DB)
-      const userRole = userData.rol;
+      // Redirección por rol
       switch (userRole) {
         case 'superadmin':
           router.push('/dashboard/admin');
