@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers, Map } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers, Map, UserShield } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -65,6 +65,7 @@ export default function AjustesPage() {
     const [isSeedingInstituciones, setIsSeedingInstituciones] = useState(false);
     const [isSeedingProgramas, setIsSeedingProgramas] = useState(false);
     const [isSeedingProvincias, setIsSeedingProvincias] = useState(false);
+    const [isSeedingAdmin, setIsSeedingAdmin] = useState(false);
     
     const [notifications, setNotifications] = useState({
         pendingEnrollment: true,
@@ -86,6 +87,36 @@ export default function AjustesPage() {
                 title: "Error al reiniciar", 
                 description: "No se pudo actualizar el contador institucional en Firestore." 
             });
+        }
+    };
+
+    const handleSeedSuperAdmin = async () => {
+        if (!db) return;
+        setIsSeedingAdmin(true);
+        try {
+            const adminId = "superadmin_root";
+            const adminRef = doc(db, "users", adminId);
+            
+            // Hash SHA-256 de "123456"
+            const passwordHash = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92";
+
+            await setDoc(adminRef, {
+                username: "superadmin",
+                passwordHash: passwordHash,
+                nombre: "Super",
+                apellido: "Admin",
+                rol: "superadmin",
+                estado: "activo",
+                escuelaId: null,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+
+            toast({ title: "Acceso Restaurado", description: "Usuario 'superadmin' creado exitosamente." });
+        } catch (error) {
+            toast({ variant: "destructive", title: "Error", description: "No se pudo crear el superadmin." });
+        } finally {
+            setIsSeedingAdmin(false);
         }
     };
 
@@ -242,11 +273,11 @@ export default function AjustesPage() {
                     <CardHeader className="bg-destructive/5">
                         <div className="flex items-center gap-2">
                             <ShieldAlert className="h-5 w-5 text-destructive" />
-                            <CardTitle className="text-destructive">Mantenimiento de Secuencias</CardTitle>
+                            <CardTitle className="text-destructive">Mantenimiento Crítico</CardTitle>
                         </div>
-                        <CardDescription>Acciones de bajo nivel para corregir o reiniciar identificadores institucionales.</CardDescription>
+                        <CardDescription>Acciones de bajo nivel para corregir o reiniciar identificadores institucionales y accesos.</CardDescription>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-6 space-y-4">
                         <div className="flex items-center justify-between p-4 rounded-xl border border-destructive/10 bg-destructive/5">
                             <div className="space-y-1">
                                 <h4 className="text-sm font-bold">Reiniciar Secuencia de Secciones</h4>
@@ -267,6 +298,16 @@ export default function AjustesPage() {
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-primary/5">
+                            <div className="space-y-1">
+                                <h4 className="text-sm font-bold">Restaurar Acceso SuperAdmin</h4>
+                                <p className="text-xs text-muted-foreground max-w-md">Crea o actualiza el usuario 'superadmin' con clave '123456'.</p>
+                            </div>
+                            <Button variant="outline" size="sm" onClick={handleSeedSuperAdmin} disabled={isSeedingAdmin}>
+                                {isSeedingAdmin ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserShield className="mr-2 h-4 w-4" />} Restaurar Root
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
