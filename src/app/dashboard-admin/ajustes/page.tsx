@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from 'framer-motion';
-import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers, Map, UserShield } from "lucide-react";
+import { RefreshCw, ShieldAlert, Database, Loader2, Landmark, Layers, Map, ShieldCheck } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 
@@ -306,7 +306,7 @@ export default function AjustesPage() {
                                 <p className="text-xs text-muted-foreground max-w-md">Crea o actualiza el usuario 'superadmin' con clave '123456'.</p>
                             </div>
                             <Button variant="outline" size="sm" onClick={handleSeedSuperAdmin} disabled={isSeedingAdmin}>
-                                {isSeedingAdmin ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserShield className="mr-2 h-4 w-4" />} Restaurar Root
+                                {isSeedingAdmin ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />} Restaurar Root
                             </Button>
                         </div>
                     </CardContent>
