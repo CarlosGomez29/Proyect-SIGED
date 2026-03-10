@@ -42,20 +42,21 @@
     },
     "UserProfile": {
       "title": "Perfil de Usuario",
-      "description": "Información extendida del usuario y su rol.",
+      "description": "Información del usuario con autenticación manual.",
       "type": "object",
       "properties": {
+        "username": { "type": "string", "description": "Nombre de usuario único" },
+        "passwordHash": { "type": "string", "description": "Contraseña encriptada" },
         "nombre": { "type": "string" },
         "apellido": { "type": "string" },
-        "email": { "type": "string", "format": "email" },
         "telefono": { "type": "string" },
         "rol": { "type": "string", "enum": ["superadmin", "admin", "admision"] },
-        "escuelaId": { "type": "string", "description": "ID de la escuela asignada (null para superadmin)" },
+        "escuelaId": { "type": "string", "description": "ID de la escuela asignada" },
         "estado": { "type": "string", "enum": ["activo", "inactivo"] },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["nombre", "apellido", "email", "rol", "estado"]
+      "required": ["username", "passwordHash", "nombre", "apellido", "rol", "estado"]
     },
     "Sede": {
       "title": "Sede / Recinto",
@@ -212,7 +213,7 @@
     "providers": ["password"]
   },
   "firestore": {
-    "/users/{userId}": { "schema": "UserProfile", "description": "Perfiles de usuario y roles." },
+    "/users/{userId}": { "schema": "UserProfile", "description": "Perfiles de usuario y credenciales manuales." },
     "/escuelas/{escuelaId}": { "schema": "Escuela", "description": "Maestro de recintos." },
     "/provincias/{provinciaId}": { "schema": "Provincia", "description": "Catálogo de provincias." },
     "/academic_periods/{periodId}": { "schema": "AcademicPeriod", "description": "Ciclos lectivos globales." },

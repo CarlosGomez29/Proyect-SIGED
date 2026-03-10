@@ -10,7 +10,7 @@ import {
   UserPlus,
   BookUser,
   GraduationCap,
-  Mail,
+  User as UserIcon,
   Lock,
   ArrowLeft,
   Loader2
@@ -20,9 +20,10 @@ import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import images from "@/app/lib/placeholder-images";
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useAuth as useFirebaseInstance, useFirestore } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { useFirestore } from '@/firebase';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
+import { useAuth } from '@/contexts/auth-context';
+import { hashPassword } from '@/lib/hash';
 
 const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
@@ -33,15 +34,15 @@ const profileDetails: { [key: string]: { name: string; icon: React.ElementType; 
 };
 
 export default function RoleLoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const { role } = useParams() as { role: string };
   
-  const auth = useFirebaseInstance();
   const db = useFirestore();
+  const { handleLoginSuccess } = useAuth();
 
   const details = profileDetails[role];
 
@@ -64,73 +65,66 @@ export default function RoleLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting || !auth || !db) return;
+    if (isSubmitting || !db) return;
 
     setIsSubmitting(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // 1. Buscar usuario por username
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("username", "==", username.trim()), limit(1));
+      const querySnapshot = await getDocs(q);
 
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      
-      if (!userDoc.exists()) {
-        await auth.signOut();
-        throw new Error("No se encontró un perfil vinculado a esta cuenta en la base de datos.");
+      if (querySnapshot.empty) {
+        throw new Error("Usuario no encontrado.");
       }
 
+      const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
-      const userRole = userData.rol;
-      const userStatus = (userData.estado || 'activo').toLowerCase();
 
-      // Permitir acceso siempre si es SuperAdmin, de lo contrario validar estado
-      if (userRole !== 'superadmin' && userStatus === 'inactivo') {
-        await auth.signOut();
-        throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin para habilitar su acceso.");
+      // 2. Verificar hash de contraseña
+      const inputHash = await hashPassword(password);
+      if (inputHash !== userData.passwordHash) {
+        throw new Error("Contraseña incorrecta.");
       }
+
+      // 3. Validar estado (excepto superadmin)
+      const userStatus = (userData.estado || 'activo').toLowerCase();
+      if (userData.rol !== 'superadmin' && userStatus === 'inactivo') {
+        throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin.");
+      }
+
+      // 4. Iniciar sesión manual en el contexto
+      handleLoginSuccess({
+        uid: userDoc.id,
+        username: userData.username,
+        nombre: userData.nombre,
+        apellido: userData.apellido,
+        rol: userData.rol,
+        escuelaId: userData.escuelaId,
+        estado: userData.estado
+      });
 
       toast({
         title: "Sesión Iniciada",
-        description: `Bienvenido al sistema, ${userData.nombre || 'Usuario'}.`,
+        description: `Bienvenido al sistema, ${userData.nombre}.`,
       });
 
       // Redirección por rol
-      switch (userRole) {
-        case 'superadmin':
-          router.push('/dashboard/admin');
-          break;
-        case 'admin':
-          router.push('/dashboard-admin');
-          break;
-        case 'admision':
-          router.push('/dashboard/admision');
-          break;
-        case 'docente':
-          router.push('/dashboard-docente');
-          break;
-        case 'alumno':
-          router.push('/dashboard-alumno');
-          break;
-        default:
-          router.push('/');
+      switch (userData.rol) {
+        case 'superadmin': router.push('/dashboard/admin'); break;
+        case 'admin': router.push('/dashboard-admin'); break;
+        case 'admision': router.push('/dashboard/admision'); break;
+        case 'docente': router.push('/dashboard-docente'); break;
+        case 'alumno': router.push('/dashboard-alumno'); break;
+        default: router.push('/');
       }
 
     } catch (error: any) {
-      console.error("Error de autenticación:", error);
-      let errorMessage = "Ocurrió un error al intentar iniciar sesión.";
-
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = "Credenciales inválidas. Verifique su correo y contraseña.";
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = "Demasiados intentos fallidos. Su cuenta ha sido bloqueada temporalmente.";
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
       toast({
         variant: "destructive",
         title: "Error de Acceso",
-        description: errorMessage,
+        description: error.message || "Credenciales inválidas.",
       });
     } finally {
       setIsSubmitting(false);
@@ -170,14 +164,14 @@ export default function RoleLoginPage() {
                 <form onSubmit={handleLogin} className="grid gap-4 w-full">
                     <div className="space-y-2">
                         <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input
-                                id="email"
-                                type="email"
-                                placeholder="Correo institucional"
+                                id="username"
+                                type="text"
+                                placeholder="Nombre de usuario"
                                 required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus:border-primary"
                                 disabled={isSubmitting}
                             />
@@ -197,12 +191,6 @@ export default function RoleLoginPage() {
                                 disabled={isSubmitting}
                             />
                         </div>
-                    </div>
-
-                    <div className="flex items-center justify-end text-sm mt-2">
-                        <Link href="#" className="text-neutral-400 hover:text-white transition-colors">
-                            ¿Olvidaste tu contraseña?
-                        </Link>
                     </div>
 
                     <Button 

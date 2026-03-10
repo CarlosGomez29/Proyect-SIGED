@@ -7,16 +7,15 @@ import {
   Search, 
   MoreHorizontal, 
   UserCircle, 
-  Mail, 
   Phone, 
-  ShieldCheck, 
   School, 
   Power, 
   PowerOff, 
   Edit,
   Loader2,
   UserPlus,
-  KeyRound
+  KeyRound,
+  UserCheck
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,34 +51,22 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase
-import { useFirestore, useCollection, useAuth as useFirebaseAuth } from '@/firebase';
+import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
-  setDoc, 
+  addDoc,
   updateDoc, 
   doc, 
   serverTimestamp, 
   query, 
-  orderBy 
+  orderBy,
+  where,
+  getDocs,
+  limit
 } from 'firebase/firestore';
-import { 
-  createUserWithEmailAndPassword, 
-  sendPasswordResetEmail 
-} from 'firebase/auth';
-import { initializeApp, deleteApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-
-// Configuración para instancia secundaria (necesaria para crear usuarios sin cerrar sesión)
-const firebaseConfig = {
-  projectId: "esac-manager",
-  appId: "1:1014997648612:web:0dc62d590a1cd3a9c598f1",
-  storageBucket: "esac-manager.firebasestorage.app",
-  apiKey: "AIzaSyBVnGTpbY85rmPSXD6bpQ1qXCAraQMRbUw",
-  authDomain: "esac-manager.firebaseapp.com",
-  messagingSenderId: "1014997648612"
-};
+import { hashPassword } from '@/lib/hash';
 
 const ROLES = [
   { value: 'superadmin', label: 'Super Admin' },
@@ -87,12 +74,9 @@ const ROLES = [
   { value: 'admision', label: 'Admisiones' },
 ];
 
-const TEMP_PASSWORD = "Temp1234*";
-
 export default function GestionUsuariosPage() {
   const { toast } = useToast();
   const db = useFirestore();
-  const mainAuth = useFirebaseAuth();
   
   const usersQuery = useMemo(() => 
     db ? query(collection(db, "users"), orderBy("createdAt", "desc")) : null, 
@@ -106,7 +90,9 @@ export default function GestionUsuariosPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [userToReset, setUserToReset] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -115,26 +101,32 @@ export default function GestionUsuariosPage() {
     if (!db || isSaving) return;
 
     const formData = new FormData(e.currentTarget);
+    const username = (formData.get('username') as string).trim().toLowerCase();
     const role = formData.get('rol') as string;
     const escuelaId = formData.get('escuelaId') as string;
-    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
     if (role !== 'superadmin' && !escuelaId) {
-      toast({ 
-        variant: "destructive", 
-        title: "Campo requerido", 
-        description: "Debe asignar una escuela para este rol." 
-      });
+      toast({ variant: "destructive", title: "Error", description: "Asigne una escuela para este rol." });
       return;
     }
 
     setIsSaving(true);
 
     try {
-      const payload = {
+      // 1. Validar username único (si es nuevo)
+      if (!editingUser) {
+        const checkQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
+        const checkSnap = await getDocs(checkQuery);
+        if (!checkSnap.empty) {
+          throw new Error("El nombre de usuario ya está en uso.");
+        }
+      }
+
+      const payload: any = {
+        username: username,
         nombre: formData.get('nombre') as string,
         apellido: formData.get('apellido') as string,
-        email: email,
         telefono: formData.get('telefono') as string,
         rol: role,
         escuelaId: role === 'superadmin' ? null : escuelaId,
@@ -142,80 +134,52 @@ export default function GestionUsuariosPage() {
         updatedAt: serverTimestamp(),
       };
 
-      if (editingUser) {
-        await updateDoc(doc(db, "users", editingUser.id), payload);
-        toast({ title: "Usuario Actualizado", description: `${payload.nombre} ha sido modificado.` });
+      if (!editingUser) {
+        payload.passwordHash = await hashPassword(password);
+        payload.createdAt = serverTimestamp();
+        await addDoc(collection(db, "users"), payload);
+        toast({ title: "Usuario Creado", description: `Acceso habilitado para @${username}.` });
       } else {
-        // 1. Crear en Firebase Auth usando instancia secundaria
-        const secondaryApp = initializeApp(firebaseConfig, 'Secondary');
-        const secondaryAuth = getAuth(secondaryApp);
-        
-        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, TEMP_PASSWORD);
-        const uid = userCredential.user.uid;
-        
-        // 2. Guardar en Firestore usando el UID
-        await setDoc(doc(db, "users", uid), {
-          ...payload,
-          createdAt: serverTimestamp(),
-        });
-
-        // 3. Enviar correo de reset (para que establezcan su propia contraseña)
-        await sendPasswordResetEmail(secondaryAuth, email);
-        
-        await deleteApp(secondaryApp);
-
-        toast({ 
-          title: "Usuario Creado", 
-          description: `Se ha enviado un correo de bienvenida a ${email}. Contraseña temporal: ${TEMP_PASSWORD}` 
-        });
+        await updateDoc(doc(db, "users", editingUser.id), payload);
+        toast({ title: "Usuario Actualizado", description: "Los cambios han sido guardados." });
       }
+
       setIsModalOpen(false);
       setEditingUser(null);
     } catch (err: any) {
-      console.error(err);
-      if (err.code === 'auth/email-already-in-use') {
-        toast({ variant: "destructive", title: "Error", description: "El correo electrónico ya está registrado." });
-      } else {
-        toast({ variant: "destructive", title: "Error", description: "Ocurrió un error al procesar la solicitud." });
-      }
+      toast({ variant: "destructive", title: "Error", description: err.message });
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleResetPassword = (email: string) => {
-    sendPasswordResetEmail(mainAuth, email)
-      .then(() => {
-        toast({ 
-          title: "Correo Enviado", 
-          description: `Se ha enviado un enlace de recuperación a ${email}.` 
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({ 
-          variant: "destructive", 
-          title: "Error", 
-          description: "No se pudo enviar el correo de recuperación." 
-        });
+  const handleManualResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!db || !userToReset) return;
+
+    const formData = new FormData(e.currentTarget);
+    const newPassword = formData.get('newPassword') as string;
+
+    try {
+      const hash = await hashPassword(newPassword);
+      await updateDoc(doc(db, "users", userToReset.id), {
+        passwordHash: hash,
+        updatedAt: serverTimestamp()
       });
+      toast({ title: "Contraseña Actualizada", description: `Nueva clave asignada para @${userToReset.username}.` });
+      setIsResetModalOpen(false);
+      setUserToReset(null);
+    } catch (e) {
+      toast({ variant: "destructive", title: "Error", description: "No se pudo actualizar la contraseña." });
+    }
   };
 
   const toggleEstado = (user: any) => {
     if (!db) return;
     const nuevoEstado = user.estado === 'activo' ? 'inactivo' : 'activo';
-    updateDoc(doc(db, "users", user.id), { 
-      estado: nuevoEstado, 
-      updatedAt: serverTimestamp() 
-    })
-      .then(() => toast({ 
-        title: "Estado Actualizado", 
-        description: `El usuario ahora está ${nuevoEstado}.` 
-      }))
-      .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-        path: `users/${user.id}`, 
-        operation: 'update' 
-      })));
+    updateDoc(doc(db, "users", user.id), { estado: nuevoEstado, updatedAt: serverTimestamp() })
+      .then(() => toast({ title: "Estado Actualizado", description: `Usuario @${user.username} ahora está ${nuevoEstado}.` }))
+      .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${user.id}`, operation: 'update' })));
   };
 
   const openEdit = (user: any) => {
@@ -227,104 +191,78 @@ export default function GestionUsuariosPage() {
   const filteredUsers = users.filter(u => 
     u.nombre?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    u.username?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getEscuelaNombre = (id: string) => {
-    if (!id) return "N/A (Global)";
+    if (!id) return "Global / SIGED";
     const escuela = escuelas.find(e => e.id === id);
     return escuela ? escuela.nombre : "ID: " + id;
   };
 
   return (
-    <motion.div 
-      className="space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-black font-headline tracking-tighter">Gestión de Usuarios</h1>
-          <p className="text-muted-foreground font-medium">Administración de accesos administrativos y seguridad.</p>
+          <h1 className="text-3xl font-black font-headline tracking-tighter">Directorio de Usuarios</h1>
+          <p className="text-muted-foreground font-medium">Control de acceso y seguridad administrativa basado en Firestore.</p>
         </div>
-        <Dialog open={isModalOpen} onOpenChange={(open) => { 
-          setIsModalOpen(open); 
-          if (!open) { setEditingUser(null); setSelectedRole(""); }
-        }}>
+        <Dialog open={isModalOpen} onOpenChange={(open) => { setIsModalOpen(open); if (!open) { setEditingUser(null); setSelectedRole(""); }}}>
           <DialogTrigger asChild>
             <Button className="font-bold uppercase tracking-widest text-[10px]">
-              <UserPlus className="mr-2 h-4 w-4" /> Crear Usuario
+              <UserPlus className="mr-2 h-4 w-4" /> Crear Nuevo Usuario
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] rounded-2xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black">{editingUser ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}</DialogTitle>
+              <DialogTitle className="text-2xl font-black">{editingUser ? 'Editar Perfil' : 'Registrar Credenciales'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSaveUser} className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="nombre">Nombre</Label>
-                  <Input id="nombre" name="nombre" defaultValue={editingUser?.nombre || ''} placeholder="Ej. Juan" required />
+                  <Label>Nombre de Usuario (Login)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">@</span>
+                    <Input name="username" className="pl-8" defaultValue={editingUser?.username || ''} placeholder="juan.perez" required disabled={!!editingUser} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="apellido">Apellido</Label>
-                  <Input id="apellido" name="apellido" defaultValue={editingUser?.apellido || ''} placeholder="Ej. Pérez" required />
-                </div>
+                {!editingUser && (
+                  <div className="space-y-2">
+                    <Label>Contraseña Inicial</Label>
+                    <Input name="password" type="password" placeholder="Mínimo 6 caracteres" required />
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Nombre</Label><Input name="nombre" defaultValue={editingUser?.nombre || ''} required /></div>
+                <div className="space-y-2"><Label>Apellido</Label><Input name="apellido" defaultValue={editingUser?.apellido || ''} required /></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Correo Electrónico</Label>
-                  <Input id="email" name="email" type="email" defaultValue={editingUser?.email || ''} placeholder="juan@email.com" required disabled={!!editingUser} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="telefono">Teléfono</Label>
-                  <Input id="telefono" name="telefono" defaultValue={editingUser?.telefono || ''} placeholder="809-000-0000" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="rol">Rol del Sistema</Label>
-                  <Select 
-                    name="rol" 
-                    defaultValue={editingUser?.rol || ''} 
-                    onValueChange={setSelectedRole}
-                    required
-                  >
-                    <SelectTrigger className="rounded-xl h-12">
-                      <SelectValue placeholder="Seleccionar rol..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLES.map((r) => (
-                        <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
-                      ))}
-                    </SelectContent>
+                  <Label>Rol del Sistema</Label>
+                  <Select name="rol" defaultValue={editingUser?.rol || ''} onValueChange={setSelectedRole} required>
+                    <SelectTrigger className="rounded-xl h-12"><SelectValue placeholder="Seleccionar rol..." /></SelectTrigger>
+                    <SelectContent>{ROLES.map((r) => (<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>))}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="escuelaId">Escuela Asignada</Label>
-                  <Select 
-                    name="escuelaId" 
-                    defaultValue={editingUser?.escuelaId || ''} 
-                    disabled={selectedRole === 'superadmin'}
-                  >
+                  <Label>Escuela Asignada</Label>
+                  <Select name="escuelaId" defaultValue={editingUser?.escuelaId || ''} disabled={selectedRole === 'superadmin'}>
                     <SelectTrigger className="rounded-xl h-12">
-                      <SelectValue placeholder={selectedRole === 'superadmin' ? "Acceso Global" : "Seleccionar escuela..."} />
+                      <SelectValue placeholder={selectedRole === 'superadmin' ? "Acceso Institucional" : "Seleccionar recinto..."} />
                     </SelectTrigger>
                     <SelectContent>
-                      {loadingEscuelas ? (
-                        <div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>
-                      ) : escuelas.map((e) => (
-                        <SelectItem key={e.id} value={e.id}>{e.nombre}</SelectItem>
-                      ))}
+                      {loadingEscuelas ? (<div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></div>) : 
+                        escuelas.map((e) => (<SelectItem key={e.id} value={e.id}>{e.nombre}</SelectItem>))
+                      }
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+              <div className="space-y-2"><Label>Teléfono de Contacto</Label><Input name="telefono" defaultValue={editingUser?.telefono || ''} placeholder="809-000-0000" /></div>
               <DialogFooter className="pt-4">
                 <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
-                <Button type="submit" className="px-8" disabled={isSaving}>
-                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingUser ? 'Guardar Cambios' : 'Crear Cuenta')}
-                </Button>
+                <Button type="submit" disabled={isSaving}>{isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Guardar Usuario'}</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -335,26 +273,21 @@ export default function GestionUsuariosPage() {
         <CardHeader>
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Buscar por nombre, apellido o email..." 
-              className="pl-10" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <Input placeholder="Buscar por usuario o nombre..." className="pl-10" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
           </div>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="p-12 text-center text-muted-foreground animate-pulse font-bold">Consultando directorio de usuarios...</div>
+            <div className="p-12 text-center text-muted-foreground animate-pulse font-bold">Cargando base de datos...</div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Usuario</TableHead>
-                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Contacto</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">ID / Login</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Nombre Completo</TableHead>
                   <TableHead className="font-bold text-[10px] uppercase tracking-widest">Rol</TableHead>
-                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Escuela Asignada</TableHead>
-                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Estado</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-widest">Recinto</TableHead>
+                  <TableHead className="font-bold text-[10px] uppercase tracking-widest text-center">Estado</TableHead>
                   <TableHead className="text-right font-bold text-[10px] uppercase tracking-widest">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
@@ -363,76 +296,59 @@ export default function GestionUsuariosPage() {
                   <TableRow key={u.id} className="hover:bg-muted/30 border-border/50 transition-colors">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/10">
-                          <UserCircle className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-sm">{u.nombre} {u.apellido}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono">{u.id.substring(0,8)}...</span>
-                        </div>
+                        <div className="h-9 w-9 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/10"><UserCircle className="h-5 w-5 text-primary" /></div>
+                        <span className="font-mono text-xs font-black text-primary">@{u.username}</span>
                       </div>
                     </TableCell>
+                    <TableCell><span className="font-bold text-sm">{u.nombre} {u.apellido}</span></TableCell>
+                    <TableCell><Badge variant="outline" className="font-bold uppercase text-[9px]">{u.rol}</Badge></TableCell>
                     <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <Mail className="h-3 w-3 text-muted-foreground" />
-                          {u.email}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <Phone className="h-3 w-3 text-muted-foreground" />
-                          {u.telefono || 'N/A'}
-                        </div>
-                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-semibold"><School className="h-3 w-3 text-muted-foreground" />{getEscuelaNombre(u.escuelaId)}</div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="font-bold uppercase tracking-tighter text-[9px] px-2 py-0">
-                        {u.rol}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1.5 text-xs font-semibold">
-                        <School className="h-3 w-3 text-muted-foreground" />
-                        {getEscuelaNombre(u.escuelaId)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       <Badge className={u.estado === 'activo' ? 'bg-success/15 text-success border-success/20' : 'bg-destructive/15 text-destructive border-destructive/20'}>
                         {u.estado === 'activo' ? 'Activo' : 'Inactivo'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-xl border-border/50">
-                          <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Control de Usuario</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => openEdit(u)} className="cursor-pointer">
-                            <Edit className="h-4 w-4 mr-2" /> Editar Información
-                          </DropdownMenuItem>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-xl">
+                          <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Control Maestro</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => openEdit(u)} className="cursor-pointer"><Edit className="h-4 w-4 mr-2" /> Editar Información</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => toggleEstado(u)} className="cursor-pointer">
                             {u.estado === 'activo' ? <PowerOff className="h-4 w-4 mr-2 text-destructive" /> : <Power className="h-4 w-4 mr-2 text-success" />}
-                            {u.estado === 'activo' ? 'Desactivar Usuario' : 'Activar Usuario'}
+                            {u.estado === 'activo' ? 'Desactivar Acceso' : 'Habilitar Acceso'}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleResetPassword(u.email)} className="cursor-pointer text-primary font-bold">
-                            <KeyRound className="h-4 w-4 mr-2" /> Resetear Contraseña
+                          <DropdownMenuItem onClick={() => { setUserToReset(u); setIsResetModalOpen(true); }} className="cursor-pointer text-primary font-bold">
+                            <KeyRound className="h-4 w-4 mr-2" /> Forzar Nueva Clave
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
-                {filteredUsers.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground font-medium italic">No se encontraron usuarios que coincidan con la búsqueda.</TableCell>
-                  </TableRow>
-                )}
               </TableBody>
             </Table>
           )}
         </CardContent>
       </Card>
+
+      {/* Forzar Cambio de Contraseña */}
+      <Dialog open={isResetModalOpen} onOpenChange={setIsResetModalOpen}>
+        <DialogContent className="sm:max-w-[400px] rounded-2xl">
+          <DialogHeader><DialogTitle className="text-2xl font-black">Nueva Contraseña</DialogTitle></DialogHeader>
+          <form onSubmit={handleManualResetPassword} className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">Está asignando una nueva clave de acceso para <strong>@{userToReset?.username}</strong>. No se enviarán correos; informe al usuario directamente.</p>
+            <div className="space-y-2">
+              <Label>Nueva Clave de Acceso</Label>
+              <Input name="newPassword" type="password" required placeholder="Ingrese la nueva clave" />
+            </div>
+            <DialogFooter><DialogClose asChild><Button variant="ghost">Cerrar</Button></DialogClose><Button type="submit">Actualizar Clave</Button></DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

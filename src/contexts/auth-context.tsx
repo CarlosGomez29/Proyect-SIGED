@@ -2,19 +2,29 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 type UserRole = 'superadmin' | 'admin' | 'admision' | 'docente' | 'alumno' | null;
 
+interface AuthUser {
+  uid: string;
+  username: string;
+  nombre: string;
+  apellido: string;
+  rol: UserRole;
+  escuelaId?: string | null;
+  estado: string;
+}
+
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
   role: UserRole;
-  handleLogout: () => Promise<void>;
+  handleLogout: () => void;
+  handleLoginSuccess: (userData: AuthUser) => void;
   impersonatedSchool: { id: string; nombre: string } | null;
   startImpersonation: (school: { id: string; nombre: string }) => void;
   stopImpersonation: () => void;
@@ -25,7 +35,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null, 
   loading: true, 
   role: null, 
-  handleLogout: async () => {},
+  handleLogout: () => {},
+  handleLoginSuccess: () => {},
   impersonatedSchool: null,
   startImpersonation: () => {},
   stopImpersonation: () => {},
@@ -33,94 +44,83 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<UserRole>(null);
   const [impersonatedSchool, setImpersonatedSchool] = useState<{ id: string; nombre: string } | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
-  const fetchUserProfile = async (uid: string) => {
-    try {
-      const docRef = doc(db, 'users', uid);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const userRole = data.rol as UserRole;
-        const userStatus = (data.estado || 'activo').toLowerCase();
-        
-        // Bloqueo solo si el estado es inactivo y NO es superadmin
-        if (userRole !== 'superadmin' && userStatus === 'inactivo') {
-          await signOut(auth);
-          toast({
-            variant: "destructive",
-            title: "Acceso denegado",
-            description: "Su cuenta se encuentra inactiva. Contacte al administrador.",
-          });
-          return null;
-        }
-        
-        return userRole;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return null;
-    }
+  const handleLoginSuccess = (userData: AuthUser) => {
+    setUser(userData);
+    localStorage.setItem('siged_session', JSON.stringify(userData));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('siged_session');
+    localStorage.removeItem('impersonatedSchool');
+    setUser(null);
+    setImpersonatedSchool(null);
+    router.push('/');
   };
 
   const refreshProfile = async () => {
-    if (user) {
-      const userRole = await fetchUserProfile(user.uid);
-      setRole(userRole);
+    if (!user) return;
+    try {
+      const docRef = doc(db, 'users', user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data() as AuthUser;
+        const updatedUser = { ...data, uid: docSnap.id };
+        setUser(updatedUser);
+        localStorage.setItem('siged_session', JSON.stringify(updatedUser));
+      }
+    } catch (e) {
+      console.error("Error refreshing profile", e);
     }
   };
 
   useEffect(() => {
-    // Restore impersonation from local storage
-    const saved = localStorage.getItem('impersonatedSchool');
-    if (saved) {
-      try {
-        setImpersonatedSchool(JSON.parse(saved));
-      } catch (e) {
-        localStorage.removeItem('impersonatedSchool');
-      }
-    }
+    const checkSession = async () => {
+      const session = localStorage.getItem('siged_session');
+      const savedImpersonation = localStorage.getItem('impersonatedSchool');
 
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setLoading(true);
-      if (firebaseUser) {
-        const userRole = await fetchUserProfile(firebaseUser.uid);
-        if (userRole) {
-          setUser(firebaseUser);
-          setRole(userRole);
-        } else {
-          setUser(null);
-          setRole(null);
+      if (session) {
+        try {
+          const parsedSession = JSON.parse(session) as AuthUser;
+          // Validar estado actual en Firestore
+          const docRef = doc(db, 'users', parsedSession.uid);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const currentData = docSnap.data();
+            const estado = (currentData.estado || 'activo').toLowerCase();
+            
+            if (currentData.rol !== 'superadmin' && estado === 'inactivo') {
+              handleLogout();
+              toast({ variant: "destructive", title: "Acceso denegado", description: "Cuenta inactiva." });
+            } else {
+              setUser({ ...parsedSession, estado: currentData.estado, rol: currentData.rol as UserRole });
+            }
+          } else {
+            handleLogout();
+          }
+        } catch (e) {
+          localStorage.removeItem('siged_session');
         }
-      } else {
-        setUser(null);
-        setRole(null);
+      }
+
+      if (savedImpersonation) {
+        try {
+          setImpersonatedSchool(JSON.parse(savedImpersonation));
+        } catch (e) {
+          localStorage.removeItem('impersonatedSchool');
+        }
       }
       setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
+    checkSession();
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem('impersonatedSchool');
-      setImpersonatedSchool(null);
-      setUser(null);
-      setRole(null);
-      router.push('/');
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
 
   const startImpersonation = (school: { id: string; nombre: string }) => {
     setImpersonatedSchool(school);
@@ -138,8 +138,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     <AuthContext.Provider value={{ 
       user, 
       loading, 
-      role, 
+      role: user?.rol || null, 
       handleLogout, 
+      handleLoginSuccess,
       impersonatedSchool, 
       startImpersonation, 
       stopImpersonation,
