@@ -40,6 +40,23 @@
       },
       "required": ["nombre", "fechaInicio", "fechaFin", "estado"]
     },
+    "UserProfile": {
+      "title": "Perfil de Usuario",
+      "description": "Información extendida del usuario y su rol.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "telefono": { "type": "string" },
+        "rol": { "type": "string", "enum": ["superadmin", "admin", "admision", "profesor", "estudiante"] },
+        "escuelaId": { "type": "string", "description": "ID de la escuela asignada (null para superadmin)" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nombre", "apellido", "email", "rol", "estado"]
+    },
     "Sede": {
       "title": "Sede / Recinto",
       "description": "Recinto físico donde se imparten los programas académicos.",
@@ -195,6 +212,7 @@
     "providers": ["password"]
   },
   "firestore": {
+    "/users/{userId}": { "schema": "UserProfile", "description": "Perfiles de usuario y roles." },
     "/escuelas/{escuelaId}": { "schema": "Escuela", "description": "Maestro de recintos." },
     "/provincias/{provinciaId}": { "schema": "Provincia", "description": "Catálogo de provincias." },
     "/academic_periods/{periodId}": { "schema": "AcademicPeriod", "description": "Ciclos lectivos globales." },
