@@ -63,14 +63,14 @@ export default function DashboardLayout({
               <div className="flex flex-col">
                 <span className="text-sm font-black font-headline tracking-tighter text-primary leading-none">SIGED - DIGEV</span>
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
-                  {role === 'super-admin' ? 'Super Admin' : 'Portal Administrativo'}
+                  {role === 'superadmin' ? 'Super Admin' : 'Portal Administrativo'}
                 </span>
               </div>
             </div>
           </SidebarHeader>
           <SidebarContent className="px-3 py-2">
             <SidebarMenu className="gap-1">
-              {role === 'super-admin' && superAdminMenu.map((item) => (
+              {role === 'superadmin' && superAdminMenu.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton asChild tooltip={item.label} isActive={pathname === item.href}>
                     <Link href={item.href}>
