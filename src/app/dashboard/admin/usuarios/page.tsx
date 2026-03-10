@@ -15,7 +15,8 @@ import {
   PowerOff, 
   Edit,
   Loader2,
-  UserPlus
+  UserPlus,
+  KeyRound
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -51,30 +52,47 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 
 // Firebase
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore, useCollection, useAuth as useFirebaseAuth } from '@/firebase';
 import { 
   collection, 
-  addDoc, 
+  setDoc, 
   updateDoc, 
   doc, 
   serverTimestamp, 
   query, 
   orderBy 
 } from 'firebase/firestore';
+import { 
+  createUserWithEmailAndPassword, 
+  sendPasswordResetEmail 
+} from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+
+// Configuración para instancia secundaria (necesaria para crear usuarios sin cerrar sesión)
+const firebaseConfig = {
+  projectId: "esac-manager",
+  appId: "1:1014997648612:web:0dc62d590a1cd3a9c598f1",
+  storageBucket: "esac-manager.firebasestorage.app",
+  apiKey: "AIzaSyBVnGTpbY85rmPSXD6bpQ1qXCAraQMRbUw",
+  authDomain: "esac-manager.firebaseapp.com",
+  messagingSenderId: "1014997648612"
+};
 
 const ROLES = [
   { value: 'superadmin', label: 'Super Admin' },
   { value: 'admin', label: 'Admin Escuela' },
   { value: 'admision', label: 'Admisiones' },
-  { value: 'profesor', label: 'Profesor' },
-  { value: 'estudiante', label: 'Estudiante' },
 ];
+
+const TEMP_PASSWORD = "Temp1234*";
 
 export default function GestionUsuariosPage() {
   const { toast } = useToast();
   const db = useFirestore();
+  const mainAuth = useFirebaseAuth();
   
   const usersQuery = useMemo(() => 
     db ? query(collection(db, "users"), orderBy("createdAt", "desc")) : null, 
@@ -90,16 +108,17 @@ export default function GestionUsuariosPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db) return;
+    if (!db || isSaving) return;
 
     const formData = new FormData(e.currentTarget);
     const role = formData.get('rol') as string;
     const escuelaId = formData.get('escuelaId') as string;
+    const email = formData.get('email') as string;
 
-    // Validación: Si no es superadmin, debe tener escuela
     if (role !== 'superadmin' && !escuelaId) {
       toast({ 
         variant: "destructive", 
@@ -109,45 +128,77 @@ export default function GestionUsuariosPage() {
       return;
     }
 
-    const payload = {
-      nombre: formData.get('nombre') as string,
-      apellido: formData.get('apellido') as string,
-      email: formData.get('email') as string,
-      telefono: formData.get('telefono') as string,
-      rol: role,
-      escuelaId: role === 'superadmin' ? null : escuelaId,
-      estado: editingUser ? editingUser.estado : "activo",
-      updatedAt: serverTimestamp(),
-    };
+    setIsSaving(true);
 
-    if (editingUser) {
-      updateDoc(doc(db, "users", editingUser.id), payload)
-        .then(() => {
-          toast({ title: "Usuario Actualizado", description: `${payload.nombre} ha sido modificado.` });
-          setIsModalOpen(false);
-          setEditingUser(null);
-        })
-        .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-          path: `users/${editingUser.id}`, 
-          operation: 'update', 
-          requestResourceData: payload 
-        })));
-    } else {
-      const createPayload = { ...payload, createdAt: serverTimestamp() };
-      // En una implementación real, aquí se llamaría a una Cloud Function para crear el Auth User
-      // o se usaría createUserWithEmailAndPassword (pero esto desloguearía al admin actual).
-      // Por propósitos de prototipo, gestionamos el perfil en Firestore.
-      addDoc(collection(db, "users"), createPayload)
-        .then(() => {
-          toast({ title: "Usuario Creado", description: `${payload.nombre} ha sido registrado.` });
-          setIsModalOpen(false);
-        })
-        .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ 
-          path: 'users', 
-          operation: 'create', 
-          requestResourceData: createPayload 
-        })));
+    try {
+      const payload = {
+        nombre: formData.get('nombre') as string,
+        apellido: formData.get('apellido') as string,
+        email: email,
+        telefono: formData.get('telefono') as string,
+        rol: role,
+        escuelaId: role === 'superadmin' ? null : escuelaId,
+        estado: editingUser ? editingUser.estado : "activo",
+        updatedAt: serverTimestamp(),
+      };
+
+      if (editingUser) {
+        await updateDoc(doc(db, "users", editingUser.id), payload);
+        toast({ title: "Usuario Actualizado", description: `${payload.nombre} ha sido modificado.` });
+      } else {
+        // 1. Crear en Firebase Auth usando instancia secundaria
+        const secondaryApp = initializeApp(firebaseConfig, 'Secondary');
+        const secondaryAuth = getAuth(secondaryApp);
+        
+        const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, TEMP_PASSWORD);
+        const uid = userCredential.user.uid;
+        
+        // 2. Guardar en Firestore usando el UID
+        await setDoc(doc(db, "users", uid), {
+          ...payload,
+          createdAt: serverTimestamp(),
+        });
+
+        // 3. Enviar correo de reset (para que establezcan su propia contraseña)
+        await sendPasswordResetEmail(secondaryAuth, email);
+        
+        await deleteApp(secondaryApp);
+
+        toast({ 
+          title: "Usuario Creado", 
+          description: `Se ha enviado un correo de bienvenida a ${email}. Contraseña temporal: ${TEMP_PASSWORD}` 
+        });
+      }
+      setIsModalOpen(false);
+      setEditingUser(null);
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === 'auth/email-already-in-use') {
+        toast({ variant: "destructive", title: "Error", description: "El correo electrónico ya está registrado." });
+      } else {
+        toast({ variant: "destructive", title: "Error", description: "Ocurrió un error al procesar la solicitud." });
+      }
+    } finally {
+      setIsSaving(false);
     }
+  };
+
+  const handleResetPassword = (email: string) => {
+    sendPasswordResetEmail(mainAuth, email)
+      .then(() => {
+        toast({ 
+          title: "Correo Enviado", 
+          description: `Se ha enviado un enlace de recuperación a ${email}.` 
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({ 
+          variant: "destructive", 
+          title: "Error", 
+          description: "No se pudo enviar el correo de recuperación." 
+        });
+      });
   };
 
   const toggleEstado = (user: any) => {
@@ -194,7 +245,7 @@ export default function GestionUsuariosPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black font-headline tracking-tighter">Gestión de Usuarios</h1>
-          <p className="text-muted-foreground font-medium">Administración centralizada de accesos, roles y asignaciones.</p>
+          <p className="text-muted-foreground font-medium">Administración de accesos administrativos y seguridad.</p>
         </div>
         <Dialog open={isModalOpen} onOpenChange={(open) => { 
           setIsModalOpen(open); 
@@ -223,7 +274,7 @@ export default function GestionUsuariosPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Correo Electrónico</Label>
-                  <Input id="email" name="email" type="email" defaultValue={editingUser?.email || ''} placeholder="juan@email.com" required />
+                  <Input id="email" name="email" type="email" defaultValue={editingUser?.email || ''} placeholder="juan@email.com" required disabled={!!editingUser} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="telefono">Teléfono</Label>
@@ -267,15 +318,12 @@ export default function GestionUsuariosPage() {
                       ))}
                     </SelectContent>
                   </Select>
-                  {selectedRole !== 'superadmin' && !editingUser?.escuelaId && (
-                    <p className="text-[10px] text-muted-foreground mt-1 italic">Requerido para roles de escuela.</p>
-                  )}
                 </div>
               </div>
               <DialogFooter className="pt-4">
                 <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
-                <Button type="submit" className="px-8">
-                  {editingUser ? 'Guardar Cambios' : 'Crear Cuenta'}
+                <Button type="submit" className="px-8" disabled={isSaving}>
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : (editingUser ? 'Guardar Cambios' : 'Crear Cuenta')}
                 </Button>
               </DialogFooter>
             </form>
@@ -367,8 +415,8 @@ export default function GestionUsuariosPage() {
                             {u.estado === 'activo' ? 'Desactivar Usuario' : 'Activar Usuario'}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="cursor-pointer text-primary font-bold">
-                            <ShieldCheck className="h-4 w-4 mr-2" /> Resetear Contraseña
+                          <DropdownMenuItem onClick={() => handleResetPassword(u.email)} className="cursor-pointer text-primary font-bold">
+                            <KeyRound className="h-4 w-4 mr-2" /> Resetear Contraseña
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

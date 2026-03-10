@@ -49,7 +49,7 @@
         "apellido": { "type": "string" },
         "email": { "type": "string", "format": "email" },
         "telefono": { "type": "string" },
-        "rol": { "type": "string", "enum": ["superadmin", "admin", "admision", "profesor", "estudiante"] },
+        "rol": { "type": "string", "enum": ["superadmin", "admin", "admision"] },
         "escuelaId": { "type": "string", "description": "ID de la escuela asignada (null para superadmin)" },
         "estado": { "type": "string", "enum": ["activo", "inactivo"] },
         "createdAt": { "type": "string", "format": "date-time" },
@@ -102,7 +102,7 @@
         "estado_civil": { "type": "string", "enum": ["Soltero", "Casado", "Divorciado", "Viudo"] },
         "cantidad_hijos": { "type": "integer" },
         "cv_url": { "type": "string", "description": "Enlace al CV (PDF) o Portafolio digital" },
-        "clave_acceso": { "type": "string" },
+        "clave_access": { "type": "string" },
         "estado": { "type": "string", "enum": ["Activo", "Inactivo"] },
         "createdAt": { "type": "string", "format": "date-time" },
         "updatedAt": { "type": "string", "format": "date-time" }
