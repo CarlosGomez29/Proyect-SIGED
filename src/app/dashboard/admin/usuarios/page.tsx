@@ -94,6 +94,7 @@ export default function GestionUsuariosPage() {
   const [editingUser, setEditingUser] = useState<any>(null);
   const [userToReset, setUserToReset] = useState<any>(null);
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [selectedEscuelaId, setSelectedEscuelaId] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveUser = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -101,10 +102,25 @@ export default function GestionUsuariosPage() {
     if (!db || isSaving) return;
 
     const formData = new FormData(e.currentTarget);
-    const username = (formData.get('username') as string).trim().toLowerCase();
-    const role = formData.get('rol') as string;
-    const escuelaId = formData.get('escuelaId') as string;
-    const password = formData.get('password') as string;
+    
+    // Manejo robusto de campos que pueden venir nulos si están deshabilitados
+    const usernameInput = formData.get('username') as string | null;
+    const username = (usernameInput || editingUser?.username || "").trim().toLowerCase();
+    
+    // Capturamos el rol y la escuela desde el estado o el formData
+    const role = (formData.get('rol') as string) || selectedRole;
+    const escuelaId = (formData.get('escuelaId') as string) || selectedEscuelaId;
+    const password = formData.get('password') as string | null;
+
+    if (!username) {
+      toast({ variant: "destructive", title: "Error", description: "Nombre de usuario requerido." });
+      return;
+    }
+
+    if (!role) {
+      toast({ variant: "destructive", title: "Error", description: "Debe seleccionar un rol." });
+      return;
+    }
 
     if (role !== 'superadmin' && !escuelaId) {
       toast({ variant: "destructive", title: "Error", description: "Asigne una escuela para este rol." });
@@ -135,6 +151,7 @@ export default function GestionUsuariosPage() {
       };
 
       if (!editingUser) {
+        if (!password) throw new Error("La contraseña es obligatoria para nuevos usuarios.");
         payload.passwordHash = await hashPassword(password);
         payload.createdAt = serverTimestamp();
         await addDoc(collection(db, "users"), payload);
@@ -146,6 +163,8 @@ export default function GestionUsuariosPage() {
 
       setIsModalOpen(false);
       setEditingUser(null);
+      setSelectedRole("");
+      setSelectedEscuelaId("");
     } catch (err: any) {
       toast({ variant: "destructive", title: "Error", description: err.message });
     } finally {
@@ -185,6 +204,7 @@ export default function GestionUsuariosPage() {
   const openEdit = (user: any) => {
     setEditingUser(user);
     setSelectedRole(user.rol);
+    setSelectedEscuelaId(user.escuelaId || "");
     setIsModalOpen(true);
   };
 
@@ -207,7 +227,14 @@ export default function GestionUsuariosPage() {
           <h1 className="text-3xl font-black font-headline tracking-tighter">Directorio de Usuarios</h1>
           <p className="text-muted-foreground font-medium">Control de acceso y seguridad administrativa basado en Firestore.</p>
         </div>
-        <Dialog open={isModalOpen} onOpenChange={(open) => { setIsModalOpen(open); if (!open) { setEditingUser(null); setSelectedRole(""); }}}>
+        <Dialog open={isModalOpen} onOpenChange={(open) => { 
+          setIsModalOpen(open); 
+          if (!open) { 
+            setEditingUser(null); 
+            setSelectedRole(""); 
+            setSelectedEscuelaId("");
+          }
+        }}>
           <DialogTrigger asChild>
             <Button className="font-bold uppercase tracking-widest text-[10px]">
               <UserPlus className="mr-2 h-4 w-4" /> Crear Nuevo Usuario
@@ -223,7 +250,14 @@ export default function GestionUsuariosPage() {
                   <Label>Nombre de Usuario (Login)</Label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">@</span>
-                    <Input name="username" className="pl-8" defaultValue={editingUser?.username || ''} placeholder="juan.perez" required disabled={!!editingUser} />
+                    <Input 
+                      name="username" 
+                      className="pl-8" 
+                      defaultValue={editingUser?.username || ''} 
+                      placeholder="juan.perez" 
+                      required 
+                      disabled={!!editingUser} 
+                    />
                   </div>
                 </div>
                 {!editingUser && (
@@ -240,14 +274,23 @@ export default function GestionUsuariosPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Rol del Sistema</Label>
-                  <Select name="rol" defaultValue={editingUser?.rol || ''} onValueChange={setSelectedRole} required>
-                    <SelectTrigger className="rounded-xl h-12"><SelectValue placeholder="Seleccionar rol..." /></SelectTrigger>
-                    <SelectContent>{ROLES.map((r) => (<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>))}</SelectContent>
+                  <Select name="rol" value={selectedRole} onValueChange={setSelectedRole} required>
+                    <SelectTrigger className="rounded-xl h-12">
+                      <SelectValue placeholder="Seleccionar rol..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLES.map((r) => (<SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>))}
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Escuela Asignada</Label>
-                  <Select name="escuelaId" defaultValue={editingUser?.escuelaId || ''} disabled={selectedRole === 'superadmin'}>
+                  <Select 
+                    name="escuelaId" 
+                    value={selectedEscuelaId} 
+                    onValueChange={setSelectedEscuelaId} 
+                    disabled={selectedRole === 'superadmin'}
+                  >
                     <SelectTrigger className="rounded-xl h-12">
                       <SelectValue placeholder={selectedRole === 'superadmin' ? "Acceso Institucional" : "Seleccionar recinto..."} />
                     </SelectTrigger>
