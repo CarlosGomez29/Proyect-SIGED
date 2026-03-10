@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from "next/link";
 import { useRouter, useParams } from 'next/navigation';
 import {
@@ -10,30 +10,32 @@ import {
   UserPlus,
   BookUser,
   GraduationCap,
-  Terminal,
-  User,
+  Mail,
   Lock,
-  ArrowLeft
+  ArrowLeft,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import Image from 'next/image';
 import images from "@/app/lib/placeholder-images";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
-const profileDetails: { [key: string]: { name: string; icon: React.ElementType; user: string; dashboard: string; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
-  'super-admin': { name: 'Super Admin', icon: ShieldCheck, user: 'superadmin', dashboard: '/dashboard/admin', accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
-  'administrador': { name: 'Administrador', icon: UserCog, user: 'admin', dashboard: '/dashboard-admin', accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador' },
-  'admision': { name: 'Admisiones', icon: UserPlus, user: 'admision', dashboard: '/dashboard/admision', accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones' },
-  'docente': { name: 'Docente', icon: BookUser, user: 'docente', dashboard: '/dashboard-docente', accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
-  'alumno': { name: 'Estudiante', icon: GraduationCap, user: 'alumno', dashboard: '/dashboard/alumno', accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante' },
+const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
+  'super-admin': { name: 'Super Admin', icon: ShieldCheck, accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
+  'administrador': { name: 'Administrador', icon: UserCog, accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador' },
+  'admision': { name: 'Admisiones', icon: UserPlus, accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones' },
+  'docente': { name: 'Docente', icon: BookUser, accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante' },
 };
 
-
 export default function RoleLoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const { role } = useParams() as { role: string };
@@ -57,18 +59,74 @@ export default function RoleLoginPage() {
     )
   }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    if (username === details.user) {
-      localStorage.setItem('userRole', role);
-      router.push(details.dashboard);
-    } else {
+    setIsSubmitting(true);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Consultar perfil en Firestore para validación de estado y redirección
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      
+      if (!userDoc.exists()) {
+        await auth.signOut();
+        throw new Error("No se encontró el perfil de usuario en el sistema.");
+      }
+
+      const userData = userDoc.data();
+
+      if (userData.estado !== 'activo') {
+        await auth.signOut();
+        throw new Error("Su cuenta se encuentra inactiva.");
+      }
+
       toast({
-          variant: "destructive",
-          title: "Error de Autenticación",
-          description: "Nombre de usuario o contraseña incorrectos.",
+        title: "Sesión Iniciada",
+        description: `Bienvenido, ${userData.nombre}.`,
       });
+
+      // Redirección según rol real de Firestore
+      switch (userData.rol) {
+        case 'superadmin':
+          router.push('/dashboard/admin');
+          break;
+        case 'admin':
+          router.push('/dashboard-admin');
+          break;
+        case 'admision':
+          router.push('/dashboard/admision');
+          break;
+        case 'docente':
+          router.push('/dashboard-docente');
+          break;
+        case 'alumno':
+          router.push('/dashboard-alumno');
+          break;
+        default:
+          router.push('/');
+      }
+
+    } catch (error: any) {
+      console.error(error);
+      let message = "Correo electrónico o contraseña incorrectos.";
+      
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        message = "Las credenciales ingresadas son inválidas.";
+      } else if (error.message) {
+        message = error.message;
+      }
+
+      toast({
+        variant: "destructive",
+        title: "Error de Autenticación",
+        description: message,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
@@ -100,53 +158,63 @@ export default function RoleLoginPage() {
                     <Icon className="h-12 w-12" />
                 </div>
                  <h1 className="text-2xl font-bold text-center">{details.welcomeMessage}</h1>
-                 <p className="text-muted-foreground text-center text-sm">Portal de {details.name}</p>
+                 <p className="text-muted-foreground text-center text-sm mb-8">Portal Institucional SIGED</p>
                  
-                <Alert className="mt-6 mb-4 bg-primary/20 border-primary/30 text-white">
-                    <Terminal className="h-4 w-4 !text-primary" />
-                    <AlertTitle className="font-semibold">Modo Desarrollo</AlertTitle>
-                    <AlertDescription className="text-xs">
-                    Usuario: <strong>{details.user}</strong> (sin contraseña)
-                    </AlertDescription>
-                </Alert>
-          
-                <form onSubmit={handleLogin} className="grid gap-4 w-full mt-4">
-                    <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                            id="username"
-                            type="text"
-                            placeholder="Nombre de usuario"
-                            required
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className="pl-10"
-                        />
+                <form onSubmit={handleLogin} className="grid gap-4 w-full">
+                    <div className="space-y-2">
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                id="email"
+                                type="email"
+                                placeholder="Correo institucional"
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus:border-primary"
+                                disabled={isSubmitting}
+                            />
+                        </div>
                     </div>
-                     <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                            id="password"
-                            type="password"
-                            placeholder="Contraseña"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="pl-10"
-                        />
+                     <div className="space-y-2">
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                id="password"
+                                type="password"
+                                placeholder="Contraseña"
+                                required
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus:border-primary"
+                                disabled={isSubmitting}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-end text-sm mt-2">
-                        <Link href="#" className="text-white hover:underline">
+                        <Link href="#" className="text-neutral-400 hover:text-white transition-colors">
                             ¿Olvidaste tu contraseña?
                         </Link>
                     </div>
 
-                    <Button type="submit" className="w-full mt-4 text-base py-6">
-                        Ingresar
+                    <Button 
+                      type="submit" 
+                      className="w-full mt-4 text-base py-6 font-bold uppercase tracking-widest"
+                      disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                          <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Procesando...</>
+                        ) : (
+                          "Ingresar al Sistema"
+                        )}
                     </Button>
                 </form>
             </div>
         </div>
+        <p className="mt-8 text-neutral-500 text-xs font-medium uppercase tracking-widest">
+          DIGEV — Sistema de Gestión Académica
+        </p>
       </div>
     </div>
   );

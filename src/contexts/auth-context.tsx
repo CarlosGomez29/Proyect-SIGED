@@ -2,31 +2,34 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
-type UserRole = 'super-admin' | 'administrador' | 'admision' | 'docente' | 'alumno' | null;
+type UserRole = 'superadmin' | 'admin' | 'admision' | 'docente' | 'alumno' | null;
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   role: UserRole;
-  handleLogout: () => void;
+  handleLogout: () => Promise<void>;
   impersonatedSchool: { id: string; nombre: string } | null;
   startImpersonation: (school: { id: string; nombre: string }) => void;
   stopImpersonation: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({ 
   user: null, 
   loading: true, 
   role: null, 
-  handleLogout: () => {},
+  handleLogout: async () => {},
   impersonatedSchool: null,
   startImpersonation: () => {},
-  stopImpersonation: () => {}
+  stopImpersonation: () => {},
+  refreshProfile: async () => {}
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -35,6 +38,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState<UserRole>(null);
   const [impersonatedSchool, setImpersonatedSchool] = useState<{ id: string; nombre: string } | null>(null);
   const router = useRouter();
+  const { toast } = useToast();
+
+  const fetchUserProfile = async (uid: string) => {
+    try {
+      const docRef = doc(db, 'users', uid);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        
+        // Validación de estado activo
+        if (data.estado !== 'activo') {
+          await signOut(auth);
+          toast({
+            variant: "destructive",
+            title: "Acceso denegado",
+            description: "Su cuenta se encuentra inactiva. Contacte al administrador.",
+          });
+          return null;
+        }
+        
+        return data.rol as UserRole;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return null;
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      const userRole = await fetchUserProfile(user.uid);
+      setRole(userRole);
+    }
+  };
 
   useEffect(() => {
     // Restore impersonation from local storage
@@ -47,21 +86,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
 
-    const devRole = localStorage.getItem('userRole') as UserRole;
-    if (devRole && process.env.NODE_ENV === 'development') {
-      setRole(devRole);
-      setLoading(false);
-      return; 
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUser(user);
-        const docRef = doc(db, 'users', user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setRole(docSnap.data().role as UserRole);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true);
+      if (firebaseUser) {
+        const userRole = await fetchUserProfile(firebaseUser.uid);
+        if (userRole) {
+          setUser(firebaseUser);
+          setRole(userRole);
         } else {
+          setUser(null);
           setRole(null);
         }
       } else {
@@ -74,10 +107,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('impersonatedSchool');
-    router.push('/');
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem('impersonatedSchool');
+      setImpersonatedSchool(null);
+      setUser(null);
+      setRole(null);
+      router.push('/');
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   const startImpersonation = (school: { id: string; nombre: string }) => {
@@ -100,7 +140,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       handleLogout, 
       impersonatedSchool, 
       startImpersonation, 
-      stopImpersonation 
+      stopImpersonation,
+      refreshProfile
     }}>
       {children}
     </AuthContext.Provider>
