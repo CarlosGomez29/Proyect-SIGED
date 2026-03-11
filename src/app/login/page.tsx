@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -11,10 +11,7 @@ import {
   UserPlus,
   BookUser,
   GraduationCap,
-  ArrowLeft,
-  Database,
-  Loader2,
-  CheckCircle2
+  ArrowLeft
 } from "lucide-react";
 import {
   Card,
@@ -25,9 +22,6 @@ import {
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import images from "@/app/lib/placeholder-images";
-import { useFirestore } from "@/firebase";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
-import { useToast } from "@/hooks/use-toast";
 
 const profiles = [
   {
@@ -92,47 +86,6 @@ const itemVariants = {
 };
 
 export default function ProfileSelectionPage() {
-  const db = useFirestore();
-  const { toast } = useToast();
-  const [isInitializing, setIsInitializing] = useState(false);
-
-  const handleInitializeAdmin = async () => {
-    if (!db) return;
-    setIsInitializing(true);
-    try {
-      const adminId = "superadmin_root"; // ID fijo para el root
-      const adminRef = doc(db, "users", adminId);
-      
-      // Hash SHA-256 de "123456"
-      const passwordHash = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92";
-
-      await setDoc(adminRef, {
-        username: "superadmin",
-        passwordHash: passwordHash,
-        nombre: "Super",
-        apellido: "Admin",
-        rol: "superadmin",
-        estado: "activo",
-        escuelaId: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      toast({
-        title: "Sistema Inicializado",
-        description: "Usuario 'superadmin' creado. Contraseña: 123456",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "No se pudo crear el usuario base."
-      });
-    } finally {
-      setIsInitializing(false);
-    }
-  };
-
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-background p-4 overflow-hidden">
       <Image
@@ -203,24 +156,6 @@ export default function ProfileSelectionPage() {
               </Link>
             </motion.div>
           ))}
-        </motion.div>
-
-        <motion.div 
-          className="mt-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleInitializeAdmin}
-            disabled={isInitializing}
-            className="bg-black/20 border-white/10 text-white/40 hover:text-white hover:bg-primary/20 transition-all text-[10px] font-bold uppercase tracking-widest h-8"
-          >
-            {isInitializing ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Database className="h-3 w-3 mr-2" />}
-            Inicializar Acceso SuperAdmin
-          </Button>
         </motion.div>
       </div>
     </div>
