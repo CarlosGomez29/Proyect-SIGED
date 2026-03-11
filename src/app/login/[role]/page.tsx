@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -72,7 +71,7 @@ export default function RoleLoginPage() {
     try {
       // 1. Buscar usuario por username
       const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "==", username.trim()), limit(1));
+      const q = query(usersRef, where("username", "==", username.trim().toLowerCase()), limit(1));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
@@ -88,15 +87,15 @@ export default function RoleLoginPage() {
         throw new Error("Contraseña incorrecta.");
       }
 
-      // 3. VALIDACIÓN DE ROL: Solo permitir acceso si el rol del usuario coincide con el panel
+      // 3. VALIDACIÓN DE ROL
       if (userData.rol !== details.dbRole) {
         throw new Error("Este usuario no tiene permisos para acceder a este panel.");
       }
 
-      // 4. Validar estado (excepto superadmin para evitar bloqueos accidentales de gestión)
-      const userStatus = (userData.estado || 'activo').toLowerCase();
-      if (userData.rol !== 'superadmin' && userStatus === 'inactivo') {
-        throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin.");
+      // 4. VALIDACIÓN DE ESTADO
+      const userStatus = (userData.estado || '').toLowerCase();
+      if (userStatus !== 'activo') {
+        throw new Error("Este usuario se encuentra desactivado. Contacte al administrador.");
       }
 
       // 5. Iniciar sesión manual en el contexto

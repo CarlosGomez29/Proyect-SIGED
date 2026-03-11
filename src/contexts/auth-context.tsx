@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
@@ -69,8 +68,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const docRef = doc(db, 'users', user.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        const data = docSnap.data() as AuthUser;
-        const updatedUser = { ...data, uid: docSnap.id };
+        const data = docSnap.data() as any;
+        const updatedUser = { 
+          ...data, 
+          uid: docSnap.id,
+          username: data.username,
+          nombre: data.nombre,
+          apellido: data.apellido,
+          rol: data.rol as UserRole,
+          escuelaId: data.escuelaId,
+          estado: data.estado
+        };
+        
+        if ((data.estado || '').toLowerCase() !== 'activo') {
+          handleLogout();
+          toast({ variant: "destructive", title: "Acceso denegado", description: "Este usuario se encuentra desactivado. Contacte al administrador." });
+          return;
+        }
+
         setUser(updatedUser);
         localStorage.setItem('siged_session', JSON.stringify(updatedUser));
       }
@@ -87,19 +102,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session) {
         try {
           const parsedSession = JSON.parse(session) as AuthUser;
-          // Validar estado actual en Firestore
+          // Validar estado actual en Firestore en cada recarga de sesión
           const docRef = doc(db, 'users', parsedSession.uid);
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
             const currentData = docSnap.data();
-            const estado = (currentData.estado || 'activo').toLowerCase();
+            const estado = (currentData.estado || '').toLowerCase();
             
-            if (currentData.rol !== 'superadmin' && estado === 'inactivo') {
+            if (estado !== 'activo') {
               handleLogout();
-              toast({ variant: "destructive", title: "Acceso denegado", description: "Cuenta inactiva." });
+              toast({ 
+                variant: "destructive", 
+                title: "Acceso denegado", 
+                description: "Este usuario se encuentra desactivado. Contacte al administrador." 
+              });
             } else {
-              setUser({ ...parsedSession, estado: currentData.estado, rol: currentData.rol as UserRole });
+              setUser({ 
+                ...parsedSession, 
+                estado: currentData.estado, 
+                rol: currentData.rol as UserRole,
+                nombre: currentData.nombre,
+                apellido: currentData.apellido,
+                escuelaId: currentData.escuelaId
+              });
             }
           } else {
             handleLogout();
