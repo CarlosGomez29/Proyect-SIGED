@@ -25,12 +25,12 @@ import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuth } from '@/contexts/auth-context';
 import { hashPassword } from '@/lib/hash';
 
-const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; } } = {
-  'super-admin': { name: 'Super Admin', icon: ShieldCheck, accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin' },
-  'administrador': { name: 'Administrador', icon: UserCog, accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador' },
-  'admision': { name: 'Admisiones', icon: UserPlus, accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones' },
-  'docente': { name: 'Docente', icon: BookUser, accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente' },
-  'alumno': { name: 'Estudiante', icon: GraduationCap, accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante' },
+const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; dbRole: string; } } = {
+  'super-admin': { name: 'Super Admin', icon: ShieldCheck, accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin', dbRole: 'superadmin' },
+  'administrador': { name: 'Administrador', icon: UserCog, accentColor: 'text-blue-500', shadowColor: 'shadow-blue-500/20', welcomeMessage: 'Bienvenido, Administrador', dbRole: 'admin' },
+  'admision': { name: 'Admisiones', icon: UserPlus, accentColor: 'text-green-500', shadowColor: 'shadow-green-500/20', welcomeMessage: 'Bienvenido a Admisiones', dbRole: 'admision' },
+  'docente': { name: 'Docente', icon: BookUser, accentColor: 'text-teal-500', shadowColor: 'shadow-teal-500/20', welcomeMessage: 'Bienvenido, Docente', dbRole: 'docente' },
+  'alumno': { name: 'Estudiante', icon: GraduationCap, accentColor: 'text-sky-500', shadowColor: 'shadow-sky-500/20', welcomeMessage: 'Bienvenido, Estudiante', dbRole: 'alumno' },
 };
 
 export default function RoleLoginPage() {
@@ -88,13 +88,18 @@ export default function RoleLoginPage() {
         throw new Error("Contraseña incorrecta.");
       }
 
-      // 3. Validar estado (excepto superadmin)
+      // 3. VALIDACIÓN DE ROL: Solo permitir acceso si el rol del usuario coincide con el panel
+      if (userData.rol !== details.dbRole) {
+        throw new Error("Este usuario no tiene permisos para acceder a este panel.");
+      }
+
+      // 4. Validar estado (excepto superadmin para evitar bloqueos accidentales de gestión)
       const userStatus = (userData.estado || 'activo').toLowerCase();
       if (userData.rol !== 'superadmin' && userStatus === 'inactivo') {
         throw new Error("Su cuenta se encuentra inactiva. Por favor, contacte al Super Admin.");
       }
 
-      // 4. Iniciar sesión manual en el contexto
+      // 5. Iniciar sesión manual en el contexto
       handleLoginSuccess({
         uid: userDoc.id,
         username: userData.username,
