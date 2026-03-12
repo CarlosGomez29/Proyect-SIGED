@@ -58,6 +58,34 @@
       },
       "required": ["username", "passwordHash", "nombre", "apellido", "rol", "estado"]
     },
+    "Modulo": {
+      "title": "Módulo / Materia",
+      "description": "Unidad curricular reutilizable.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nombre", "estado"]
+    },
+    "AccionFormativa": {
+      "title": "Acción Formativa",
+      "description": "Programa académico completo.",
+      "type": "object",
+      "properties": {
+        "codigo": { "type": "string" },
+        "nombre": { "type": "string" },
+        "descripcion": { "type": "string" },
+        "programaId": { "type": "string" },
+        "estado": { "type": "string", "enum": ["activo", "inactivo"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["codigo", "nombre", "programaId", "estado"]
+    },
     "Sede": {
       "title": "Sede / Recinto",
       "description": "Recinto físico donde se imparten los programas académicos.",
@@ -217,6 +245,9 @@
     "/escuelas/{escuelaId}": { "schema": "Escuela", "description": "Maestro de recintos." },
     "/provincias/{provinciaId}": { "schema": "Provincia", "description": "Catálogo de provincias." },
     "/academic_periods/{periodId}": { "schema": "AcademicPeriod", "description": "Ciclos lectivos globales." },
+    "/modulos/{moduloId}": { "schema": "Modulo", "description": "Maestro de módulos académicos." },
+    "/acciones_formativas/{accionId}": { "schema": "AccionFormativa", "description": "Programas académicos completos." },
+    "/acciones_formativas/{accionId}/modulos/{subModuloId}": { "schema": "AccionFormativaModulo", "description": "Módulos asignados a un programa." },
     "/sedes/{sedeId}": { "schema": "Sede", "description": "Maestro de recintos (legacy)." },
     "/cursos/{cursoId}": { "schema": "Curso", "description": "Maestro de programas." },
     "/docentes/{docenteId}": { "schema": "Docente", "description": "Docentes." },

@@ -12,6 +12,15 @@ service cloud.firestore {
     match /academic_periods/{periodId} {
       allow read, write: if true;
     }
+    match /modulos/{moduloId} {
+      allow read, write: if true;
+    }
+    match /acciones_formativas/{accionId} {
+      allow read, write: if true;
+      match /modulos/{subModuloId} {
+        allow read, write: if true;
+      }
+    }
     match /sedes/{sedeId} {
       allow read, write: if true;
     }
