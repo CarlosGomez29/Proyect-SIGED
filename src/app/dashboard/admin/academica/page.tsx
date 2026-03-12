@@ -188,6 +188,21 @@ export default function ConfiguracionAcademicaPage() {
     if (!db || !viewingAction) return;
     const formData = new FormData(e.currentTarget);
     const moduloId = formData.get('moduloId') as string;
+
+    // VALIDACIÓN: Evitar módulos duplicados en la misma acción formativa
+    const isDuplicate = subModulos.some(sm => 
+      sm.moduloId === moduloId && (!editingSubModulo || sm.id !== editingSubModulo.id)
+    );
+
+    if (isDuplicate) {
+      toast({ 
+        variant: "destructive", 
+        title: "Módulo Duplicado", 
+        description: "Este módulo ya está agregado a esta acción formativa." 
+      });
+      return;
+    }
+
     const moduloOriginal = modulos.find(m => m.id === moduloId);
     
     const hTeoricas = parseInt(formData.get('horasTeoricas') as string) || 0;
