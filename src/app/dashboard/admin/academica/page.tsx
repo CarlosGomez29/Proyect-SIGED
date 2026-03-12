@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -506,7 +505,6 @@ export default function ConfiguracionAcademicaPage() {
                 </DialogDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleExport('excel', 'malla')} className="font-bold uppercase tracking-widest text-[10px] h-8"><FileSpreadsheet className="mr-2 h-3.5 w-3.5" /> Excel</Button>
                 <Button onClick={() => setIsSubModuloModalOpen(true)} className="font-bold uppercase tracking-widest text-[10px] h-8"><PlusCircle className="mr-2 h-3.5 w-3.5" /> Agregar Módulo</Button>
               </div>
             </div>
