@@ -60,7 +60,8 @@ import {
   query, 
   orderBy,
   deleteDoc,
-  where
+  where,
+  getDocs
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -102,6 +103,31 @@ export default function ConfiguracionAcademicaPage() {
     return query(collection(db, `acciones_formativas/${viewingAction.id}/modulos`), orderBy("orden", "asc"));
   }, [db, viewingAction]);
   const { data: subModulos, loading: loadingSubModulos } = useCollection(subModulosQuery);
+
+  // --- Sincronización de Totales ---
+  const syncAccionTotals = async (accionId: string) => {
+    if (!db) return;
+    try {
+      const subColRef = collection(db, `acciones_formativas/${accionId}/modulos`);
+      const snapshot = await getDocs(subColRef);
+      
+      let totalModulos = snapshot.size;
+      let totalHoras = 0;
+      
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        totalHoras += (data.totalHoras || 0);
+      });
+
+      await updateDoc(doc(db, "acciones_formativas", accionId), {
+        totalModulos,
+        totalHoras,
+        updatedAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.error("Error sincronizando totales:", e);
+    }
+  };
 
   // --- Handlers Módulos (Catálogo) ---
   const handleSaveModulo = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -145,7 +171,12 @@ export default function ConfiguracionAcademicaPage() {
         .then(() => { toast({ title: "Acción Formativa Actualizada" }); setIsAccionModalOpen(false); setEditingAccion(null); })
         .catch(err => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `acciones_formativas/${editingAccion.id}`, operation: 'update', requestResourceData: payload })));
     } else {
-      addDoc(collection(db, "acciones_formativas"), { ...payload, createdAt: serverTimestamp() })
+      addDoc(collection(db, "acciones_formativas"), { 
+        ...payload, 
+        totalModulos: 0,
+        totalHoras: 0,
+        createdAt: serverTimestamp() 
+      })
         .then(() => { toast({ title: "Acción Formativa Creada" }); setIsAccionModalOpen(false); })
         .catch(err => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: 'acciones_formativas', operation: 'create', requestResourceData: payload })));
     }
@@ -176,30 +207,37 @@ export default function ConfiguracionAcademicaPage() {
 
     if (editingSubModulo) {
       updateDoc(doc(db, subColPath, editingSubModulo.id), payload)
-        .then(() => { toast({ title: "Módulo en malla actualizado" }); setIsSubModuloModalOpen(false); setEditingSubModulo(null); })
+        .then(async () => { 
+          await syncAccionTotals(viewingAction.id);
+          toast({ title: "Módulo en malla actualizado" }); 
+          setIsSubModuloModalOpen(false); 
+          setEditingSubModulo(null); 
+        })
         .catch(err => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `${subColPath}/${editingSubModulo.id}`, operation: 'update', requestResourceData: payload })));
     } else {
       addDoc(collection(db, subColPath), payload)
-        .then(() => { toast({ title: "Módulo añadido a la malla" }); setIsSubModuloModalOpen(false); })
+        .then(async () => { 
+          await syncAccionTotals(viewingAction.id);
+          toast({ title: "Módulo añadido a la malla" }); 
+          setIsSubModuloModalOpen(false); 
+        })
         .catch(err => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: subColPath, operation: 'create', requestResourceData: payload })));
     }
   };
 
-  const deleteSubModulo = (id: string) => {
+  const deleteSubModulo = async (id: string) => {
     if (!db || !viewingAction) return;
-    deleteDoc(doc(db, `acciones_formativas/${viewingAction.id}/modulos`, id))
-      .then(() => toast({ title: "Módulo removido de la malla", variant: "destructive" }));
+    try {
+      await deleteDoc(doc(db, `acciones_formativas/${viewingAction.id}/modulos`, id));
+      await syncAccionTotals(viewingAction.id);
+      toast({ title: "Módulo removido de la malla", variant: "destructive" });
+    } catch (e) {
+      toast({ title: "Error al eliminar", variant: "destructive" });
+    }
   };
 
   // --- Helpers ---
   const getProgramaNombre = (id: string) => programas.find(p => p.id === id)?.nombre || "N/A";
-
-  const totalHorasAccion = (accionId: string) => {
-    // Nota: Esto es ideal hacerlo con un contador denormalizado, pero para el MVP lo calcularemos
-    // Sin embargo, useCollection solo trae los datos si el usuario está viendo esa acción.
-    // Para el listado general, usaremos una aproximación o mostraremos 0 si no se ha cargado.
-    return 0; // Se implementaría con agregaciones de Firebase o Cloud Functions para producción
-  };
 
   // --- Export Logic ---
   const handleExport = async (format: 'excel' | 'pdf' | 'word', type: 'acciones' | 'malla') => {
@@ -438,7 +476,7 @@ export default function ConfiguracionAcademicaPage() {
                         </TableCell>
                         <TableCell className="py-6 text-center">
                           <Button variant="link" onClick={() => setViewingAction(a)} className="h-auto p-0 font-black text-primary underline decoration-primary/30">
-                            <Layers className="h-3 w-3 mr-1.5" /> Gestionar
+                            {a.totalModulos || 0} módulos
                           </Button>
                         </TableCell>
                         <TableCell className="py-6 text-center">
