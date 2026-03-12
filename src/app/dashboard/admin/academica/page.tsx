@@ -45,7 +45,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
@@ -310,7 +310,6 @@ export default function ConfiguracionAcademicaPage() {
           <TabsTrigger value="modulos" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold px-8">Maestro de Módulos</TabsTrigger>
         </TabsList>
 
-        {/* --- Pestaña Acciones Formativas --- */}
         <TabsContent value="acciones" className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div className="relative w-full max-w-sm group">
@@ -423,7 +422,6 @@ export default function ConfiguracionAcademicaPage() {
           </Card>
         </TabsContent>
 
-        {/* --- Pestaña Maestro de Módulos --- */}
         <TabsContent value="modulos" className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <div className="relative w-full max-w-sm group">
@@ -452,10 +450,10 @@ export default function ConfiguracionAcademicaPage() {
                   <DialogFooter className="pt-4">
                     <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
                     <Button type="submit">Guardar Registro</Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <Card className="border-border/50 shadow-xl overflow-hidden rounded-[1.5rem]">
@@ -497,7 +495,6 @@ export default function ConfiguracionAcademicaPage() {
         </TabsContent>
       </Tabs>
 
-      {/* --- MODAL DE GESTIÓN DE MALLA CURRICULAR --- */}
       <Dialog open={isMallaModalOpen} onOpenChange={(open) => { setIsMallaModalOpen(open); if (!open) setViewingAction(null); }}>
         <DialogContent className="sm:max-w-[900px] rounded-[1.5rem] p-0 overflow-hidden">
           <DialogHeader className="p-8 bg-muted/30 border-b">
@@ -561,7 +558,6 @@ export default function ConfiguracionAcademicaPage() {
         </DialogContent>
       </Dialog>
 
-      {/* --- DIALOG PARA AGREGAR / EDITAR SUB-MÓDULO --- */}
       <Dialog open={isSubModuloModalOpen} onOpenChange={(open) => { setIsSubModuloModalOpen(open); if (!open) setEditingSubModulo(null); }}>
         <DialogContent className="sm:max-w-[500px] rounded-2xl shadow-2xl">
           <DialogHeader>
