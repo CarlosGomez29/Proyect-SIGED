@@ -306,7 +306,7 @@ export default function ConfiguracionAcademicaPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="bg-muted/50 p-1 rounded-xl">
           <TabsTrigger value="acciones" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold px-8">Acciones Formativas</TabsTrigger>
-          <TabsTrigger value="modulos" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold px-8">Maestro de Módulos</TabsTrigger>
+          <TabsTrigger value="modulos" className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-white font-bold px-8">Módulos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="acciones" className="space-y-6">
