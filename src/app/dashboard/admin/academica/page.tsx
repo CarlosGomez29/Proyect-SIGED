@@ -19,7 +19,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Hash
+  Hash,
+  Trash2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,8 +67,6 @@ import {
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-const INSTITUTIONAL_LOGO_URL = "https://digev.mil.do/wp-content/uploads/2021/08/logo-digev.png";
-
 export default function ConfiguracionAcademicaPage() {
   const { toast } = useToast();
   const db = useFirestore();
@@ -84,7 +83,7 @@ export default function ConfiguracionAcademicaPage() {
 
   // --- Estado Local ---
   const [activeTab, setActiveTab] = useState("acciones");
-  const [viewingAction, setViewingAction] = useState<any>(null); // Cuando se entra a gestionar módulos de una acción
+  const [viewingAction, setViewingAction] = useState<any>(null); // Acción cuya malla se está gestionando
   const [searchTerm, setSearchTerm] = useState("");
   
   // Modals
@@ -94,6 +93,7 @@ export default function ConfiguracionAcademicaPage() {
   const [isModuloModalOpen, setIsModuloModalOpen] = useState(false);
   const [editingModulo, setEditingModulo] = useState<any>(null);
 
+  const [isMallaModalOpen, setIsMallaModalOpen] = useState(false);
   const [isSubModuloModalOpen, setIsSubModuloModalOpen] = useState(false);
   const [editingSubModulo, setEditingSubModulo] = useState<any>(null);
 
@@ -260,7 +260,7 @@ export default function ConfiguracionAcademicaPage() {
     
     const now = new Date().toLocaleDateString();
     const data = type === 'acciones' ? acciones : subModulos;
-    const fileName = type === 'acciones' ? `Acciones_Formativas_${now}` : `Malla_${viewingAction.nombre}_${now}`;
+    const fileName = type === 'acciones' ? `Acciones_Formativas_${now}` : `Malla_${viewingAction?.nombre}_${now}`;
 
     try {
       if (format === 'excel') {
@@ -273,7 +273,7 @@ export default function ConfiguracionAcademicaPage() {
         const { default: jsPDF } = await import('jspdf');
         const { default: autoTable } = await import('jspdf-autotable');
         const docPDF = new jsPDF();
-        docPDF.text(type === 'acciones' ? "Listado de Acciones Formativas" : `Malla Curricular: ${viewingAction.nombre}`, 14, 15);
+        docPDF.text(type === 'acciones' ? "Listado de Acciones Formativas" : `Malla Curricular: ${viewingAction?.nombre}`, 14, 15);
         autoTable(docPDF, {
           startY: 20,
           head: [type === 'acciones' ? ['Código', 'Nombre', 'Programa', 'Estado'] : ['Módulo', 'T', 'P', 'Total', 'Orden']],
@@ -290,104 +290,10 @@ export default function ConfiguracionAcademicaPage() {
     }
   };
 
-  // --- Render Malla View ---
-  if (viewingAction) {
-    return (
-      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => setViewingAction(null)} className="rounded-full">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-black font-headline tracking-tighter">Malla Curricular</h1>
-              <p className="text-muted-foreground font-medium">Gestionando módulos para: <span className="text-primary font-bold">{viewingAction.nombre}</span></p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => handleExport('pdf', 'malla')} className="font-bold uppercase tracking-widest text-[10px]"><FileText className="mr-2 h-4 w-4" /> PDF</Button>
-            <Button variant="outline" size="sm" onClick={() => handleExport('excel', 'malla')} className="font-bold uppercase tracking-widest text-[10px]"><FileSpreadsheet className="mr-2 h-4 w-4" /> Excel</Button>
-            <Dialog open={isSubModuloModalOpen} onOpenChange={(open) => { setIsSubModuloModalOpen(open); if (!open) setEditingSubModulo(null); }}>
-              <DialogTrigger asChild>
-                <Button className="font-bold uppercase tracking-widest text-[10px]"><PlusCircle className="mr-2 h-4 w-4" /> Agregar Módulo</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px] rounded-2xl">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-black">{editingSubModulo ? 'Editar Módulo en Malla' : 'Añadir Módulo a Programa'}</DialogTitle>
-                  <DialogDescription>Selecciona un módulo del catálogo y asigna sus horas.</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSaveSubModulo} className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label>Seleccionar Módulo *</Label>
-                    <Select name="moduloId" defaultValue={editingSubModulo?.moduloId || ''} required>
-                      <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Buscar materia..." /></SelectTrigger>
-                      <SelectContent>
-                        {modulos.filter(m => m.estado === 'activo').map(m => (
-                          <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label>Horas Teóricas</Label><Input name="horasTeoricas" type="number" defaultValue={editingSubModulo?.horasTeoricas || 0} min="0" /></div>
-                    <div className="space-y-2"><Label>Horas Prácticas</Label><Input name="horasPracticas" type="number" defaultValue={editingSubModulo?.horasPracticas || 0} min="0" /></div>
-                  </div>
-                  <div className="space-y-2"><Label>Orden Secuencial</Label><Input name="orden" type="number" defaultValue={editingSubModulo?.orden || subModulos.length + 1} required /></div>
-                  <DialogFooter className="pt-4">
-                    <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
-                    <Button type="submit">{editingSubModulo ? 'Actualizar' : 'Añadir a Malla'}</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
-        <Card className="border-border/50 shadow-xl overflow-hidden rounded-[1.5rem]">
-          <CardContent className="p-0">
-            {loadingSubModulos ? (
-              <div className="p-12 text-center animate-pulse"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>
-            ) : (
-              <Table>
-                <TableHeader className="bg-muted/30">
-                  <TableRow>
-                    <TableHead className="font-bold py-5 pl-8 text-[10px] uppercase tracking-widest opacity-60">NO</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Módulo / Materia</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">H. Teóricas</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">H. Prácticas</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60">Total Horas</TableHead>
-                    <TableHead className="font-bold py-5 text-[10px] uppercase tracking-widest opacity-60 text-center">Orden</TableHead>
-                    <TableHead className="text-right font-bold py-5 pr-8 text-[10px] uppercase tracking-widest opacity-60">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {subModulos.map((sm, index) => (
-                    <TableRow key={sm.id} className="hover:bg-muted/20 border-border/50">
-                      <TableCell className="py-6 pl-8 font-bold text-xs text-muted-foreground">{index + 1}</TableCell>
-                      <TableCell className="py-6"><span className="font-bold text-sm">{sm.nombreModulo}</span></TableCell>
-                      <TableCell className="py-6"><Badge variant="outline" className="font-mono text-[10px]">{sm.horasTeoricas} hrs</Badge></TableCell>
-                      <TableCell className="py-6"><Badge variant="outline" className="font-mono text-[10px]">{sm.horasPracticas} hrs</Badge></TableCell>
-                      <TableCell className="py-6"><Badge className="bg-primary/10 text-primary border-primary/20 font-bold">{sm.totalHoras} hrs</Badge></TableCell>
-                      <TableCell className="py-6 text-center"><Badge variant="secondary" className="rounded-md h-6 w-6 p-0 flex items-center justify-center mx-auto">{sm.orden}</Badge></TableCell>
-                      <TableCell className="py-6 pr-8 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => { setEditingSubModulo(sm); setIsSubModuloModalOpen(true); }} className="rounded-full h-8 w-8"><Edit className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => deleteSubModulo(sm.id)} className="rounded-full h-8 w-8 text-destructive hover:bg-destructive/10"><XCircle className="h-4 w-4" /></Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {subModulos.length === 0 && (
-                    <TableRow><TableCell colSpan={7} className="text-center py-12 text-muted-foreground italic font-medium">Esta acción formativa no tiene módulos asignados.</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
-    );
-  }
+  const handleOpenMalla = (accion: any) => {
+    setViewingAction(accion);
+    setIsMallaModalOpen(true);
+  };
 
   return (
     <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
@@ -490,7 +396,7 @@ export default function ConfiguracionAcademicaPage() {
                           <Badge variant="outline" className="font-bold text-[10px] px-3">{getProgramaNombre(a.programaId)}</Badge>
                         </TableCell>
                         <TableCell className="py-6 text-center">
-                          <Button variant="link" onClick={() => setViewingAction(a)} className="h-auto p-0 font-black text-primary underline decoration-primary/30">
+                          <Button variant="link" onClick={() => handleOpenMalla(a)} className="h-auto p-0 font-black text-primary underline decoration-primary/30">
                             {a.totalModulos || 0} módulos
                           </Button>
                         </TableCell>
@@ -590,6 +496,104 @@ export default function ConfiguracionAcademicaPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* --- MODAL DE GESTIÓN DE MALLA CURRICULAR --- */}
+      <Dialog open={isMallaModalOpen} onOpenChange={(open) => { setIsMallaModalOpen(open); if (!open) setViewingAction(null); }}>
+        <DialogContent className="sm:max-w-[900px] rounded-[1.5rem] p-0 overflow-hidden">
+          <DialogHeader className="p-8 bg-muted/30 border-b">
+            <div className="flex items-center justify-between w-full">
+              <div className="space-y-1">
+                <DialogTitle className="text-2xl font-black font-headline tracking-tighter">Malla Curricular</DialogTitle>
+                <DialogDescription className="font-medium">
+                  Gestionando módulos para: <span className="text-primary font-bold">{viewingAction?.nombre}</span>
+                </DialogDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => handleExport('pdf', 'malla')} className="font-bold uppercase tracking-widest text-[10px] h-8"><FileText className="mr-2 h-3.5 w-3.5" /> PDF</Button>
+                <Button variant="outline" size="sm" onClick={() => handleExport('excel', 'malla')} className="font-bold uppercase tracking-widest text-[10px] h-8"><FileSpreadsheet className="mr-2 h-3.5 w-3.5" /> Excel</Button>
+                <Button onClick={() => setIsSubModuloModalOpen(true)} className="font-bold uppercase tracking-widest text-[10px] h-8"><PlusCircle className="mr-2 h-3.5 w-3.5" /> Agregar Módulo</Button>
+              </div>
+            </div>
+          </DialogHeader>
+          
+          <div className="p-0 max-h-[60vh] overflow-y-auto">
+            {loadingSubModulos ? (
+              <div className="p-12 text-center animate-pulse"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>
+            ) : (
+              <Table>
+                <TableHeader className="bg-muted/10">
+                  <TableRow>
+                    <TableHead className="font-bold py-4 pl-8 text-[10px] uppercase tracking-widest opacity-60">NO</TableHead>
+                    <TableHead className="font-bold py-4 text-[10px] uppercase tracking-widest opacity-60">Módulo / Materia</TableHead>
+                    <TableHead className="font-bold py-4 text-[10px] uppercase tracking-widest opacity-60">H. Teóricas</TableHead>
+                    <TableHead className="font-bold py-4 text-[10px] uppercase tracking-widest opacity-60">H. Prácticas</TableHead>
+                    <TableHead className="font-bold py-4 text-[10px] uppercase tracking-widest opacity-60">Total Horas</TableHead>
+                    <TableHead className="font-bold py-4 text-[10px] uppercase tracking-widest opacity-60 text-center">Orden</TableHead>
+                    <TableHead className="text-right font-bold py-4 pr-8 text-[10px] uppercase tracking-widest opacity-60">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {subModulos.map((sm, index) => (
+                    <TableRow key={sm.id} className="hover:bg-muted/20 border-border/50">
+                      <TableCell className="py-4 pl-8 font-bold text-xs text-muted-foreground">{index + 1}</TableCell>
+                      <TableCell className="py-4"><span className="font-bold text-sm">{sm.nombreModulo}</span></TableCell>
+                      <TableCell className="py-4"><Badge variant="outline" className="font-mono text-[10px]">{sm.horasTeoricas} hrs</Badge></TableCell>
+                      <TableCell className="py-4"><Badge variant="outline" className="font-mono text-[10px]">{sm.horasPracticas} hrs</Badge></TableCell>
+                      <TableCell className="py-4"><Badge className="bg-primary/10 text-primary border-primary/20 font-bold">{sm.totalHoras} hrs</Badge></TableCell>
+                      <TableCell className="py-4 text-center"><Badge variant="secondary" className="rounded-md h-6 w-6 p-0 flex items-center justify-center mx-auto">{sm.orden}</Badge></TableCell>
+                      <TableCell className="py-4 pr-8 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" onClick={() => { setEditingSubModulo(sm); setIsSubModuloModalOpen(true); }} className="rounded-full h-8 w-8"><Edit className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => deleteSubModulo(sm.id)} className="rounded-full h-8 w-8 text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {subModulos.length === 0 && (
+                    <TableRow><TableCell colSpan={7} className="text-center py-12 text-muted-foreground italic font-medium">Esta acción formativa no tiene módulos asignados.</TableCell></TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+          <DialogFooter className="p-6 bg-muted/30 border-t">
+            <DialogClose asChild><Button variant="outline" className="font-bold uppercase tracking-widest text-[10px] px-8">Cerrar Gestión</Button></DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- DIALOG PARA AGREGAR / EDITAR SUB-MÓDULO --- */}
+      <Dialog open={isSubModuloModalOpen} onOpenChange={(open) => { setIsSubModuloModalOpen(open); if (!open) setEditingSubModulo(null); }}>
+        <DialogContent className="sm:max-w-[500px] rounded-2xl shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black">{editingSubModulo ? 'Editar Módulo en Malla' : 'Añadir Módulo a Programa'}</DialogTitle>
+            <DialogDescription>Selecciona un módulo del catálogo maestro y asigna su carga horaria.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSaveSubModulo} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Seleccionar Módulo *</Label>
+              <Select name="moduloId" defaultValue={editingSubModulo?.moduloId || ''} required>
+                <SelectTrigger className="h-12 rounded-xl"><SelectValue placeholder="Buscar materia..." /></SelectTrigger>
+                <SelectContent>
+                  {modulos.filter(m => m.estado === 'activo').map(m => (
+                    <SelectItem key={m.id} value={m.id}>{m.nombre}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2"><Label>Horas Teóricas</Label><Input name="horasTeoricas" type="number" defaultValue={editingSubModulo?.horasTeoricas || 0} min="0" /></div>
+              <div className="space-y-2"><Label>Horas Prácticas</Label><Input name="horasPracticas" type="number" defaultValue={editingSubModulo?.horasPracticas || 0} min="0" /></div>
+            </div>
+            <div className="space-y-2"><Label>Orden Secuencial</Label><Input name="orden" type="number" defaultValue={editingSubModulo?.orden || subModulos.length + 1} required /></div>
+            <DialogFooter className="pt-4">
+              <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
+              <Button type="submit">{editingSubModulo ? 'Actualizar Módulo' : 'Añadir a Malla'}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
     </motion.div>
   );
 }
