@@ -551,7 +551,7 @@ export default function ConfiguracionAcademicaPage() {
             )}
           </div>
           <DialogFooter className="p-6 bg-muted/30 border-t">
-            <DialogClose asChild><Button variant="outline" className="font-bold uppercase tracking-widest text-[10px] px-8">Cerrar Gestión</Button></DialogClose>
+            <DialogClose asChild><Button variant="outline" className="font-bold uppercase tracking-widest text-[10px] px-8">CERRAR</Button></DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
