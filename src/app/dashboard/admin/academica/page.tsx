@@ -45,7 +45,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/tabs";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
@@ -452,10 +452,10 @@ export default function ConfiguracionAcademicaPage() {
                   <DialogFooter className="pt-4">
                     <DialogClose asChild><Button variant="ghost">Cancelar</Button></DialogClose>
                     <Button type="submit">Guardar Registro</Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <Card className="border-border/50 shadow-xl overflow-hidden rounded-[1.5rem]">
@@ -509,7 +509,6 @@ export default function ConfiguracionAcademicaPage() {
                 </DialogDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleExport('pdf', 'malla')} className="font-bold uppercase tracking-widest text-[10px] h-8"><FileText className="mr-2 h-3.5 w-3.5" /> PDF</Button>
                 <Button variant="outline" size="sm" onClick={() => handleExport('excel', 'malla')} className="font-bold uppercase tracking-widest text-[10px] h-8"><FileSpreadsheet className="mr-2 h-3.5 w-3.5" /> Excel</Button>
                 <Button onClick={() => setIsSubModuloModalOpen(true)} className="font-bold uppercase tracking-widest text-[10px] h-8"><PlusCircle className="mr-2 h-3.5 w-3.5" /> Agregar Módulo</Button>
               </div>
