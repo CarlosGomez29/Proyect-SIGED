@@ -82,7 +82,7 @@ import { collection, updateDoc, doc, serverTimestamp, query, orderBy, runTransac
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
+const INSTITUTIONAL_LOGO_URL = "/img/logo-digev.jpg";
 
 const DIAS_SEMANA = [
   { id: "lun", label: "Lunes" },
@@ -285,7 +285,7 @@ export default function AperturaSeccionesPage() {
         const docWord = new Document({
           sections: [{
             children: [
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 } })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 }, type: "jpg" })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
@@ -300,7 +300,7 @@ export default function AperturaSeccionesPage() {
                     }))
                   }),
                   ...dataToExport.map(row => new TableRow({
-                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ text: String(v), size: 16 })] }))
+                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: String(v), size: 16 })] })] }))
                   }))
                 ]
               }),

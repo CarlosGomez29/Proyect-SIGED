@@ -89,7 +89,7 @@ import { collection, updateDoc, doc, query, orderBy } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
-const INSTITUTIONAL_LOGO_URL = "https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=k4LHuS2fyZk0hqMaMppmGA&_nc_ss=8&oh=00_AfwReuaU0s2hGLkzazE0TipD7oV3F_Kh__qive_uh_tnJQ&oe=69ACD868";
+const INSTITUTIONAL_LOGO_URL = "/img/logo-digev.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -271,7 +271,7 @@ export default function GestionSeccionesPanel() {
         const docWord = new Document({
           sections: [{
             children: [
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 } })] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ data: buffer, transformation: { width: 60, height: 60 }, type: "jpg" })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "REPÚBLICA DOMINICANA", bold: true, size: 28 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", size: 20 })] }),
               new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "“TODO POR LA PATRIA”", italics: true, size: 20 })], spacing: { after: 200 } }),
@@ -286,7 +286,7 @@ export default function GestionSeccionesPanel() {
                     }))
                   }),
                   ...dataToExport.map(row => new TableRow({
-                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ text: String(v), size: 16 })] }))
+                    children: Object.values(row).map(v => new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: String(v), size: 16 })] })] }))
                   }))
                 ]
               }),
@@ -483,7 +483,7 @@ export default function GestionSeccionesPanel() {
                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
                                <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
-                               <DropdownMenuItem onClick={() => setSelectedSeccion(seccion) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
+                               <DropdownMenuItem onClick={() => { setSelectedSeccion(seccion); setIsViewDialogOpen(true); }} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
                                <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
                                <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
                                <DropdownMenuSeparator className="opacity-50" />

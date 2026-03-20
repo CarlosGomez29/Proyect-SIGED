@@ -85,7 +85,7 @@ export default function DashboardLayout({
           <SidebarFooter className="p-4 border-t border-border/50">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild href="#" tooltip="Centro de Ayuda">
+                <SidebarMenuButton asChild tooltip="Centro de Ayuda">
                   <Link href="#">
                     <LifeBuoy />
                     <span>Ayuda</span>

@@ -42,6 +42,13 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -175,9 +182,9 @@ export default function AlumnosPage() {
                          <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="estado" className="text-right">Estado</Label>
                             <Select name="estado" defaultValue={editingAlumno?.estado || 'Activo'}>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="col-span-3 text-left justify-start">Seleccionar Estado</Button>
-                                </DropdownMenuTrigger>
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Seleccionar Estado" />
+                                </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="Activo">Activo</SelectItem>
                                     <SelectItem value="Inactivo">Inactivo</SelectItem>

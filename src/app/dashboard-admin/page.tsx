@@ -4,13 +4,13 @@
 import React, { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { 
-  Users, 
-  BookOpen, 
-  GraduationCap, 
-  ClipboardCheck, 
-  PlusCircle, 
-  UserPlus, 
+import {
+  Users,
+  BookOpen,
+  GraduationCap,
+  ClipboardCheck,
+  PlusCircle,
+  UserPlus,
   FileStack,
   ArrowRight,
   ShieldCheck,
@@ -40,7 +40,7 @@ const itemVariants = {
 
 export default function DashboardAdminPage() {
   const db = useFirestore();
-  
+
   // Queries para métricas reales
   const estudiantesQuery = useMemo(() => db ? collection(db, "estudiantes") : null, [db]);
   const docentesQuery = useMemo(() => db ? collection(db, "docentes") : null, [db]);
@@ -69,15 +69,15 @@ export default function DashboardAdminPage() {
   ];
 
   return (
-    <motion.div 
+    <motion.div
       className="space-y-10 pb-12"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
       <motion.section variants={itemVariants} className="relative h-[400px] w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/10">
-        <Image 
-          src={images.workshop_secondary.url} 
+        <Image
+          src={images.workshop_secondary.url}
           alt={images.workshop_secondary.alt}
           fill
           className="object-cover transition-transform duration-[2s] hover:scale-105"
@@ -151,8 +151,8 @@ export default function DashboardAdminPage() {
       {/* Sección Institucional */}
       <motion.section variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
         <Card className="relative overflow-hidden glass-card h-full min-h-[400px] border-none">
-          <Image 
-            src={images.vision_institutional.url} 
+          <Image
+            src={images.vision_institutional.url}
             alt={images.vision_institutional.alt}
             fill
             className="object-cover brightness-50"

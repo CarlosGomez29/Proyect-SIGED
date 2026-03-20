@@ -59,7 +59,7 @@ export default function DashboardHeader() {
             <Button variant="ghost" className="relative h-11 w-11 rounded-full p-0 overflow-hidden ring-offset-background transition-all hover:ring-2 hover:ring-primary/20">
               <Avatar className="h-10 w-10 border-2 border-muted/50">
                 <AvatarImage 
-                  src="https://scontent.fhex4-1.fna.fbcdn.net/v/t39.30808-6/464333115_966007555565670_4128720996564005167_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=EMvGNmceS2MQ7kNvwEsOLIQ&_nc_oc=Adn7yCmL1L0d_q_T3RmKPjlNzNjoymkuBFubAEUATP6uhRXx1xO45dP6A-fSHuRry6k&_nc_zt=23&_nc_ht=scontent.fhex4-1.fna&_nc_gid=35N8dRsWtTgy_9p_7yqYng&_nc_ss=8&oh=00_AfxRE-ecS-k6qO0l6hnbMY25NXpjbn4q3gKAjekZExqomQ&oe=69ACA028" 
+                  src="/img/logo-digev.jpg" 
                   alt="Admin" 
                 />
                 <AvatarFallback className="font-bold">AD</AvatarFallback>

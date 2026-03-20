@@ -644,7 +644,7 @@ export default function DocentesPage() {
                           <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-52 rounded-xl p-2 shadow-2xl">
                              <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Acciones de Perfil</DropdownMenuLabel>
-                             <DropdownMenuItem onClick={() => setSelectedDocente(d) || setIsViewDialogOpen(true)} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Expediente</DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => { setSelectedDocente(d); setIsViewDialogOpen(true); }} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Expediente</DropdownMenuItem>
                              <DropdownMenuItem onClick={() => openEdit(d)} className="cursor-pointer text-xs"><Edit className="h-4 w-4 mr-2" /> Editar Datos</DropdownMenuItem>
                              <DropdownMenuSeparator />
                              <DropdownMenuItem onClick={() => toggleStatus(d)} className="cursor-pointer text-xs">
