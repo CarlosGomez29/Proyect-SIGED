@@ -75,12 +75,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
 } from "@/components/ui/pagination";
 
 // Firebase imports
@@ -115,7 +115,7 @@ export default function GestionSeccionesPanel() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSeccion, setSelectedSeccion] = useState<any>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  
+
   const [visibleColumns, setVisibleColumns] = useState({
     codigoSeccion: true,
     periodo: true,
@@ -140,12 +140,12 @@ export default function GestionSeccionesPanel() {
       // Regla: No mostrar Finalizadas por defecto en el panel operativo principal
       if (filterConfig.estado !== "Finalizada" && s.estado === "Finalizada") return false;
 
-      const matchesSearch = 
+      const matchesSearch =
         s.codigoSeccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.curso?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.docente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         s.periodo?.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       const matchesEstado = filterConfig.estado === "Todos" || s.estado === filterConfig.estado;
       const matchesPrograma = filterConfig.programa === "Todos" || s.programa === filterConfig.programa;
 
@@ -165,7 +165,7 @@ export default function GestionSeccionesPanel() {
   }, [filteredSecciones]);
 
   const totalPages = Math.ceil(filteredSecciones.length / itemsPerPage);
-  
+
   const paginatedSecciones = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredSecciones.slice(start, start + itemsPerPage);
@@ -219,7 +219,7 @@ export default function GestionSeccionesPanel() {
     const exportHeaders = Object.keys(dataToExport[0] || {});
 
     toast({ title: "Generando reporte institucional", description: `Exportando ${totalRegistros} registros a ${format.toUpperCase()}...` });
-
+    //hola mundo
     try {
       if (format === 'excel') {
         const { utils, writeFile } = await import('xlsx');
@@ -245,7 +245,7 @@ export default function GestionSeccionesPanel() {
         const { default: autoTable } = await import('jspdf-autotable');
         const doc = new jsPDF('landscape');
         const centerX = doc.internal.pageSize.getWidth() / 2;
-        try { doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - 12.5, 10, 25, 25); } catch (e) {}
+        try { doc.addImage(INSTITUTIONAL_LOGO_URL, 'JPEG', centerX - 12.5, 10, 25, 25); } catch (e) { }
         doc.setFont("helvetica", "bold").setFontSize(14).text("REPÚBLICA DOMINICANA", centerX, 42, { align: "center" });
         doc.setFontSize(10).setFont("helvetica", "normal").text("Dirección General de las Escuelas Vocacionales de las FF. AA. y la P.N.", centerX, 48, { align: "center" });
         doc.text("SANTO DOMINGO, ESTE.", centerX, 53, { align: "center" });
@@ -372,11 +372,11 @@ export default function GestionSeccionesPanel() {
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 group w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input 
-            placeholder="Buscar por Código de Sección, Curso, Programa, Docente o Período..." 
-            className="pl-12 h-12 bg-card/50 border-border/50 text-sm rounded-xl" 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
+          <Input
+            placeholder="Buscar por Código de Sección, Curso, Programa, Docente o Período..."
+            className="pl-12 h-12 bg-card/50 border-border/50 text-sm rounded-xl"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex items-center gap-3">
@@ -387,7 +387,7 @@ export default function GestionSeccionesPanel() {
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl bg-card" align="end">
-               <div className="space-y-6">
+              <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h4 className="font-black text-xs uppercase tracking-widest text-primary">Configuración</h4>
                   <Settings2 className="h-4 w-4 text-muted-foreground" />
@@ -397,7 +397,7 @@ export default function GestionSeccionesPanel() {
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(visibleColumns).map(([key, isVisible]) => (
                       <div key={key} className="flex items-center space-x-2">
-                        <Checkbox id={`gest-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({...visibleColumns, [key]: !!checked})} />
+                        <Checkbox id={`gest-${key}`} checked={isVisible} onCheckedChange={(checked) => setVisibleColumns({ ...visibleColumns, [key]: !!checked })} />
                         <Label htmlFor={`gest-${key}`} className="text-[11px] font-medium capitalize">{key === 'codigoSeccion' ? 'Código de Sección' : key}</Label>
                       </div>
                     ))}
@@ -405,16 +405,16 @@ export default function GestionSeccionesPanel() {
                 </div>
                 <Separator className="opacity-50" />
                 <div className="space-y-3">
-                    <Label className="text-[10px] uppercase font-bold opacity-60">Estado de Sección</Label>
-                    <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({...filterConfig, estado: val})}>
-                        <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Todos" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Todos">Todos</SelectItem>
-                            <SelectItem value="Abierta">Abierta</SelectItem>
-                            <SelectItem value="Cerrada">Cerrada</SelectItem>
-                            <SelectItem value="Finalizada">Finalizada</SelectItem>
-                        </SelectContent>
-                    </Select>
+                  <Label className="text-[10px] uppercase font-bold opacity-60">Estado de Sección</Label>
+                  <Select value={filterConfig.estado} onValueChange={(val) => setFilterConfig({ ...filterConfig, estado: val })}>
+                    <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Todos" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todos">Todos</SelectItem>
+                      <SelectItem value="Abierta">Abierta</SelectItem>
+                      <SelectItem value="Cerrada">Cerrada</SelectItem>
+                      <SelectItem value="Finalizada">Finalizada</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </PopoverContent>
@@ -482,17 +482,17 @@ export default function GestionSeccionesPanel() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-full h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl p-2 shadow-2xl">
-                               <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
-                               <DropdownMenuItem onClick={() => { setSelectedSeccion(seccion); setIsViewDialogOpen(true); }} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
-                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
-                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
-                               <DropdownMenuSeparator className="opacity-50" />
-                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "toggle")} className="cursor-pointer text-xs">
-                                  {seccion.estado === "Abierta" ? <><Lock className="h-4 w-4 mr-2 text-destructive" /> Cerrar Sección</> : <><Unlock className="h-4 w-4 mr-2 text-success" /> Reabrir Sección</>}
-                               </DropdownMenuItem>
-                               <DropdownMenuItem onClick={() => handleAction(seccion.id, "finalizar")} className="cursor-pointer text-xs text-destructive">
-                                  <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Sección Académica
-                               </DropdownMenuItem>
+                              <DropdownMenuLabel className="text-[9px] font-bold uppercase opacity-50 px-2">Gestión Operativa</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => { setSelectedSeccion(seccion); setIsViewDialogOpen(true); }} className="cursor-pointer text-xs"><Eye className="h-4 w-4 mr-2" /> Ver Detalles Completos</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAction(seccion.id, "notas")} className="cursor-pointer text-xs"><GraduationCap className="h-4 w-4 mr-2" /> Registrar Notas</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAction(seccion.id, "asistencia")} className="cursor-pointer text-xs"><ClipboardCheck className="h-4 w-4 mr-2" /> Pasar Asistencia</DropdownMenuItem>
+                              <DropdownMenuSeparator className="opacity-50" />
+                              <DropdownMenuItem onClick={() => handleAction(seccion.id, "toggle")} className="cursor-pointer text-xs">
+                                {seccion.estado === "Abierta" ? <><Lock className="h-4 w-4 mr-2 text-destructive" /> Cerrar Sección</> : <><Unlock className="h-4 w-4 mr-2 text-success" /> Reabrir Sección</>}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleAction(seccion.id, "finalizar")} className="cursor-pointer text-xs text-destructive">
+                                <CheckCircle2 className="h-4 w-4 mr-2" /> Finalizar Sección Académica
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -517,11 +517,11 @@ export default function GestionSeccionesPanel() {
               </div>
             </div>
             <Pagination className="w-auto mx-0">
-                <PaginationContent>
-                    <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} /></PaginationItem>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (<PaginationItem key={page} className="hidden sm:block"><PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }} className="text-xs h-8 w-8">{page}</PaginationLink></PaginationItem>))}
-                    <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} /></PaginationItem>
-                </PaginationContent>
+              <PaginationContent>
+                <PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); if (currentPage > 1) setCurrentPage(currentPage - 1); }} /></PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (<PaginationItem key={page} className="hidden sm:block"><PaginationLink href="#" isActive={currentPage === page} onClick={(e) => { e.preventDefault(); setCurrentPage(page); }} className="text-xs h-8 w-8">{page}</PaginationLink></PaginationItem>))}
+                <PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); if (currentPage < totalPages) setCurrentPage(currentPage + 1); }} /></PaginationItem>
+              </PaginationContent>
             </Pagination>
           </div>
         </Card>
@@ -530,32 +530,32 @@ export default function GestionSeccionesPanel() {
       {/* Ver Detalles Expandido */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-[700px] rounded-[1.5rem]">
-           <DialogHeader><DialogTitle className="text-2xl font-black">Panel Operativo de Sección</DialogTitle></DialogHeader>
-           {selectedSeccion && (
-             <div className="grid grid-cols-2 gap-8 py-6">
-               <div className="space-y-4">
-                 <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información General</div>
-                 <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
-                    <div><Label className="text-[10px] opacity-60">CÓDIGO DE SECCIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.codigoSeccion}</p></div>
-                    <div><Label className="text-[10px] opacity-60">CURSO</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
-                    <div><Label className="text-[10px] opacity-60">DOCENTE</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
-                    <div><Label className="text-[10px] opacity-60">PERÍODO</Label><p className="text-sm font-bold">{selectedSeccion.periodo}</p></div>
-                 </div>
-               </div>
-               <div className="space-y-4">
-                 <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Control de Tiempos y Cupos</div>
-                 <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
-                    <div className="flex gap-4">
-                        <div className="flex-1"><Label className="text-[10px] opacity-60">INICIO</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaInicio}</p></div>
-                        <div className="flex-1"><Label className="text-[10px] opacity-60">FIN</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaFin}</p></div>
-                    </div>
-                    <div><Label className="text-[10px] opacity-60">HORARIO</Label><p className="text-xs font-bold">{selectedSeccion.horario}</p></div>
-                    <div><Label className="text-[10px] opacity-60">MÉTRICA DE OCUPACIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.inscritos || 0} / {selectedSeccion.capacidad || 40} ({calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%)</p></div>
-                 </div>
-               </div>
-             </div>
-           )}
-           <DialogFooter><DialogClose asChild><Button variant="outline">Cerrar Panel</Button></DialogClose></DialogFooter>
+          <DialogHeader><DialogTitle className="text-2xl font-black">Panel Operativo de Sección</DialogTitle></DialogHeader>
+          {selectedSeccion && (
+            <div className="grid grid-cols-2 gap-8 py-6">
+              <div className="space-y-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Información General</div>
+                <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
+                  <div><Label className="text-[10px] opacity-60">CÓDIGO DE SECCIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.codigoSeccion}</p></div>
+                  <div><Label className="text-[10px] opacity-60">CURSO</Label><p className="text-sm font-bold">{selectedSeccion.curso}</p></div>
+                  <div><Label className="text-[10px] opacity-60">DOCENTE</Label><p className="text-sm font-bold">{selectedSeccion.docente}</p></div>
+                  <div><Label className="text-[10px] opacity-60">PERÍODO</Label><p className="text-sm font-bold">{selectedSeccion.periodo}</p></div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-primary">Control de Tiempos y Cupos</div>
+                <div className="space-y-3 bg-muted/20 p-4 rounded-xl border border-border/50">
+                  <div className="flex gap-4">
+                    <div className="flex-1"><Label className="text-[10px] opacity-60">INICIO</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaInicio}</p></div>
+                    <div className="flex-1"><Label className="text-[10px] opacity-60">FIN</Label><p className="text-xs font-bold flex items-center gap-2"><Calendar className="h-3 w-3" />{selectedSeccion.fechaFin}</p></div>
+                  </div>
+                  <div><Label className="text-[10px] opacity-60">HORARIO</Label><p className="text-xs font-bold">{selectedSeccion.horario}</p></div>
+                  <div><Label className="text-[10px] opacity-60">MÉTRICA DE OCUPACIÓN</Label><p className="text-sm font-black text-primary">{selectedSeccion.inscritos || 0} / {selectedSeccion.capacidad || 40} ({calculateOcupacion(selectedSeccion.inscritos, selectedSeccion.capacidad)}%)</p></div>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter><DialogClose asChild><Button variant="outline">Cerrar Panel</Button></DialogClose></DialogFooter>
         </DialogContent>
       </Dialog>
     </motion.div>
