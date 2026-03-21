@@ -219,6 +219,7 @@ export default function GestionSeccionesPanel() {
     const exportHeaders = Object.keys(dataToExport[0] || {});
 
     toast({ title: "Generando reporte institucional", description: `Exportando ${totalRegistros} registros a ${format.toUpperCase()}...` });
+
     try {
       if (format === 'excel') {
         const { utils, writeFile } = await import('xlsx');
