@@ -39,28 +39,28 @@ import DashboardHeader from "@/components/dashboard-header";
 import { useAuth } from "@/contexts/auth-context";
 
 const academicOffering = [
-    { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
-    { href: "/dashboard-admin/cursos", label: "Gestión de Secciones", icon: Library },
-    { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
+  { href: "/dashboard-admin/secciones/apertura", label: "Apertura de Secciones", icon: PlusCircle },
+  { href: "/dashboard-admin/cursos", label: "Gestión de Secciones", icon: Library },
+  { href: "/dashboard-admin/docentes", label: "Docentes", icon: Users },
 ];
 
 const studentsModule = [
-    { href: "/dashboard-admin/alumnos", label: "Gestión de Estudiantes", icon: UsersRound },
-    { href: "/dashboard-admin/solicitudes", label: "Solicitudes de Ingreso", icon: UserPlus },
+  { href: "/dashboard-admin/alumnos", label: "Gestión de Estudiantes", icon: UsersRound },
+  { href: "/dashboard-admin/solicitudes", label: "Solicitudes de Ingreso", icon: UserPlus },
 ];
 
 const academicManagement = [
-    { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
-    { href: "/dashboard-admin/inscripciones-web", label: "Inscripciones Web", icon: Globe },
-    { href: "/dashboard-admin/inscripciones/liberar", label: "Liberar Inscripción", icon: UserMinus },
+  { href: "/dashboard-admin/inscripciones", label: "Inscripciones", icon: ClipboardList },
+  { href: "/dashboard-admin/inscripciones-web", label: "Inscripciones Web", icon: Globe },
+  { href: "/dashboard-admin/inscripciones/liberar", label: "Liberar Inscripción", icon: UserMinus },
 ];
 
 const reportsModule = [
-    { href: "/dashboard-admin/consultas", label: "Consultas", icon: Search },
-    { href: "/dashboard-admin/ocupacion", label: "Ocupación", icon: Activity },
-    { href: "/dashboard-admin/historicos", label: "Históricos", icon: History },
-    { href: "/dashboard-admin/graficas", label: "Gráficas", icon: BarChart3 },
-    { href: "/dashboard-admin/reportes", label: "Reportes Avanzados", icon: FileStack },
+  { href: "/dashboard-admin/consultas", label: "Consultas", icon: Search },
+  { href: "/dashboard-admin/ocupacion", label: "Ocupación", icon: Activity },
+  { href: "/dashboard-admin/historicos", label: "Históricos", icon: History },
+  { href: "/dashboard-admin/graficas", label: "Gráficas", icon: BarChart3 },
+  { href: "/dashboard-admin/reportes", label: "Reportes Avanzados", icon: FileStack },
 ];
 
 export default function DashboardAdminLayout({
@@ -97,20 +97,20 @@ export default function DashboardAdminLayout({
         <Sidebar className="border-r border-border/50 bg-background/80 backdrop-blur-xl">
           <SidebarHeader className="p-8 flex flex-col items-center justify-center text-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-primary/10 shadow-xl ring-2 ring-background">
-              <AvatarImage 
-                src="/img/logo-digev.jpg" 
-                alt="Admin Profile" 
+              <AvatarImage
+                src="/img/logo-digev.jpg"
+                alt="Admin Profile"
               />
               <AvatarFallback className="bg-primary/5 text-primary">AD</AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <p className="font-bold text-foreground text-sm tracking-tight">Administración de Escuela</p>
+              <p className="font-bold text-foreground text-sm tracking-tight">SIGED - DIGEV</p>
               <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-[9px] font-bold text-primary uppercase tracking-widest">
-                {impersonatedSchool ? impersonatedSchool.nombre : 'DIGEV - Institucional'}
+                {impersonatedSchool ? impersonatedSchool.nombre : 'Administrador de escuela'}
               </div>
             </div>
           </SidebarHeader>
-          
+
           <SidebarContent className="px-2 space-y-6">
             <div className="px-4">
               <p className="mb-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">Inicio</p>
@@ -171,10 +171,10 @@ export default function DashboardAdminLayout({
                   Modo Super Admin — Administrando: <span className="underline">{impersonatedSchool.nombre}</span>
                 </span>
               </div>
-              <Button 
-                onClick={stopImpersonation} 
-                variant="outline" 
-                size="sm" 
+              <Button
+                onClick={stopImpersonation}
+                variant="outline"
+                size="sm"
                 className="h-7 px-4 bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white text-[10px] font-black uppercase tracking-tighter"
               >
                 <ArrowLeftCircle className="h-3 w-3 mr-2" /> Salir de esta escuela
