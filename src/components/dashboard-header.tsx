@@ -33,7 +33,7 @@ export default function DashboardHeader() {
   
   return (
     <header className="flex h-20 items-center gap-4 border-b border-border/40 bg-background/60 backdrop-blur-xl px-6 lg:px-10 sticky top-0 z-30 transition-all duration-300">
-      <SidebarTrigger className="md:hidden" />
+      <SidebarTrigger className="md:hidden h-10 w-10 rounded-full border-2 border-muted/50 bg-background/50 hover:bg-muted/80 transition-all shadow-sm flex items-center justify-center" />
       
       <div className="w-full flex-1">
         <div className="relative max-w-sm hidden md:block">
@@ -47,7 +47,11 @@ export default function DashboardHeader() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:bg-muted/50 rounded-full transition-colors">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative h-10 w-10 text-muted-foreground hover:bg-muted/50 rounded-full border-2 border-muted/50 bg-background/50 transition-all shadow-sm"
+        >
           <Bell className="h-5 w-5" />
           <span className="absolute top-2.5 right-2.5 h-2 w-2 bg-primary rounded-full border-2 border-background animate-pulse"></span>
         </Button>
