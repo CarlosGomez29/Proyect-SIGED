@@ -9,6 +9,9 @@ import { FirebaseClientProvider } from '@/firebase';
 export const metadata: Metadata = {
   title: 'SIGED',
   description: 'Sistema Integral de Gestion de Estudiantes y Docentes',
+  icons: {
+    icon: '/icon.png',
+  },
 };
 
 export default function RootLayout({
