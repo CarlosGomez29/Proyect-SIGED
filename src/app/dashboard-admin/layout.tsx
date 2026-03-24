@@ -148,16 +148,8 @@ export default function DashboardAdminLayout({
           </SidebarContent>
 
           <SidebarFooter className="p-6 border-t border-border/50 bg-muted/5">
-            <div className="flex items-center justify-between">
-              <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                  <Avatar key={i} className="h-7 w-7 border-2 border-background shadow-sm">
-                    <AvatarImage src={`https://picsum.photos/seed/stu${i}/32/32`} />
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                ))}
-              </div>
-              <span className="text-[10px] font-semibold text-muted-foreground">+72 Activos</span>
+            <div className="flex items-center justify-center">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-40">SIGED v0.1.0</span>
             </div>
           </SidebarFooter>
         </Sidebar>
