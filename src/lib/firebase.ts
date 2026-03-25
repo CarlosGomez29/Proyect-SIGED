@@ -1,4 +1,4 @@
-"use client";
+// Firebase configuration for both client and server usage
 
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
@@ -19,5 +19,9 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+export function initializeFirebase() {
+  return { app, auth, db, storage };
+}
 
 export { app, auth, db, storage };

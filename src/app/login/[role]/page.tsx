@@ -19,10 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import Image from 'next/image';
 import images from "@/app/lib/placeholder-images";
-import { useFirestore } from '@/firebase';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { useAuth } from '@/contexts/auth-context';
-import { hashPassword } from '@/lib/hash';
 
 const profileDetails: { [key: string]: { name: string; icon: React.ElementType; accentColor: string; shadowColor: string; welcomeMessage: string; dbRole: string; } } = {
   'super-admin': { name: 'Super Admin', icon: ShieldCheck, accentColor: 'text-primary', shadowColor: 'shadow-primary/20', welcomeMessage: 'Bienvenido, Super Admin', dbRole: 'superadmin' },
@@ -40,7 +37,7 @@ export default function RoleLoginPage() {
   const { toast } = useToast();
   const { role } = useParams() as { role: string };
   
-  const db = useFirestore();
+  
   const { handleLoginSuccess } = useAuth();
 
   const details = profileDetails[role];
@@ -64,63 +61,43 @@ export default function RoleLoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSubmitting || !db) return;
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
 
     try {
-      // 1. Buscar usuario por username
-      const usersRef = collection(db, "users");
-      const q = query(usersRef, where("username", "==", username.trim().toLowerCase()), limit(1));
-      const querySnapshot = await getDocs(q);
-
-      if (querySnapshot.empty) {
-        throw new Error("Usuario no encontrado.");
-      }
-
-      const userDoc = querySnapshot.docs[0];
-      const userData = userDoc.data();
-
-      // 2. Verificar hash de contraseña
-      const inputHash = await hashPassword(password);
-      if (inputHash !== userData.passwordHash) {
-        throw new Error("Contraseña incorrecta.");
-      }
-
-      // 3. VALIDACIÓN DE ROL
-      if (userData.rol !== details.dbRole) {
-        throw new Error("Este usuario no tiene permisos para acceder a este panel.");
-      }
-
-      // 4. VALIDACIÓN DE ESTADO
-      const userStatus = (userData.estado || '').toLowerCase();
-      if (userStatus !== 'activo') {
-        throw new Error("Este usuario se encuentra desactivado. Contacte al administrador.");
-      }
-
-      // 5. Iniciar sesión manual en el contexto
-      handleLoginSuccess({
-        uid: userDoc.id,
-        username: userData.username,
-        nombre: userData.nombre,
-        apellido: userData.apellido,
-        rol: userData.rol,
-        escuelaId: userData.escuelaId,
-        estado: userData.estado
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          expectedRole: details.dbRole
+        })
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al iniciar sesión');
+      }
+
+      // 5. Iniciar sesión en el contexto (el servidor ya puso la cookie)
+      handleLoginSuccess(data.user);
 
       toast({
         title: "Sesión Iniciada",
-        description: `Bienvenido al sistema, ${userData.nombre}.`,
+        description: `Bienvenido al sistema, ${data.user.nombre}.`,
       });
 
       // Redirección por rol
-      switch (userData.rol) {
+      switch (data.user.rol) {
         case 'superadmin': router.push('/dashboard/admin'); break;
         case 'admin': router.push('/dashboard-admin'); break;
         case 'admision': router.push('/dashboard/admision'); break;
         case 'docente': router.push('/dashboard-docente'); break;
         case 'alumno': router.push('/dashboard-alumno'); break;
+        case 'instructor': router.push('/dashboard-admin'); break; // Ajustar según corresponda
         default: router.push('/');
       }
 

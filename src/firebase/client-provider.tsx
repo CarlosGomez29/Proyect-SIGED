@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { initializeFirebase } from './config';
+import { initializeFirebase } from '@/lib/firebase';
 import { FirebaseProvider } from './provider';
 
 export function FirebaseClientProvider({ children }: { children: React.ReactNode }) {

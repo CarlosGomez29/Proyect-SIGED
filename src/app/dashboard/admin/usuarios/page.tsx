@@ -3,7 +3,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { 
-  PlusCircle, 
   Search, 
   MoreHorizontal, 
   UserCircle, 
@@ -14,8 +13,7 @@ import {
   Edit,
   Loader2,
   UserPlus,
-  KeyRound,
-  UserCheck
+  KeyRound
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,19 +52,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirestore, useCollection } from '@/firebase';
 import { 
   collection, 
-  addDoc,
-  updateDoc, 
-  doc, 
-  serverTimestamp, 
   query, 
   orderBy,
-  where,
-  getDocs,
-  limit
+  where
 } from 'firebase/firestore';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
-import { hashPassword } from '@/lib/hash';
 
 const ROLES = [
   { value: 'superadmin', label: 'Super Admin' },
@@ -130,15 +119,6 @@ export default function GestionUsuariosPage() {
     setIsSaving(true);
 
     try {
-      // 1. Validar username único (si es nuevo)
-      if (!editingUser) {
-        const checkQuery = query(collection(db, "users"), where("username", "==", username), limit(1));
-        const checkSnap = await getDocs(checkQuery);
-        if (!checkSnap.empty) {
-          throw new Error("El nombre de usuario ya está en uso.");
-        }
-      }
-
       const payload: any = {
         username: username,
         nombre: formData.get('nombre') as string,
@@ -146,20 +126,27 @@ export default function GestionUsuariosPage() {
         telefono: formData.get('telefono') as string,
         rol: role,
         escuelaId: role === 'superadmin' ? null : escuelaId,
-        estado: editingUser ? editingUser.estado : "activo",
-        updatedAt: serverTimestamp(),
       };
 
-      if (!editingUser) {
-        if (!password) throw new Error("La contraseña es obligatoria para nuevos usuarios.");
-        payload.passwordHash = await hashPassword(password);
-        payload.createdAt = serverTimestamp();
-        await addDoc(collection(db, "users"), payload);
-        toast({ title: "Usuario Creado", description: `Acceso habilitado para @${username}.` });
+      if (editingUser) {
+        payload.id = editingUser.id;
       } else {
-        await updateDoc(doc(db, "users", editingUser.id), payload);
-        toast({ title: "Usuario Actualizado", description: "Los cambios han sido guardados." });
+        payload.password = password;
       }
+
+      const response = await fetch('/api/admin/users/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Error al guardar');
+
+      toast({ 
+        title: editingUser ? "Usuario Actualizado" : "Usuario Creado", 
+        description: editingUser ? "Los cambios han sido guardados." : `Acceso habilitado para @${username}.` 
+      });
 
       setIsModalOpen(false);
       setEditingUser(null);
@@ -174,31 +161,41 @@ export default function GestionUsuariosPage() {
 
   const handleManualResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!db || !userToReset) return;
+    if (!userToReset) return;
 
     const formData = new FormData(e.currentTarget);
     const newPassword = formData.get('newPassword') as string;
 
     try {
-      const hash = await hashPassword(newPassword);
-      await updateDoc(doc(db, "users", userToReset.id), {
-        passwordHash: hash,
-        updatedAt: serverTimestamp()
+      const response = await fetch('/api/admin/users/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: userToReset.id, newPassword })
       });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+
       toast({ title: "Contraseña Actualizada", description: `Nueva clave asignada para @${userToReset.username}.` });
       setIsResetModalOpen(false);
       setUserToReset(null);
-    } catch (e) {
-      toast({ variant: "destructive", title: "Error", description: "No se pudo actualizar la contraseña." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Error", description: err.message || "No se pudo actualizar la contraseña." });
     }
   };
-
-  const toggleEstado = (user: any) => {
-    if (!db) return;
+  const toggleEstado = async (user: any) => {
     const nuevoEstado = user.estado === 'activo' ? 'inactivo' : 'activo';
-    updateDoc(doc(db, "users", user.id), { estado: nuevoEstado, updatedAt: serverTimestamp() })
-      .then(() => toast({ title: "Estado Actualizado", description: `Usuario @${user.username} ahora está ${nuevoEstado}.` }))
-      .catch(async (err) => errorEmitter.emit('permission-error', new FirestorePermissionError({ path: `users/${user.id}`, operation: 'update' })));
+    try {
+      const response = await fetch('/api/admin/users/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: user.id, estado: nuevoEstado })
+      });
+      if (!response.ok) throw new Error('Error al actualizar estado');
+      toast({ title: "Estado Actualizado", description: `Usuario @${user.username} ahora está ${nuevoEstado}.` });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Error", description: "No se pudo cambiar el estado del usuario." });
+    }
   };
 
   const openEdit = (user: any) => {
